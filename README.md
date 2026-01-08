@@ -53,8 +53,9 @@ The following features are design goals and not necessarily implemented yet:
 ## Tooling
 
 - **Language:** C
-- **IDE:** STM32CubeIDE
+- **IDE:** STM32CubeMX, Visual Studio Code + STM32Cube
 - **PCB design:** EasyEDA
+- **Debugging:** ST-Link V2 (important!)
 
 ## Project status
 
