@@ -1,0 +1,8 @@
+src/build
+src/cmake
+src/CMakeLists.txt
+src/CMakePresets.json
+src/.settings/*
+src/.clangd
+src/.mxproject
+src/.vscode/*
