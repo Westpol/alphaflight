@@ -23,7 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "time-utils.h"
-#include "usbd_cdc.h"
+#include "sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -165,8 +165,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    IWDG->KR = 0xAAAA;
-    HAL_WWDG_Refresh(&hwwdg);
+    uint8_t buffer[512] = {0};
+    SD_READ_BLOCK(buffer, 99);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
