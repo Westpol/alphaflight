@@ -24,8 +24,10 @@ Alphaflight targets a custom-designed flight controller PCB, designed in EasyEDA
 ### External hardware
 - **GPS:** TBS M10Q
 - **RC link:** CRSF Nano RX Long Range (500 mW telemetry)
-- **Motor control:** DSHOT ESC (2 outputs)
-- **Actuators:** Standard PWM servos (4 outputs)
+- **Motor control:** DSHOT600 ESC (4 outputs)
+- **Actuators:** Standard PWM servos (8 outputs)
+- **LED Strips:** WS2812B (2 outputs)
+- **PDB:** [Mateksys FCHUB-W](https://www.mateksys.com/?portfolio=fchub-w)
 
 ## Current focus
 
