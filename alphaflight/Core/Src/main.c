@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
+#include "sd.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -81,7 +82,7 @@ static void MX_TIM23_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-__attribute__((section(".dma_rx"))) volatile uint8_t dma_buffer_rx[1024] = {0};
+
 /* USER CODE END 0 */
 
 /**
@@ -158,9 +159,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    for(int i = 0; i < 1023; i++){
-      dma_buffer_rx[i] += dma_buffer_rx[i + 1];
-    }
+    bump();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
