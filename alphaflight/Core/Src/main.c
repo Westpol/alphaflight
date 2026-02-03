@@ -18,9 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32h723xx.h"
 #include "usb_device.h"
-#include <stdint.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -1796,7 +1794,7 @@ void MPU_Config(void)
 
   /** Initializes and configures the Region and the memory to be protected
   */
-  LL_MPU_ConfigRegion(LL_MPU_REGION_NUMBER0, 0x00, 0x2400000, LL_MPU_REGION_SIZE_32KB|LL_MPU_TEX_LEVEL0|LL_MPU_REGION_NO_ACCESS|LL_MPU_INSTRUCTION_ACCESS_DISABLE|LL_MPU_ACCESS_SHAREABLE|LL_MPU_ACCESS_NOT_CACHEABLE|LL_MPU_ACCESS_NOT_BUFFERABLE);
+  LL_MPU_ConfigRegion(LL_MPU_REGION_NUMBER0, 0x00, 0x24000000, LL_MPU_REGION_SIZE_32KB|LL_MPU_TEX_LEVEL0|LL_MPU_REGION_FULL_ACCESS|LL_MPU_INSTRUCTION_ACCESS_DISABLE|LL_MPU_ACCESS_SHAREABLE|LL_MPU_ACCESS_NOT_CACHEABLE|LL_MPU_ACCESS_NOT_BUFFERABLE);
   /* Enables the MPU */
   LL_MPU_Enable(LL_MPU_CTRL_HFNMI_PRIVDEF);
 
