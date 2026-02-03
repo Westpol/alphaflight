@@ -18,7 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32h723xx.h"
 #include "usb_device.h"
+#include <stdint.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -81,7 +83,7 @@ static void MX_TIM23_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+__attribute__((section(".dma_rx"))) volatile uint8_t dma_buffer_rx[1024] = {0};
 /* USER CODE END 0 */
 
 /**
@@ -158,6 +160,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    for(int i = 0; i < 1023; i++){
+      dma_buffer_rx[i] += dma_buffer_rx[i + 1];
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -555,7 +560,7 @@ static void MX_SDMMC1_SD_Init(void)
   hsd1.Init.ClockPowerSave = SDMMC_CLOCK_POWER_SAVE_DISABLE;
   hsd1.Init.BusWide = SDMMC_BUS_WIDE_4B;
   hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
-  hsd1.Init.ClockDiv = 100;
+  hsd1.Init.ClockDiv = 10;
   if (HAL_SD_Init(&hsd1) != HAL_OK)
   {
     Error_Handler();
@@ -775,7 +780,7 @@ static void MX_TIM1_Init(void)
   /* USER CODE END TIM1_Init 1 */
   TIM_InitStruct.Prescaler = 0;
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-  TIM_InitStruct.Autoreload = 65535;
+  TIM_InitStruct.Autoreload = 200;
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   TIM_InitStruct.RepetitionCounter = 0;
   LL_TIM_Init(TIM1, &TIM_InitStruct);
@@ -1788,6 +1793,10 @@ void MPU_Config(void)
 
   /* Disables the MPU */
   LL_MPU_Disable();
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
+  LL_MPU_ConfigRegion(LL_MPU_REGION_NUMBER0, 0x00, 0x2400000, LL_MPU_REGION_SIZE_32KB|LL_MPU_TEX_LEVEL0|LL_MPU_REGION_NO_ACCESS|LL_MPU_INSTRUCTION_ACCESS_DISABLE|LL_MPU_ACCESS_SHAREABLE|LL_MPU_ACCESS_NOT_CACHEABLE|LL_MPU_ACCESS_NOT_BUFFERABLE);
   /* Enables the MPU */
   LL_MPU_Enable(LL_MPU_CTRL_HFNMI_PRIVDEF);
 

@@ -56,7 +56,9 @@ ENTRY(Reset_Handler)
 MEMORY
 {
 DTCMRAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 128K
-RAM_D1 (xrw)      : ORIGIN = 0x24000000, LENGTH = 320K
+RAM_DMA_PERI_TO_MEM (xrw)      : ORIGIN = 0x24000000, LENGTH = 16K
+RAM_DMA_MEM_TO_PERI (xrw)      : ORIGIN = 0x24004000, LENGTH = 16K
+RAM_D1 (xrw)      : ORIGIN = 0x24008000, LENGTH = 288K
 RAM_D2 (xrw)      : ORIGIN = 0x30000000, LENGTH = 32K
 RAM_D3 (xrw)      : ORIGIN = 0x38000000, LENGTH = 16K
 ITCMRAM (xrw)      : ORIGIN = 0x00000000, LENGTH = 64K
@@ -190,6 +192,25 @@ SECTIONS
   PROVIDE( __data_source = LOADADDR(.data) );
   PROVIDE( __data_source_end = __tdata_source_end );
   PROVIDE( __data_source_size = __data_source_end - __data_source );
+
+  /* DMA RX buffers */
+  .dma_rx (NOLOAD) :
+  {
+    . = ALIGN(32);
+    *(.dma_rx)
+    *(.dma_rx*)
+    . = ALIGN(32);
+  } >RAM_DMA_PERI_TO_MEM
+
+  /* DMA TX buffers */
+  .dma_tx (NOLOAD) :
+  {
+    . = ALIGN(32);
+    *(.dma_tx)
+    *(.dma_tx*)
+    . = ALIGN(32);
+  } >RAM_DMA_MEM_TO_PERI
+
   /* Uninitialized data section */
   .tbss (NOLOAD) : ALIGN(4)
   {
