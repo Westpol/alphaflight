@@ -12,7 +12,7 @@ __attribute__((section(".dma_rx"))) static uint8_t sd_dma_buffer_2[2048] = {0};
 
 static uint32_t generate_crc32_hw(uint8_t* buffer_pointer){      // buffer pointer MUST BE pointing at first byte of block
     CRC->CR = 1;    // reset crc engine
-    for(size_t i = 0; i < sd_usable_block_size_bytes / 4; i++){       // 127 comes from 508 byte block size divided by 4 bytes (32 bit words used for CRC engine)
+    for(size_t i = 0; i < sd_usable_block_size_bytes / 4; i++){       // sd_usable_block_size_bytes / 4 comes from 508 byte block size divided by 4 bytes (32 bit words used for CRC engine)
         uint32_t word;
         memcpy(&word, &buffer_pointer[i * 4], 4);
         CRC->DR = word;
