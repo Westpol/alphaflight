@@ -1,6 +1,6 @@
 CompileFlags:
   Add:
-    - '-T/home/benno/Documents/GitHub/alphaflight/alphaflight/STM32H723XG_FLASH.ld'
+    - ''
     - '-ferror-limit=0'
     - '-Wno-implicit-int'
     - '--target=arm-none-eabi'
