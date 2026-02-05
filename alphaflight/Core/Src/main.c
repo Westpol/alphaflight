@@ -18,11 +18,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32h723xx.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "sd.h"
+#include "gps.h"
+#include "timer.h"
+#include "scheduler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -151,15 +155,16 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM23_Init();
   /* USER CODE BEGIN 2 */
+  GPS_INIT(UART4, 20);
 
+  if(TIMER_INIT(TIM23, TIM24) != TIMER_OKAY) Error_Handler();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  if(TIMER_START() != TIMER_OKAY) Error_Handler();
   while (1)
   {
-    bump();
-    LL_USART_EnableIT_IDLE(UART4);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

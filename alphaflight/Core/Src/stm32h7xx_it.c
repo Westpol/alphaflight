@@ -22,6 +22,9 @@
 #include "stm32h7xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "gps.h"
+#include "stm32h723xx.h"
+#include "stm32h7xx_ll_usart.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -269,7 +272,10 @@ void SPI1_IRQHandler(void)
 void UART4_IRQHandler(void)
 {
   /* USER CODE BEGIN UART4_IRQn 0 */
-
+  if(LL_USART_IsActiveFlag_IDLE(UART4)){
+    LL_USART_ClearFlag_IDLE(UART4);
+    GPS_UART_IDLE_CALLBACK();
+  }
   /* USER CODE END UART4_IRQn 0 */
   /* USER CODE BEGIN UART4_IRQn 1 */
 

@@ -1,0 +1,14 @@
+
+
+
+#ifndef SCHEDULER_H_
+#define SCHEDULER_H_
+
+typedef enum{
+    SCHEDULER_OKAY,
+    SCHEDULER_FAIL,
+    SCHEDULER_TIMER_PROBLEM
+
+} SCHEDULER_RETURN_TYPE;
+
+#endif
