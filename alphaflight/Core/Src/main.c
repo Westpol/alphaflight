@@ -18,12 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32h7xx_ll_usart.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "sd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -159,7 +158,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    //bump();
+    bump();
     LL_USART_EnableIT_IDLE(UART4);
     /* USER CODE END WHILE */
 
@@ -1352,7 +1351,7 @@ static void MX_UART5_Init(void)
   /* USER CODE BEGIN UART5_Init 1 */
 
   /* USER CODE END UART5_Init 1 */
-  UART_InitStruct.BaudRate = 115200;
+  UART_InitStruct.BaudRate = 576000;
   UART_InitStruct.DataWidth = LL_USART_DATAWIDTH_8B;
   UART_InitStruct.StopBits = LL_USART_STOPBITS_1;
   UART_InitStruct.Parity = LL_USART_PARITY_NONE;
