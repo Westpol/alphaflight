@@ -48,6 +48,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "devices/Src/gps.c"
     "utils/Src/timer.c"
     "utils/Src/scheduler.c"
+    "utils/Src/utils.c"
     # Add user sources here
 )
 

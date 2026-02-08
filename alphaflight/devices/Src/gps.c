@@ -1,10 +1,9 @@
 #include "gps.h"
 #include "stm32h7xx_ll_usart.h"
-#include <stdint.h>
-#include <stdbool.h>
 #include "timer.h"
 
 #define recieve_to_parse_time_offset 1000       // in microseconds
+#define timing_filter_value 9
 
 static USART_TypeDef* gps_uart;
 
@@ -15,7 +14,7 @@ static volatile struct{
     uint32_t package_skipped;
 
     uint32_t average_package_delta;
-    uint32_t next_execution_timestamp;
+    uint32_t next_execution_delta;
 } gps_task_timing;
 
 uint8_t buffer_point;
@@ -53,7 +52,7 @@ GPS_RETURN_TYPE GPS_INIT(USART_TypeDef *uart, uint8_t update_rate){   // Assumes
 
 uint32_t GPS_PARSE_BUFFER(){
 
-    if(!gps_task_timing.new_package) return MICROS32() + 5000UL;      // try again in 5 ms
+    if(!gps_task_timing.new_package) return 2000UL;      // try again in 2 ms
 
     // TODO: add parsing logic
 
@@ -64,10 +63,10 @@ uint32_t GPS_PARSE_BUFFER(){
     uint32_t package_delta = gps_task_timing.package_recieved_timestamp - gps_task_timing.last_package_recieved_timestamp;
     gps_task_timing.last_package_recieved_timestamp = gps_task_timing.package_recieved_timestamp;       // set last timestamp to now for next delta calculation when new package has arrived
 
-    gps_task_timing.average_package_delta = (9 * gps_task_timing.average_package_delta + package_delta) / 10;      // simple lowpass filter to avoid jittering
-    gps_task_timing.next_execution_timestamp = gps_task_timing.package_recieved_timestamp + gps_task_timing.average_package_delta + recieve_to_parse_time_offset;
+    gps_task_timing.average_package_delta = (timing_filter_value * gps_task_timing.average_package_delta + package_delta) / (timing_filter_value + 1);      // simple lowpass filter to avoid jittering
+    gps_task_timing.next_execution_delta = gps_task_timing.package_recieved_timestamp + gps_task_timing.average_package_delta + recieve_to_parse_time_offset;
 
-    return gps_task_timing.next_execution_timestamp;
+    return gps_task_timing.next_execution_delta;
 }
 
 GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK(){
