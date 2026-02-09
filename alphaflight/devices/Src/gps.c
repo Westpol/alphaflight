@@ -1,6 +1,7 @@
 #include "gps.h"
 #include "stm32h7xx_ll_usart.h"
 #include "timer.h"
+#include <stdint.h>
 
 #define recieve_to_parse_time_offset 1000       // in microseconds
 #define timing_filter_value 9
@@ -18,6 +19,49 @@ static volatile struct{
 } gps_task_timing;
 
 uint8_t buffer_point;
+
+typedef struct __attribute__((packed)){
+    uint32_t iTOW;
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t min;
+    uint8_t sec;
+    uint8_t valid;
+    uint32_t tAcc;
+    int32_t nano;
+    uint8_t fixType;
+    uint8_t flags;
+    uint8_t flags2;
+    uint8_t numSV;
+    int32_t lon;    // 1e-7 deg
+    int32_t lat;    // 1e-7 deg
+    int32_t height; // mm
+    int32_t hMSL;   // mm
+    uint32_t hAcc;  // mm
+    uint32_t vAcc;  // mm
+    int32_t velN;   // mm/s
+    int32_t velE;   // mm/s
+    int32_t velD;   // mm/s
+    int32_t gSpeed; // mm/s
+    int32_t headMot; // 1e-5 deg
+    uint32_t sAcc;  // mm/s
+    uint32_t headAcc; // 1e-5 deg
+    uint16_t pDOP;  // 0.01
+    uint16_t flags3;
+    uint8_t reserved[4];
+    int32_t headVeh; // 1e-5 deg
+    int16_t magDec; // 1e-2 deg
+    uint32_t magAcc; // 1e-2 deg
+} gps_nav_pvt_t;
+
+static struct{
+    uint16_t preamble;
+    uint8_t class;
+    uint8_t id;
+    gps_nav_pvt_t data;
+} gps_nav_pvt = {0x625b, 0x01, 0x07, {0}};
 
 __attribute__((section(".dma_rx"))) static uint8_t dma_buffer[255] = {0};
 
