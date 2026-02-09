@@ -13,5 +13,6 @@ typedef enum{
 
 GPS_RETURN_TYPE GPS_INIT(USART_TypeDef* gps_uart, uint8_t update_rate);
 GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK();
+bool GPS_UART_NEW_DATA_FLAG();
 
 #endif

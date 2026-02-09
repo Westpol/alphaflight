@@ -20,6 +20,8 @@ static volatile struct{
 
 uint8_t buffer_point;
 
+static bool new_uart_data_arrived = false;
+
 typedef struct __attribute__((packed)){
     uint32_t iTOW;
     uint16_t year;
@@ -113,18 +115,13 @@ uint32_t GPS_PARSE_BUFFER(){
     return gps_task_timing.next_execution_delta;
 }
 
+// TODO: code state machine and feed it new UART data when UART_IDLE interrupt fires (scheduler task running at 500Hz checking flags and calling functions so that interrupts are kept tight)
+
 GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK(){
-    uint32_t now = MICROS32();
-
-    if(now - gps_task_timing.package_recieved_timestamp < 10000UL){     // do not count as package loss if less than 10ms has passed since last callback (accidental idle in the middle of a message probably)
-        gps_task_timing.package_recieved_timestamp = now;
-        gps_task_timing.new_package = true;
-        return GPS_CALLBACK_OKAY;
-    }
-
-    gps_task_timing.package_recieved_timestamp = now;        // timestamp new package
-    if(gps_task_timing.new_package) gps_task_timing.package_skipped++;      // check if last package was parsed
-    gps_task_timing.new_package = true;     // mark arrival of new package
-
+    new_uart_data_arrived = true;
     return GPS_CALLBACK_OKAY;
+}
+
+bool GPS_UART_NEW_DATA_FLAG(){
+    return new_uart_data_arrived;
 }
