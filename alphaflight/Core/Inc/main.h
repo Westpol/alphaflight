@@ -77,14 +77,17 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BARO_EXTI_Pin LL_GPIO_PIN_3
 #define BARO_EXTI_GPIO_Port GPIOE
+#define BARO_EXTI_EXTI_IRQn EXTI3_IRQn
 #define BARO_CS_Pin LL_GPIO_PIN_4
 #define BARO_CS_GPIO_Port GPIOE
 #define MAGNETO_CS_Pin LL_GPIO_PIN_13
 #define MAGNETO_CS_GPIO_Port GPIOC
 #define MAGNETO_EXTI_Pin LL_GPIO_PIN_0
 #define MAGNETO_EXTI_GPIO_Port GPIOC
+#define MAGNETO_EXTI_EXTI_IRQn EXTI0_IRQn
 #define IMU_EXTI_2_Pin LL_GPIO_PIN_4
 #define IMU_EXTI_2_GPIO_Port GPIOA
+#define IMU_EXTI_2_EXTI_IRQn EXTI4_IRQn
 #define IMU_CS_Pin LL_GPIO_PIN_4
 #define IMU_CS_GPIO_Port GPIOC
 #define V_SENSE_Pin LL_GPIO_PIN_5
@@ -93,6 +96,7 @@ void Error_Handler(void);
 #define CUR_SENSE_GPIO_Port GPIOB
 #define IMU_EXTI_1_Pin LL_GPIO_PIN_2
 #define IMU_EXTI_1_GPIO_Port GPIOB
+#define IMU_EXTI_1_EXTI_IRQn EXTI2_IRQn
 #define SD_CARD_DETECT_Pin LL_GPIO_PIN_12
 #define SD_CARD_DETECT_GPIO_Port GPIOD
 #define RGB_B_Pin LL_GPIO_PIN_13

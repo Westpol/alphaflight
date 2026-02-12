@@ -18,11 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32h723xx.h"
-#include "stm32h7xx_hal.h"
-#include "stm32h7xx_hal_sd.h"
-#include "stm32h7xx_ll_gpio.h"
-#include "stm32h7xx_ll_spi.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -178,10 +173,6 @@ int main(void)
   HAL_Delay(100);
   while (1)
   {
-    uint8_t tx_buff_imu[2] = {0x8F, 0x00};
-    uint8_t rx_buff_imu[2] = {0x00, 0x00};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, tx_buff_imu, rx_buff_imu, 2);
-    HAL_Delay(1000);
     uint8_t tx_buff_baro[3] = {0x80, 0x00, 0x00};
     uint8_t rx_buff_baro[3] = {0x00, 0x00, 0x00};
     SPI_TRANSFER_FIFO(SPI_DEVICE_BARO, tx_buff_baro, rx_buff_baro, 3);
@@ -1856,6 +1847,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(SD_CARD_DETECT_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  NVIC_SetPriority(EXTI0_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),13, 0));
+  NVIC_EnableIRQ(EXTI0_IRQn);
+  NVIC_SetPriority(EXTI2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),5, 0));
+  NVIC_EnableIRQ(EXTI2_IRQn);
+  NVIC_SetPriority(EXTI3_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),14, 0));
+  NVIC_EnableIRQ(EXTI3_IRQn);
+  NVIC_SetPriority(EXTI4_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),6, 0));
+  NVIC_EnableIRQ(EXTI4_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

@@ -9,6 +9,7 @@ static struct{
     SPI_TypeDef* spi_peripheral;
     GPIO_TypeDef* cs_port;
     uint32_t cs_pin;
+    bool configured;
 } spi_device[num_devices];
 
 SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_TypeDef* SPIx, GPIO_TypeDef* cs_port, uint32_t cs_pin){
@@ -17,11 +18,13 @@ SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_TypeDef* SPIx, GPIO_TypeDef* cs_
     spi_device[device].cs_pin = cs_pin;
     LL_SPI_Enable(SPIx);
     LL_GPIO_SetOutputPin(cs_port, cs_pin);
+    spi_device[device].configured = true;
     return SPI_OKAY;
 }
 
 SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len){
     if(len > 16) return SPI_TOO_MUCH_DATA;
+    if(!spi_device[device].configured) return SPI_NOT_INITIALIZED;
 
     SPI_TypeDef* spi_peripheral = spi_device[device].spi_peripheral;
 

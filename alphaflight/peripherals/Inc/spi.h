@@ -8,7 +8,8 @@
 typedef enum{
     SPI_OKAY,
     SPI_FAIL,
-    SPI_TOO_MUCH_DATA
+    SPI_TOO_MUCH_DATA,
+    SPI_NOT_INITIALIZED
 } SPI_RETURN_TYPE;
 
 typedef enum{
