@@ -60,3 +60,7 @@ SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* 
 
     return SPI_OKAY;
 }
+
+SPI_TypeDef* SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE device){
+    return spi_device[device].spi_peripheral;
+}

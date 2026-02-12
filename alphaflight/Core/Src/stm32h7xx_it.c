@@ -25,6 +25,7 @@
 #include "gps.h"
 #include "stm32h723xx.h"
 #include "stm32h7xx_ll_usart.h"
+#include "lsm6dso.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -224,7 +225,7 @@ void EXTI0_IRQHandler(void)
 /**
   * @brief This function handles EXTI line2 interrupt.
   */
-void EXTI2_IRQHandler(void)
+void EXTI2_IRQHandler(void)   // IMU EXTI1 (DRDY)
 {
   /* USER CODE BEGIN EXTI2_IRQn 0 */
 
@@ -233,7 +234,7 @@ void EXTI2_IRQHandler(void)
   {
     LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
     /* USER CODE BEGIN LL_EXTI_LINE_2 */
-
+    IMU_DATA_READY_INTERRUPT_HANDLER();
     /* USER CODE END LL_EXTI_LINE_2 */
   }
   /* USER CODE BEGIN EXTI2_IRQn 1 */
@@ -368,7 +369,7 @@ void UART4_IRQHandler(void)
 void DMA2_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
-
+  IMU_DMA_FINISHED_INTERRUPT_HANDLER();
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
 

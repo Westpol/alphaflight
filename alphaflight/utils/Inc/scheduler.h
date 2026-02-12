@@ -47,4 +47,7 @@ typedef struct{
     task_func_t func;
 } task_t;
 
+int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, char* task_name);
+void SCHEDULER_LOOP(void);
+
 #endif

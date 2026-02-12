@@ -10,7 +10,7 @@ static struct{
 } scheduler = {0};
 
 
-void SCHEDULER_LOOP(){
+void SCHEDULER_LOOP(void){
     uint32_t now = MICROS32();
 
     for(uint8_t i = 0; i < scheduler.num_registered_tasks; i++){

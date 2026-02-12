@@ -22,13 +22,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "common.h"
 #include "sd.h"
 #include "gps.h"
+#include "lsm6dso.h"
 #include "timer.h"
 #include "scheduler.h"
 #include "spi.h"
 #include "usbd_cdc.h"
-#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -165,12 +166,14 @@ int main(void)
   GPS_INIT(UART4, 20);
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
+
+  SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 150, true, 100, 300, "Gyro Read");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   if(TIMER_START() != TIMER_OKAY) Error_Handler();
-  HAL_Delay(100);
   while (1)
   {
     uint8_t tx_buff_baro[3] = {0x80, 0x00, 0x00};
