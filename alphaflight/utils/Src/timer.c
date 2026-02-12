@@ -23,8 +23,8 @@ TIMER_RETURN_TYPE TIMER_START(){
 
     if(millis_timer->CR1 & TIMER_CEN_MASK || micros_timer->CR1 & TIMER_CEN_MASK) return TIMER_START_ALREADY_STARTED;
 
-    millis_timer->CR1 |= TIMER_CEN_MASK;     // activate timers, change nothing else
-    micros_timer->CR1 |= TIMER_CEN_MASK;
+    millis_timer->CR1 |= 0x01 & TIMER_CEN_MASK;     // activate timers, change nothing else
+    micros_timer->CR1 |= 0x01 & TIMER_CEN_MASK;
 
     return TIMER_OKAY;
 }

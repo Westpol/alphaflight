@@ -19,6 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32h723xx.h"
+#include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_sd.h"
+#include "stm32h7xx_ll_gpio.h"
+#include "stm32h7xx_ll_spi.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -27,6 +31,9 @@
 #include "gps.h"
 #include "timer.h"
 #include "scheduler.h"
+#include "spi.h"
+#include "usbd_cdc.h"
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -155,16 +162,37 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM23_Init();
   /* USER CODE BEGIN 2 */
+
+  SPI_INIT(SPI_DEVICE_IMU, SPI1, GPIOC, LL_GPIO_PIN_4);
+  SPI_INIT(SPI_DEVICE_BARO, SPI4, GPIOE, LL_GPIO_PIN_4);
+  SPI_INIT(SPI_DEVICE_MAGNETO, SPI4, GPIOC, LL_GPIO_PIN_13);
+
   GPS_INIT(UART4, 20);
 
-  if(TIMER_INIT(TIM23, TIM24) != TIMER_OKAY) Error_Handler();
+  if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   if(TIMER_START() != TIMER_OKAY) Error_Handler();
+  HAL_Delay(100);
   while (1)
   {
+    uint8_t tx_buff_imu[2] = {0x8F, 0x00};
+    uint8_t rx_buff_imu[2] = {0x00, 0x00};
+    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, tx_buff_imu, rx_buff_imu, 2);
+    HAL_Delay(1000);
+    uint8_t tx_buff_baro[3] = {0x80, 0x00, 0x00};
+    uint8_t rx_buff_baro[3] = {0x00, 0x00, 0x00};
+    SPI_TRANSFER_FIFO(SPI_DEVICE_BARO, tx_buff_baro, rx_buff_baro, 3);
+    HAL_Delay(1000);
+    uint8_t tx_buff_magneto[2] = {0x2F | 0x80, 0x00};
+    uint8_t rx_buff_magneto[2] = {0x00, 0x00};
+    SPI_TRANSFER_FIFO(SPI_DEVICE_MAGNETO, tx_buff_magneto, rx_buff_magneto, 2);
+    HAL_Delay(1000);
+    uint8_t sd_block[512] = {0};
+    HAL_SD_ReadBlocks(&hsd1, sd_block, 99, 1, 1000);
+    HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
