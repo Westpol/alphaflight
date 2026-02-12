@@ -5,7 +5,6 @@
 #include "timer.h"
 
 #define imu_execution_delta_offset 20       // offset in us
-#define imu_dma_miss_next_execution 50
 #define imu_execution_averaging_bias 9
 
 #define IMU_DMA_PROCESSED 0x00
@@ -20,6 +19,7 @@ volatile static struct{
     uint32_t timestamp_dma_finished_last;
     uint32_t execution_delta_average;
     uint8_t imu_dma_state_flags;        // three states: 0x00 -> data processed, 0x01 -> new data (DMA finished), 0x02 -> DMA running
+    uint16_t phase_delay;
     uint32_t num_missed_measurements;
 } imu_dma_metadata;
 
@@ -33,7 +33,8 @@ IMU_RETURN_TYPE IMU_INIT(){
 }
 
 uint32_t IMU_CONVERT_DATA(const task_info_t *task){    // converting register values in read gyro and accel data, returns execution delta for next predicted DRDY + dma transfer execution time
-    if(imu_dma_metadata.imu_dma_state_flags != IMU_DMA_READY) return imu_dma_miss_next_execution;
+    if(imu_dma_metadata.imu_dma_state_flags != IMU_DMA_READY) return 0;
+    imu_dma_metadata.phase_delay = MICROS32() - imu_dma_metadata.timestamp_dma_finished;
     // TODO: parse data
     imu_dma_metadata.imu_dma_state_flags = IMU_DMA_PROCESSED;    // sets data flag to data processed
 
