@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug STM32",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "stlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "build/Debug/alphaflight.elf",
+            "device": "STM32H723VG",
+            "interface": "swd",
+            "svdFile": "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h723.svd",
+            "gdbPath": "/home/benno/.local/share/stm32cube/bundles/gnu-tools-for-stm32/14.3.1+st.2/bin/arm-none-eabi-gdb",
+            "runToEntryPoint": "main"
+        }
+    ]
+}
