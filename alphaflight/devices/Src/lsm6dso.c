@@ -11,8 +11,8 @@
 #define IMU_DMA_READY 0x01
 #define IMU_DMA_RUNNING 0x02
 
-__attribute__((section(".dma_rx"))) static uint8_t imu_dma_rx[13] = {0};
-__attribute__((section(".dma_tx"))) static uint8_t imu_dma_tx[13] = {0};
+__attribute__((section(".dma_rx"))) static uint8_t imu_dma_rx[STM32_WORD_SIZE] = {0};
+__attribute__((section(".dma_tx"))) static uint8_t imu_dma_tx[STM32_WORD_SIZE] = {0};
 
 volatile static struct{
     uint32_t timestamp_dma_finished;

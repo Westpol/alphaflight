@@ -65,7 +65,7 @@ static struct{
     gps_nav_pvt_t data;
 } gps_nav_pvt = {0x625b, 0x01, 0x07, {0}};
 
-__attribute__((section(".dma_rx"))) static uint8_t dma_buffer[255] = {0};
+__attribute__((section(".dma_rx"))) static uint8_t dma_buffer[STM32_WORD_SIZE * 16] = {0};
 
 static bool validate_ubx_crc(uint8_t* buffer, uint8_t len, uint8_t checksum_a, uint8_t checksum_b){
     uint8_t ck_a = 0, ck_b = 0;

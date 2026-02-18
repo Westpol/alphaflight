@@ -6,8 +6,8 @@
 #include <stddef.h>
 #include <string.h>
 
-__attribute__((section(".dma_rx"))) static uint8_t sd_dma_buffer_1[2048] = {0};
-__attribute__((section(".dma_rx"))) static uint8_t sd_dma_buffer_2[2048] = {0};
+__attribute__((section(".dma_rx"))) static uint8_t sd_dma_buffer_1[STM32_WORD_SIZE * 64] = {0};
+__attribute__((section(".dma_rx"))) static uint8_t sd_dma_buffer_2[STM32_WORD_SIZE * 64] = {0};
 
 
 static uint32_t generate_crc32_hw(uint8_t* buffer_pointer){      // buffer pointer MUST BE pointing at first byte of block

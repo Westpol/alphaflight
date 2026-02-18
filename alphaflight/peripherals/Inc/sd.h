@@ -1,6 +1,6 @@
 // sd driver header file
 
-#include <stdint.h>
+#include "common.h"
 
 #ifndef SD_H_
 #define SD_H_
