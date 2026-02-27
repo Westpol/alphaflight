@@ -1,0 +1,1412 @@
+Start quaternion(1.000000, 0.000000i, 0.000000j, 0.000000k)
+Gyro rotation vector: 
+
+15.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.261799
+normalized magnitude: 1.000000
+Delta quaternion(0.991445, 0.130526i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991445, 0.130526i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.258819, 0.965926)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.034900, 0.000000, 0.000000)
+
+Error I: (-0.000349, 0.000000, 0.000000)
+Error P: (-0.001745, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.12°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.002094
+normalized magnitude: 1.000000
+Delta quaternion(0.999999, -0.001047i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991581, 0.129488i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991581, 0.129488i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.256796, 0.966466)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.032807, 0.000000, 0.000000)
+
+Error I: (-0.000677, 0.000000, 0.000000)
+Error P: (-0.003385, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.23°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.004062
+normalized magnitude: 1.000000
+Delta quaternion(0.999998, -0.002031i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991842, 0.127474i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991842, 0.127474i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.252868, 0.967501)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.028746, 0.000000, 0.000000)
+
+Error I: (-0.000965, 0.000000, 0.000000)
+Error P: (-0.004823, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.33°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.005787
+normalized magnitude: 1.000000
+Delta quaternion(0.999996, -0.002894i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992207, 0.124603i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992207, 0.124603i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.247264, 0.968948)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.022961, 0.000000, 0.000000)
+
+Error I: (-0.001194, 0.000000, 0.000000)
+Error P: (-0.005971, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.41°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007165
+normalized magnitude: 1.000000
+Delta quaternion(0.999994, -0.003582i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992647, 0.121048i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992647, 0.121048i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.240316, 0.970695)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.015798, 0.000000, 0.000000)
+
+Error I: (-0.001352, 0.000000, 0.000000)
+Error P: (-0.006761, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.46°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008113
+normalized magnitude: 1.000000
+Delta quaternion(0.999992, -0.004056i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993130, 0.117020i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993130, 0.117020i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.232433, 0.972613)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.007685, 0.000000, 0.000000)
+
+Error I: (-0.001429, 0.000000, 0.000000)
+Error P: (-0.007145, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.49°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008574
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, -0.004287i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993622, 0.112762i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993622, 0.112762i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.224086, 0.974569)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.000888, 0.000000, 0.000000)
+
+Error I: (-0.001420, 0.000000, 0.000000)
+Error P: (-0.007100, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.49°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008521
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, -0.004260i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994093, 0.108528i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994093, 0.108528i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.215774, 0.976444)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.009409, 0.000000, 0.000000)
+
+Error I: (-0.001326, 0.000000, 0.000000)
+Error P: (-0.006630, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.46°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007956
+normalized magnitude: 1.000000
+Delta quaternion(0.999992, -0.003978i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994517, 0.104573i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994517, 0.104573i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.207998, 0.978129)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.017364, 0.000000, 0.000000)
+
+Error I: (-0.001152, 0.000000, 0.000000)
+Error P: (-0.005762, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.40°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.006914
+normalized magnitude: 1.000000
+Delta quaternion(0.999994, -0.003457i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994873, 0.101134i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994873, 0.101134i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.201230, 0.979544)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.024277, 0.000000, 0.000000)
+
+Error I: (-0.000910, 0.000000, 0.000000)
+Error P: (-0.004548, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.31°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.005458
+normalized magnitude: 1.000000
+Delta quaternion(0.999996, -0.002729i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995145, 0.098419i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995145, 0.098419i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.195882, 0.980628)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.029732, 0.000000, 0.000000)
+
+Error I: (-0.000612, 0.000000, 0.000000)
+Error P: (-0.003061, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.21°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.003674
+normalized magnitude: 1.000000
+Delta quaternion(0.999998, -0.001837i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995324, 0.096591i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995324, 0.096591i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.192278, 0.981341)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.033404, 0.000000, 0.000000)
+
+Error I: (-0.000278, 0.000000, 0.000000)
+Error P: (-0.001391, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.10°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.001669
+normalized magnitude: 1.000000
+Delta quaternion(1.000000, -0.000835i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995405, 0.095760i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995405, 0.095760i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.190639, 0.981660)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.035072, 0.000000, 0.000000)
+
+Error I: (0.000072, 0.000000, 0.000000)
+Error P: (0.000362, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.02°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.000435
+normalized magnitude: 1.000000
+Delta quaternion(1.000000, 0.000217i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995384, 0.095976i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995384, 0.095976i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.191066, 0.981578)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.034638, 0.000000, 0.000000)
+
+Error I: (0.000419, 0.000000, 0.000000)
+Error P: (0.002094, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.14°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.002513
+normalized magnitude: 1.000000
+Delta quaternion(0.999999, 0.001257i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995262, 0.097227i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995262, 0.097227i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.193533, 0.981094)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.032126, 0.000000, 0.000000)
+
+Error I: (0.000740, 0.000000, 0.000000)
+Error P: (0.003701, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.25°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.004441
+normalized magnitude: 1.000000
+Delta quaternion(0.999998, 0.002220i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995044, 0.099436i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995044, 0.099436i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.197887, 0.980225)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.027687, 0.000000, 0.000000)
+
+Error I: (0.001017, 0.000000, 0.000000)
+Error P: (0.005085, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.35°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.006102
+normalized magnitude: 1.000000
+Delta quaternion(0.999995, 0.003051i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994736, 0.102472i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994736, 0.102472i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.203865, 0.978999)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.021587, 0.000000, 0.000000)
+
+Error I: (0.001233, 0.000000, 0.000000)
+Error P: (0.006164, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.42°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007397
+normalized magnitude: 1.000000
+Delta quaternion(0.999993, 0.003699i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994350, 0.106150i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994350, 0.106150i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.211101, 0.977465)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.014191, 0.000000, 0.000000)
+
+Error I: (0.001375, 0.000000, 0.000000)
+Error P: (0.006874, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.47°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008249
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, 0.004124i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993904, 0.110250i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993904, 0.110250i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.219157, 0.975690)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.005943, 0.000000, 0.000000)
+
+Error I: (0.001434, 0.000000, 0.000000)
+Error P: (0.007171, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.49°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008605
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, 0.004303i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993420, 0.114526i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993420, 0.114526i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.227544, 0.973768)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.002662, 0.000000, 0.000000)
+
+Error I: (0.001408, 0.000000, 0.000000)
+Error P: (0.007038, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.48°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008445
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, 0.004223i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992928, 0.118720i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992928, 0.118720i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.235760, 0.971812)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.011108, 0.000000, 0.000000)
+
+Error I: (0.001297, 0.000000, 0.000000)
+Error P: (0.006483, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.45°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007779
+normalized magnitude: 1.000000
+Delta quaternion(0.999992, 0.003890i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992459, 0.122581i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992459, 0.122581i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.243313, 0.969948)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.018886, 0.000000, 0.000000)
+
+Error I: (0.001108, 0.000000, 0.000000)
+Error P: (0.005538, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.38°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.006646
+normalized magnitude: 1.000000
+Delta quaternion(0.999994, 0.003323i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992046, 0.125878i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992046, 0.125878i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.249753, 0.968310)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.025530, 0.000000, 0.000000)
+
+Error I: (0.000852, 0.000000, 0.000000)
+Error P: (0.004262, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.29°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.005114
+normalized magnitude: 1.000000
+Delta quaternion(0.999997, 0.002557i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991721, 0.128414i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991721, 0.128414i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.254702, 0.967020)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.030642, 0.000000, 0.000000)
+
+Error I: (0.000546, 0.000000, 0.000000)
+Error P: (0.002730, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.19°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.003276
+normalized magnitude: 1.000000
+Delta quaternion(0.999999, 0.001638i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991509, 0.130038i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991509, 0.130038i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.257868, 0.966180)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.033916, 0.000000, 0.000000)
+
+Error I: (0.000207, 0.000000, 0.000000)
+Error P: (0.001034, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.07°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.001241
+normalized magnitude: 1.000000
+Delta quaternion(1.000000, 0.000620i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991428, 0.130653i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991428, 0.130653i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.259067, 0.965860)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.035156, 0.000000, 0.000000)
+
+Error I: (-0.000145, 0.000000, 0.000000)
+Error P: (-0.000724, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.05°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.000869
+normalized magnitude: 1.000000
+Delta quaternion(1.000000, -0.000434i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991485, 0.130223i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991485, 0.130223i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.258228, 0.966084)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.034288, 0.000000, 0.000000)
+
+Error I: (-0.000488, 0.000000, 0.000000)
+Error P: (-0.002438, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.17°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.002926
+normalized magnitude: 1.000000
+Delta quaternion(0.999999, -0.001463i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991674, 0.128772i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991674, 0.128772i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.255400, 0.966836)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.031363, 0.000000, 0.000000)
+
+Error I: (-0.000801, 0.000000, 0.000000)
+Error P: (-0.004006, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.28°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.004808
+normalized magnitude: 1.000000
+Delta quaternion(0.999997, -0.002404i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991981, 0.126388i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991981, 0.126388i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.250748, 0.968052)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.026557, 0.000000, 0.000000)
+
+Error I: (-0.001067, 0.000000, 0.000000)
+Error P: (-0.005334, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.37°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.006401
+normalized magnitude: 1.000000
+Delta quaternion(0.999995, -0.003201i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992380, 0.123212i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992380, 0.123212i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.244547, 0.969638)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.020158, 0.000000, 0.000000)
+
+Error I: (-0.001268, 0.000000, 0.000000)
+Error P: (-0.006342, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.44°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007611
+normalized magnitude: 1.000000
+Delta quaternion(0.999993, -0.003805i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992842, 0.119435i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992842, 0.119435i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.237160, 0.971471)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.012548, 0.000000, 0.000000)
+
+Error I: (-0.001394, 0.000000, 0.000000)
+Error P: (-0.006970, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.48°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008364
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, -0.004182i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993333, 0.115282i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993333, 0.115282i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.229027, 0.973420)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.004185, 0.000000, 0.000000)
+
+Error I: (-0.001436, 0.000000, 0.000000)
+Error P: (-0.007179, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.49°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008615
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, -0.004307i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993820, 0.111002i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993820, 0.111002i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.220633, 0.975357)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.004430, 0.000000, 0.000000)
+
+Error I: (-0.001391, 0.000000, 0.000000)
+Error P: (-0.006957, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.48°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008349
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, -0.004174i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994275, 0.106853i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994275, 0.106853i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.212482, 0.977165)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.012778, 0.000000, 0.000000)
+
+Error I: (-0.001264, 0.000000, 0.000000)
+Error P: (-0.006319, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.43°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007582
+normalized magnitude: 1.000000
+Delta quaternion(0.999993, -0.003791i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994673, 0.103083i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994673, 0.103083i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.205067, 0.978748)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.020359, 0.000000, 0.000000)
+
+Error I: (-0.001060, 0.000000, 0.000000)
+Error P: (-0.005301, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.36°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.006361
+normalized magnitude: 1.000000
+Delta quaternion(0.999995, -0.003180i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994996, 0.099919i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994996, 0.099919i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.198837, 0.980033)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.026718, 0.000000, 0.000000)
+
+Error I: (-0.000793, 0.000000, 0.000000)
+Error P: (-0.003965, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.27°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.004758
+normalized magnitude: 1.000000
+Delta quaternion(0.999997, -0.002379i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995230, 0.097552i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995230, 0.097552i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.194173, 0.980967)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.031474, 0.000000, 0.000000)
+
+Error I: (-0.000478, 0.000000, 0.000000)
+Error P: (-0.002391, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.16°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.002869
+normalized magnitude: 1.000000
+Delta quaternion(0.999999, -0.001435i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995369, 0.096124i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995369, 0.096124i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.191357, 0.981521)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.034341, 0.000000, 0.000000)
+
+Error I: (-0.000135, 0.000000, 0.000000)
+Error P: (-0.000674, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+-0.05°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.000809
+normalized magnitude: 1.000000
+Delta quaternion(1.000000, -0.000404i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995408, 0.095721i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995408, 0.095721i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.190563, 0.981675)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.035150, 0.000000, 0.000000)
+
+Error I: (0.000217, 0.000000, 0.000000)
+Error P: (0.001084, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.07°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.001300
+normalized magnitude: 1.000000
+Delta quaternion(1.000000, 0.000650i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995346, 0.096368i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995346, 0.096368i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.191840, 0.981426)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.033850, 0.000000, 0.000000)
+
+Error I: (0.000555, 0.000000, 0.000000)
+Error P: (0.002776, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.19°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.003331
+normalized magnitude: 1.000000
+Delta quaternion(0.999999, 0.001666i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995184, 0.098026i, 0.000000j, 0.000000k)
+rotated quaternion:(0.995184, 0.098026i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.195108, 0.980782)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.030520, 0.000000, 0.000000)
+
+Error I: (0.000860, 0.000000, 0.000000)
+Error P: (0.004302, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.30°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.005163
+normalized magnitude: 1.000000
+Delta quaternion(0.999997, 0.002581i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994928, 0.100595i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994928, 0.100595i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.200169, 0.979761)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.025360, 0.000000, 0.000000)
+
+Error I: (0.001114, 0.000000, 0.000000)
+Error P: (0.005570, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.38°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.006684
+normalized magnitude: 1.000000
+Delta quaternion(0.999994, 0.003342i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994586, 0.103919i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994586, 0.103919i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.206713, 0.978402)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.018677, 0.000000, 0.000000)
+
+Error I: (0.001301, 0.000000, 0.000000)
+Error P: (0.006504, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.45°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007805
+normalized magnitude: 1.000000
+Delta quaternion(0.999992, 0.003902i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994173, 0.107800i, 0.000000j, 0.000000k)
+rotated quaternion:(0.994173, 0.107800i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.214343, 0.976758)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.010873, 0.000000, 0.000000)
+
+Error I: (0.001410, 0.000000, 0.000000)
+Error P: (0.007048, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.48°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008457
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, 0.004229i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993708, 0.112003i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993708, 0.112003i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.222596, 0.974911)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (0.002416, 0.000000, 0.000000)
+
+Error I: (0.001434, 0.000000, 0.000000)
+Error P: (0.007168, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.49°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008602
+normalized magnitude: 1.000000
+Delta quaternion(0.999991, 0.004301i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993217, 0.116276i, 0.000000j, 0.000000k)
+rotated quaternion:(0.993217, 0.116276i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.230974, 0.972960)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.006186, 0.000000, 0.000000)
+
+Error I: (0.001372, 0.000000, 0.000000)
+Error P: (0.006859, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.47°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.008231
+normalized magnitude: 1.000000
+Delta quaternion(0.999992, 0.004116i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992730, 0.120362i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992730, 0.120362i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.238974, 0.971026)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.014416, 0.000000, 0.000000)
+
+Error I: (0.001228, 0.000000, 0.000000)
+Error P: (0.006138, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.42°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.007366
+normalized magnitude: 1.000000
+Delta quaternion(0.999993, 0.003683i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992280, 0.124018i, 0.000000j, 0.000000k)
+rotated quaternion:(0.992280, 0.124018i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.246121, 0.969239)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.021781, 0.000000, 0.000000)
+
+Error I: (0.001010, 0.000000, 0.000000)
+Error P: (0.005049, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.35°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.006059
+normalized magnitude: 1.000000
+Delta quaternion(0.999995, 0.003030i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991900, 0.127023i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991900, 0.127023i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.251989, 0.967730)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.027838, 0.000000, 0.000000)
+
+Error I: (0.000731, 0.000000, 0.000000)
+Error P: (0.003657, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.25°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.004389
+normalized magnitude: 1.000000
+Delta quaternion(0.999998, 0.002194i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991619, 0.129200i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991619, 0.129200i, 0.000000j, 0.000000k)
+
+Gravity extracted from Quaternion: (0.000000, 0.256234, 0.966615)
+Gravity vector from accelerometer: (0.000000, 0.224951, 0.974370)
+Error extracted from cross product: (-0.032225, 0.000000, 0.000000)
+
+Error I: (0.000409, 0.000000, 0.000000)
+Error P: (0.002046, 0.000000, 0.000000)
+Gyro rotation vector: 
+
+0.00°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Corrected gyro rotation vector: 
+
+0.14°/s
+0.00°/s
+0.00°/s
+
+ over 1.00 seconds.
+
+Theta is: 0.002455
+normalized magnitude: 1.000000
+Delta quaternion(0.999999, 0.001228i, 0.000000j, 0.000000k)
+rotated quaternion:(0.991459, 0.130417i, 0.000000j, 0.000000k)
