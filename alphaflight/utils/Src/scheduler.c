@@ -39,7 +39,7 @@ void SCHEDULER_LOOP(void){
     }
 }
 
-int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, char* task_name){
+int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, uint32_t max_execution_time, char* task_name){
 
     if(scheduler.num_registered_tasks >= num_tasks) return -1;
 
@@ -51,6 +51,7 @@ int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dyna
     scheduler.task[task_num].info.call_delta_max = delta_max;
     scheduler.task[task_num].info.call_delta_norm = delta_norm;
     scheduler.task[task_num].info.task_name = task_name;
+    scheduler.task[task_num].info.activated = true;
 
     return task_num;
 }

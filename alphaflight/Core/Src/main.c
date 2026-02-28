@@ -30,6 +30,7 @@
 #include "scheduler.h"
 #include "spi.h"
 #include "usbd_cdc.h"
+#include "status_led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -159,6 +160,8 @@ int main(void)
   MX_TIM23_Init();
   /* USER CODE BEGIN 2 */
 
+  STATUS_LED_INIT();
+
   SPI_INIT(SPI_DEVICE_IMU, SPI1, GPIOC, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_BARO, SPI4, GPIOE, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_MAGNETO, SPI4, GPIOC, LL_GPIO_PIN_13);
@@ -167,7 +170,8 @@ int main(void)
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
 
-  SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 150, true, 100, 300, "Gyro Read");
+  SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 150, true, 100, 300, 10, "Gyro Read");
+  SCHEDULER_REGISTER_TASK(STATUS_PULSE, 10000, false, 9000, 11000, 5, "Status LED Pulsing");
 
   /* USER CODE END 2 */
 
@@ -176,6 +180,8 @@ int main(void)
   if(TIMER_START() != TIMER_OKAY) Error_Handler();
   while (1)
   {
+    SCHEDULER_LOOP();
+    /*
     uint8_t tx_buff_baro[3] = {0x80, 0x00, 0x00};
     uint8_t rx_buff_baro[3] = {0x00, 0x00, 0x00};
     SPI_TRANSFER_FIFO(SPI_DEVICE_BARO, tx_buff_baro, rx_buff_baro, 3);
@@ -186,7 +192,7 @@ int main(void)
     HAL_Delay(1000);
     uint8_t sd_block[512] = {0};
     HAL_SD_ReadBlocks(&hsd1, sd_block, 99, 1, 1000);
-    HAL_Delay(1000);
+    HAL_Delay(1000);*/
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -1030,15 +1036,18 @@ static void MX_TIM4_Init(void)
   LL_TIM_Init(TIM4, &TIM_InitStruct);
   LL_TIM_EnableARRPreload(TIM4);
   LL_TIM_SetClockSource(TIM4, LL_TIM_CLOCKSOURCE_INTERNAL);
-  TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_FROZEN;
+  LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH2);
+  TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM1;
   TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.CompareValue = 0;
   TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
   LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH2, &TIM_OC_InitStruct);
   LL_TIM_OC_DisableFast(TIM4, LL_TIM_CHANNEL_CH2);
+  LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH3);
   LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH3, &TIM_OC_InitStruct);
   LL_TIM_OC_DisableFast(TIM4, LL_TIM_CHANNEL_CH3);
+  LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH4);
   LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH4, &TIM_OC_InitStruct);
   LL_TIM_OC_DisableFast(TIM4, LL_TIM_CHANNEL_CH4);
   LL_TIM_SetTriggerOutput(TIM4, LL_TIM_TRGO_RESET);

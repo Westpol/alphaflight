@@ -29,11 +29,11 @@ typedef struct{
     uint32_t call_delta_max;        // given while registering task
     uint32_t call_delta_min;
     uint32_t call_delta_norm;
+    uint32_t max_execution_time;    // after time delta gets exceeded, the function must return
 
     volatile bool dynamic_execution_management;     // given while registering task, can be changed by wwdg, activates using task given deltas
 
     volatile bool running;      // for wwdg function, true while task executes
-    volatile bool exit_loops;       // standard false. **EVERY LOOP SHOULD HAVE IT APPENDED WITH AN AND TO EXIT LOOPS IN WORST CASE**
     volatile bool activated;        // activate / deactivate task
     uint32_t task_index;
     char* task_name;
@@ -47,7 +47,7 @@ typedef struct{
     task_func_t func;
 } task_t;
 
-int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, char* task_name);
+int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, uint32_t max_execution_time, char* task_name);
 void SCHEDULER_LOOP(void);
 
 #endif

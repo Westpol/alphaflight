@@ -47,6 +47,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "devices/Src/gps.c"
     "devices/Src/lsm6dso.c"
     "devices/Src/bmp390.c"
+    "devices/Src/status_led.c"
     "utils/Src/timer.c"
     "utils/Src/scheduler.c"
     "utils/Src/utils.c"

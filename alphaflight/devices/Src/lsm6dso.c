@@ -36,7 +36,7 @@ uint32_t IMU_CONVERT_DATA(const task_info_t *task){    // converting register va
     if(imu_dma_metadata.imu_dma_state_flags != IMU_DMA_READY) return 0;
     imu_dma_metadata.phase_delay = MICROS32() - imu_dma_metadata.timestamp_dma_finished;
     // TODO: parse data
-    imu_dma_metadata.imu_dma_state_flags = IMU_DMA_PROCESSED;    // sets data flag to data processed
+    imu_dma_metadata.imu_dma_state_flags = IMU_DMA_PROCESSED;
 
     uint32_t drdy_delta_time = imu_dma_metadata.timestamp_dma_finished - imu_dma_metadata.timestamp_dma_finished_last;
     imu_dma_metadata.timestamp_dma_finished_last = imu_dma_metadata.timestamp_dma_finished;
