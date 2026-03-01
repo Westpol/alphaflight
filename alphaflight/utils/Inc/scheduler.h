@@ -50,4 +50,6 @@ typedef struct{
 int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, uint32_t max_execution_time, char* task_name);
 void SCHEDULER_LOOP(void);
 
+int32_t SCHEDULER_DISABLE_TASK_BY_INDEX(uint32_t index);
+
 #endif

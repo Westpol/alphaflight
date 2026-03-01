@@ -39,6 +39,15 @@ void SCHEDULER_LOOP(void){
     }
 }
 
+int32_t SCHEDULER_DISABLE_TASK_BY_INDEX(uint32_t index){
+    if(index > scheduler.num_registered_tasks) return -1;
+    if(!scheduler.task[index].info.activated){
+        return 1;
+    }
+    scheduler.task[index].info.activated = false;
+    return 0;
+}
+
 int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, uint32_t max_execution_time, char* task_name){
 
     if(scheduler.num_registered_tasks >= num_tasks) return -1;

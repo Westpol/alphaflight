@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32h723xx.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -31,6 +32,7 @@
 #include "spi.h"
 #include "usbd_cdc.h"
 #include "status_led.h"
+#include <stdint.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -159,7 +161,7 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM23_Init();
   /* USER CODE BEGIN 2 */
-
+  
   STATUS_LED_INIT();
 
   SPI_INIT(SPI_DEVICE_IMU, SPI1, GPIOC, LL_GPIO_PIN_4);
@@ -1931,9 +1933,31 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+
+  MX_TIM4_Init();
+  MX_TIM23_Init();
+  MX_TIM24_Init();
+
+  STATUS_LED_INIT();
+  TIMER_INIT(TIM23, TIM24);
+  TIMER_START();
+
   __disable_irq();
+  STATUS_LED_SET_ALL(0);
+  uint32_t now = MILLIS32();
+  bool led_toggle = false;
   while (1)
   {
+    if((int32_t)(MILLIS32() - now) >= 500){
+      if(led_toggle){
+        STATUS_LED_SET_R(999);
+      }
+      else {
+        STATUS_LED_SET_R(0);
+      }
+      led_toggle = !led_toggle;
+      now = MILLIS32();
+    }
   }
   /* USER CODE END Error_Handler_Debug */
 }
