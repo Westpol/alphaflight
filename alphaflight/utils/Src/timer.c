@@ -45,7 +45,7 @@ uint32_t MICROS32(){
 }
 
 uint32_t MILLIS32(){
-    return millis_timer ? millis_timer->CNT : 0;
+    return millis_timer ? millis_timer->CNT >> 1 : 0;
 }
 
 bool TIMER_RUNNING(){

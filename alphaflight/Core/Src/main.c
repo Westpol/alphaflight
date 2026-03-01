@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "stm32h723xx.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -1190,10 +1189,10 @@ static void MX_TIM23_Init(void)
   /* USER CODE BEGIN TIM23_Init 1 */
 
   /* USER CODE END TIM23_Init 1 */
-  TIM_InitStruct.Prescaler = 29999;
+  TIM_InitStruct.Prescaler = 59999;
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
   TIM_InitStruct.Autoreload = 4294967295;
-  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV4;
+  TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   LL_TIM_Init(TIM23, &TIM_InitStruct);
   LL_TIM_DisableARRPreload(TIM23);
   LL_TIM_SetClockSource(TIM23, LL_TIM_CLOCKSOURCE_INTERNAL);
