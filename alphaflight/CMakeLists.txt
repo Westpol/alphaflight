@@ -53,6 +53,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "utils/Src/utils.c"
     "peripherals/Src/spi.c"
     "peripherals/Src/sd.c"
+    "peripherals/Src/usb.c"
     # Add user sources here
 )
 

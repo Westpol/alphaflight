@@ -31,7 +31,7 @@
 #include "spi.h"
 #include "usbd_cdc.h"
 #include "status_led.h"
-#include <stdint.h>
+#include "usb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -173,6 +173,7 @@ int main(void)
 
   SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 150, true, 100, 300, 10, "Gyro Read");
   SCHEDULER_REGISTER_TASK(STATUS_PULSE, 10000, false, 9000, 11000, 5, "Status LED Pulsing");
+  SCHEDULER_REGISTER_TASK(USB_STATUS, 1000000, false, 900000, 1100000, 50, "USB Stats");
 
   /* USER CODE END 2 */
 
