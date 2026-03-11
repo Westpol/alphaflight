@@ -46,6 +46,7 @@ extern "C" {
 #include "stm32h7xx_ll_tim.h"
 #include "stm32h7xx_ll_usart.h"
 #include "stm32h7xx_ll_gpio.h"
+#include "stm32h7xx_ll_hsem.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */

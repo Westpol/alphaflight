@@ -173,7 +173,7 @@ int main(void)
 
   SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 150, true, 100, 300, 10, "Gyro Read");
   SCHEDULER_REGISTER_TASK(STATUS_PULSE, 10000, false, 9000, 11000, 5, "Status LED Pulsing");
-  SCHEDULER_REGISTER_TASK(USB_STATUS, 1000000, false, 900000, 1100000, 50, "USB Stats");
+  SCHEDULER_REGISTER_TASK(USB_STATUS, 100000, false, 90000, 110000, 50, "USB Stats");
 
   /* USER CODE END 2 */
 
@@ -235,7 +235,7 @@ void SystemClock_Config(void)
   LL_RCC_PLL1_SetN(120);
   LL_RCC_PLL1_SetP(1);
   LL_RCC_PLL1_SetQ(10);
-  LL_RCC_PLL1_SetR(1);
+  LL_RCC_PLL1_SetR(10);
   LL_RCC_PLL1_Enable();
 
    /* Wait till PLL is ready */

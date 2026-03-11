@@ -22,7 +22,7 @@ void USB_PRINTLN(const char *format, ...){
 }
 
 uint32_t USB_STATUS(const task_info_t *task){
-    USB_PRINTLN("%dms TEST", MILLIS32());
+    USB_PRINTLN("%dms TEST | task: %s", MILLIS32(), task->task_name);
     return 0;
 }
 
