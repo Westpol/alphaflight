@@ -163,15 +163,22 @@ int main(void)
   
   STATUS_LED_INIT();
 
+  if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
+  
+  if(TIMER_START() != TIMER_OKAY) Error_Handler();
+
   SPI_INIT(SPI_DEVICE_IMU, SPI1, GPIOC, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_BARO, SPI4, GPIOE, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_MAGNETO, SPI4, GPIOC, LL_GPIO_PIN_13);
 
+  SPI_ENABLE_DMA(SPI_DEVICE_IMU);
+
+  if(IMU_INIT() != IMU_OKAY) Error_Handler();
+
   GPS_INIT(UART4, 20);
 
-  if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
 
-  SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 150, true, 100, 300, 10, "Gyro Read");
+  SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 600, true, 500, 800, 10, "Gyro Read");
   SCHEDULER_REGISTER_TASK(STATUS_PULSE, 10000, false, 9000, 11000, 5, "Status LED Pulsing");
   SCHEDULER_REGISTER_TASK(USB_STATUS, 100000, false, 90000, 110000, 50, "USB Stats");
 
@@ -179,7 +186,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  if(TIMER_START() != TIMER_OKAY) Error_Handler();
   while (1)
   {
     SCHEDULER_LOOP();
@@ -1748,6 +1754,9 @@ static void MX_DMA_Init(void)
   /* DMA2_Stream1_IRQn interrupt configuration */
   NVIC_SetPriority(DMA2_Stream1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
   NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+
+  LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_0); // RX complete
+  LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_1); // TX complete
 
 }
 

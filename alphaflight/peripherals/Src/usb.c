@@ -22,7 +22,8 @@ void USB_PRINTLN(const char *format, ...){
 }
 
 uint32_t USB_STATUS(const task_info_t *task){
-    USB_PRINTLN("%dms TEST | task: %s", MILLIS32(), task->task_name);
+    const task_stat_t* stat = SCHEDULER_GET_TASK_STAT_BY_INDEX(2);
+    USB_PRINTLN("%dus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
     return 0;
 }
 

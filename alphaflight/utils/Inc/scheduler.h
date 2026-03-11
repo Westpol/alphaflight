@@ -52,4 +52,6 @@ void SCHEDULER_LOOP(void);
 
 int32_t SCHEDULER_DISABLE_TASK_BY_INDEX(uint32_t index);
 
+const task_stat_t* SCHEDULER_GET_TASK_STAT_BY_INDEX(uint32_t index);
+
 #endif
