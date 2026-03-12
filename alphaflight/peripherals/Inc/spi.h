@@ -1,6 +1,7 @@
 
 #include "common.h"
 #include "stm32h723xx.h"
+#include "stm32h7xx_hal.h"
 
 #ifndef SPI_H_
 #define SPI_H_
@@ -18,10 +19,12 @@ typedef enum{
     SPI_DEVICE_MAGNETO
 } SPI_DEVICE;
 
-SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_TypeDef* SPIx, GPIO_TypeDef* cs_port, uint32_t cs_pin);
-SPI_RETURN_TYPE SPI_ENABLE_DMA(SPI_DEVICE device);
-SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len);
+SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_HandleTypeDef* SPIx, GPIO_TypeDef* cs_port, uint32_t cs_pin);
+SPI_RETURN_TYPE SPI_TRANSFER_DMA(SPI_DEVICE device, const uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len);
+SPI_RETURN_TYPE SPI_TRANSFER(SPI_DEVICE device, const uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len);
+SPI_RETURN_TYPE SPI_START_CS(SPI_DEVICE device);
+SPI_RETURN_TYPE SPI_STOP_CS(SPI_DEVICE device);
 
-SPI_TypeDef* SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE device);
+SPI_HandleTypeDef* SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE device);
 
 #endif

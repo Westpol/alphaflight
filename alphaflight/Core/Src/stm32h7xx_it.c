@@ -409,10 +409,12 @@ void UART5_IRQHandler(void)
 void DMA2_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
-  IMU_DMA_FINISHED_INTERRUPT_HANDLER();
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_spi1_rx);
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
+
+  SPI_STOP_CS(SPI_DEVICE_IMU);
+  IMU_DMA_FINISHED_INTERRUPT_HANDLER();
 
   /* USER CODE END DMA2_Stream0_IRQn 1 */
 }

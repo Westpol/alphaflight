@@ -186,11 +186,9 @@ int main(void)
   
   if(TIMER_START() != TIMER_OKAY) Error_Handler();
 
-  SPI_INIT(SPI_DEVICE_IMU, SPI1, GPIOC, LL_GPIO_PIN_4);
-  SPI_INIT(SPI_DEVICE_BARO, SPI4, GPIOE, LL_GPIO_PIN_4);
-  SPI_INIT(SPI_DEVICE_MAGNETO, SPI4, GPIOC, LL_GPIO_PIN_13);
-
-  SPI_ENABLE_DMA(SPI_DEVICE_IMU);
+  SPI_INIT(SPI_DEVICE_IMU, &hspi1, GPIOC, LL_GPIO_PIN_4);
+  SPI_INIT(SPI_DEVICE_BARO, &hspi4, GPIOE, LL_GPIO_PIN_4);
+  SPI_INIT(SPI_DEVICE_MAGNETO, &hspi4, GPIOC, LL_GPIO_PIN_13);
 
   if(IMU_INIT() != IMU_OKAY) Error_Handler();
 
@@ -199,7 +197,7 @@ int main(void)
 
   SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 600, true, 500, 800, 10, "Gyro Read");
   SCHEDULER_REGISTER_TASK(STATUS_PULSE, 10000, false, 9000, 11000, 5, "Status LED Pulsing");
-  SCHEDULER_REGISTER_TASK(USB_STATUS, 100000, false, 90000, 110000, 50, "USB Stats");
+  SCHEDULER_REGISTER_TASK(IMU_DEBUG_PRINT, 100000, false, 90000, 110000, 50, "USB Stats");
 
   /* USER CODE END 2 */
 
@@ -1668,7 +1666,7 @@ void Error_Handler(void)
   bool led_toggle = false;
   while (1)
   {
-    if((int32_t)(MILLIS32() - now) >= 500){
+    if(((int32_t)(MILLIS32() - now) >= 200 && led_toggle) || ((int32_t)(MILLIS32() - now) >= 400 && !led_toggle)){
       if(led_toggle){
         STATUS_LED_SET_R(999);
       }

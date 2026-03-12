@@ -3,9 +3,9 @@
 #include "stm32h7xx_ll_dma.h"
 #include "stm32h7xx_ll_spi.h"
 #include "timer.h"
-#include <stdint.h>
+#include "usb.h"
 
-#define imu_execution_delta_offset 20       // offset in us
+#define imu_execution_delta_offset 5       // offset in us
 #define imu_execution_averaging_bias 9
 
 #define IMU_DMA_PROCESSED 0x00
@@ -27,14 +27,14 @@ volatile static struct{
 static uint8_t read_register(uint8_t address){
     uint8_t tx_buff[2] = {LSM6DSO_CONFIG_READ | address, 0};
     uint8_t rx_buff[2] = {0};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2);
+    SPI_TRANSFER(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2);
     return rx_buff[1];
 }
 
 static IMU_RETURN_TYPE write_register(uint8_t address, uint8_t data){
     uint8_t tx_buff[2] = {LSM6DSO_CONFIG_WRITE & address, data};
     uint8_t rx_buff[2] = {0};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2);
+    SPI_TRANSFER(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2);
     return IMU_OKAY;
 }
 
@@ -53,7 +53,7 @@ static IMU_RETURN_TYPE imu_setup(){
 IMU_RETURN_TYPE IMU_INIT(){
     uint8_t tx_buff_imu[2] = {0x8F, 0x00};
     uint8_t rx_buff_imu[2] = {0x00, 0x00};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, tx_buff_imu, rx_buff_imu, 2);
+    SPI_TRANSFER(SPI_DEVICE_IMU, tx_buff_imu, rx_buff_imu, 2);
     if(rx_buff_imu[1] != 108) return IMU_WRONG_ID;
     imu_dma_tx[0] = 0x80 | 0x22;    // set first byte command to read OUTX_L_G (first IMU data register)
 
@@ -63,7 +63,7 @@ IMU_RETURN_TYPE IMU_INIT(){
 }
 
 
-uint32_t IMU_CONVERT_DATA(const task_info_t *task){    // converting register values in read gyro and accel data, returns execution delta for next predicted DRDY + dma transfer execution time
+uint32_t IMU_CONVERT_DATA(const task_info_t* task){    // converting register values in read gyro and accel data, returns execution delta for next predicted DRDY + dma transfer execution time
     if(imu_dma_metadata.imu_dma_state_flags != IMU_DMA_READY) return 0;
     imu_dma_metadata.phase_delay = MICROS32() - imu_dma_metadata.timestamp_dma_finished;
     // TODO: parse data
@@ -77,29 +77,20 @@ uint32_t IMU_CONVERT_DATA(const task_info_t *task){    // converting register va
 }
 
 void IMU_DATA_READY_INTERRUPT_HANDLER(void){
-    uint8_t tx[13] = {0};
-    uint8_t rx[13] = {0};
-    tx[0] = 0x8F;
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx[0], &rx[0], 13);
-    return;
     if(imu_dma_metadata.imu_dma_state_flags == IMU_DMA_RUNNING) return;        // dma still running, skip everything
     if(imu_dma_metadata.imu_dma_state_flags == IMU_DMA_READY) imu_dma_metadata.num_missed_measurements++;       // last packet hasn't yet been parsed, save the skip in variable and start DMA
 
-    LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_0, (uint32_t)imu_dma_rx);
-    LL_DMA_SetMemoryAddress(DMA2, LL_DMA_STREAM_1, (uint32_t)imu_dma_tx);
+    SPI_TRANSFER_DMA(SPI_DEVICE_IMU, &imu_dma_tx[0], &imu_dma_rx[0], 13);
 
-    LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_0, 13);
-    LL_DMA_SetDataLength(DMA2, LL_DMA_STREAM_1, 13);
-
-    LL_SPI_EnableDMAReq_RX(SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE_IMU));
-    LL_SPI_EnableDMAReq_TX(SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE_IMU));
-
-    LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_0);
-    LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_1);
     imu_dma_metadata.imu_dma_state_flags = IMU_DMA_RUNNING;
 }
 
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
     imu_dma_metadata.timestamp_dma_finished = MICROS32();
     imu_dma_metadata.imu_dma_state_flags = IMU_DMA_READY;
+}
+
+uint32_t IMU_DEBUG_PRINT(const task_info_t* task){
+    USB_PRINTLN("%X %X %X %X %X %X\n", imu_dma_rx[0], imu_dma_rx[1], imu_dma_rx[2], imu_dma_rx[3], imu_dma_rx[4], imu_dma_rx[5]);
+    return 0;
 }

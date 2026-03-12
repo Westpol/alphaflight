@@ -13,7 +13,10 @@ typedef enum{
 } IMU_RETURN_TYPE;
 
 IMU_RETURN_TYPE IMU_INIT();
+
+// tasks
 uint32_t IMU_CONVERT_DATA(const task_info_t *task);
+uint32_t IMU_DEBUG_PRINT(const task_info_t* task);
 
 void IMU_DATA_READY_INTERRUPT_HANDLER(void);
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void);
