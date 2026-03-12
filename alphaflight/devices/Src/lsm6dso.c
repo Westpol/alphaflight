@@ -39,8 +39,8 @@ static IMU_RETURN_TYPE write_register(uint8_t address, uint8_t data){
 }
 
 static IMU_RETURN_TYPE imu_setup(){
-    write_register(LSM6DSO_CRTL3_C_ADDRESS, LSM6DSO_CTRL3_C_RESET);
-    while((read_register(LSM6DSO_CRTL3_C_ADDRESS) & 0x01));
+    //write_register(LSM6DSO_CRTL3_C_ADDRESS, LSM6DSO_CTRL3_C_RESET);
+    //while((read_register(LSM6DSO_CRTL3_C_ADDRESS) & 0x01));
     write_register(LSM6DSO_CTRL9_XL_ADDRESS, LSM6DSO_CTRL9_XL_I3C_DISABLE);
     write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_1666 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
     write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_1666 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
