@@ -24,13 +24,13 @@ SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_TypeDef* SPIx, GPIO_TypeDef* cs_
 }
 
 SPI_RETURN_TYPE SPI_ENABLE_DMA(SPI_DEVICE device){
-    LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_1);    // 2. Enable DMA stream
+    /*LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_1);    // 2. Enable DMA stream
     LL_DMA_EnableStream(DMA2, LL_DMA_STREAM_0);
     LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_0);    // Enable interrupt before starting
     LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_0); // optional
     LL_DMA_EnableIT_TE(DMA2, LL_DMA_STREAM_1);
     LL_SPI_EnableDMAReq_TX(spi_device[device].spi_peripheral);            // 3. Enable SPI TX requests
-    LL_SPI_EnableDMAReq_RX(spi_device[device].spi_peripheral);            // 4. Enable SPI RX requests
+    LL_SPI_EnableDMAReq_RX(spi_device[device].spi_peripheral);            // 4. Enable SPI RX requests*/
     return SPI_OKAY;
 }
 

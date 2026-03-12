@@ -161,6 +161,8 @@ int main(void)
   MX_TIM23_Init();
   /* USER CODE BEGIN 2 */
   
+  HAL_NVIC_DisableIRQ(EXTI2_IRQn);
+
   STATUS_LED_INIT();
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
@@ -171,7 +173,7 @@ int main(void)
   SPI_INIT(SPI_DEVICE_BARO, SPI4, GPIOE, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_MAGNETO, SPI4, GPIOC, LL_GPIO_PIN_13);
 
-  SPI_ENABLE_DMA(SPI_DEVICE_IMU);
+  //SPI_ENABLE_DMA(SPI_DEVICE_IMU);
 
   if(IMU_INIT() != IMU_OKAY) Error_Handler();
 
@@ -1754,9 +1756,6 @@ static void MX_DMA_Init(void)
   /* DMA2_Stream1_IRQn interrupt configuration */
   NVIC_SetPriority(DMA2_Stream1_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
   NVIC_EnableIRQ(DMA2_Stream1_IRQn);
-
-  LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_0); // RX complete
-  LL_DMA_EnableIT_TC(DMA2, LL_DMA_STREAM_1); // TX complete
 
 }
 

@@ -39,8 +39,8 @@ static IMU_RETURN_TYPE write_register(uint8_t address, uint8_t data){
 }
 
 static IMU_RETURN_TYPE imu_setup(){
-    //write_register(LSM6DSO_CRTL3_C_ADDRESS, LSM6DSO_CTRL3_C_RESET);
-    //while((read_register(LSM6DSO_CRTL3_C_ADDRESS) & 0x01));
+    write_register(LSM6DSO_CRTL3_C_ADDRESS, LSM6DSO_CTRL3_C_RESET);
+    while((read_register(LSM6DSO_CRTL3_C_ADDRESS) & 0x01));
     write_register(LSM6DSO_CTRL9_XL_ADDRESS, LSM6DSO_CTRL9_XL_I3C_DISABLE);
     write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_1666 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
     write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_1666 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
@@ -58,6 +58,11 @@ IMU_RETURN_TYPE IMU_INIT(){
     imu_dma_tx[0] = 0x80 | 0x22;    // set first byte command to read OUTX_L_G (first IMU data register)
 
     if(imu_setup() != IMU_OKAY) return IMU_SETUP_FAILED;
+
+    uint8_t interrupt = read_register(LSM6DSO_INT1_CTRL_ADDRESS);
+    uint8_t odr = read_register(LSM6DSO_CTRL2_G_ADDRESS);
+
+    NVIC_EnableIRQ(EXTI2_IRQn);
 
     return IMU_OKAY;
 }
