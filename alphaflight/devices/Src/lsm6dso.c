@@ -61,6 +61,7 @@ IMU_RETURN_TYPE IMU_INIT(){
 
     uint8_t interrupt = read_register(LSM6DSO_INT1_CTRL_ADDRESS);
     uint8_t odr = read_register(LSM6DSO_CTRL2_G_ADDRESS);
+    uint8_t status = read_register(0x1E);
 
     NVIC_EnableIRQ(EXTI2_IRQn);
 
