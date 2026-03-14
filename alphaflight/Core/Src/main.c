@@ -184,6 +184,11 @@ int main(void)
   SCHEDULER_REGISTER_TASK(STATUS_PULSE, 10000, false, 9000, 11000, 5, "Status LED Pulsing");
   SCHEDULER_REGISTER_TASK(USB_STATUS, 100000, false, 90000, 110000, 50, "USB Stats");
 
+  uint8_t tx[13] = {0};
+  uint8_t rx[13] = {0};
+  tx[0] = 0x22 | LSM6DSO_CONFIG_READ;
+  SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx[0], &rx[0], 13);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
