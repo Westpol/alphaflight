@@ -20,7 +20,10 @@ typedef enum{
 
 SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_TypeDef* SPIx, GPIO_TypeDef* cs_port, uint32_t cs_pin);
 SPI_RETURN_TYPE SPI_ENABLE_DMA(SPI_DEVICE device);
-SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len);
+SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len, uint32_t timeout);
+
+SPI_RETURN_TYPE SPI_STOP_CS(SPI_DEVICE device);
+SPI_RETURN_TYPE SPI_START_CS(SPI_DEVICE device);
 
 SPI_TypeDef* SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE device);
 

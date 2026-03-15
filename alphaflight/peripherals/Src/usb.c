@@ -1,6 +1,9 @@
 #include "usb.h"
+#include "stm32h723xx.h"
+#include "stm32h7xx_ll_dma.h"
 #include "usbd_cdc_if.h"
 #include "timer.h"
+
 
 
 void USB_PRINTLN(const char *format, ...){
@@ -22,8 +25,9 @@ void USB_PRINTLN(const char *format, ...){
 }
 
 uint32_t USB_STATUS(const task_info_t *task){
-    const task_stat_t* stat = SCHEDULER_GET_TASK_STAT_BY_INDEX(2);
+    const task_stat_t* stat = SCHEDULER_GET_TASK_STAT_BY_INDEX(0);
     USB_PRINTLN("%dus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
+    //USB_PRINTLN("Data Length: %d", LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_0));
     return 0;
 }
 

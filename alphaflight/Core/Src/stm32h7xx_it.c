@@ -395,6 +395,7 @@ void UART5_IRQHandler(void)
 void DMA2_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
+  LL_DMA_ClearFlag_TC0(DMA2);
   IMU_DMA_FINISHED_INTERRUPT_HANDLER();
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */

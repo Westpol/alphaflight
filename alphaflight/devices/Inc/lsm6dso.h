@@ -5,6 +5,8 @@
 #ifndef LSM6DSO_H
 #define LSM6DSO_H
 
+#define LSM6DSO_POLLING false   // switch between fixed interval blocked SPI polling (true) and DRDY based DMA SPI (false)
+
 typedef enum{
     IMU_OKAY,
     IMU_WRONG_ID,
@@ -13,13 +15,27 @@ typedef enum{
 } IMU_RETURN_TYPE;
 
 IMU_RETURN_TYPE IMU_INIT();
-uint32_t IMU_CONVERT_DATA(const task_info_t *task);
+
+#if LSM6DSO_POLLING
+    uint32_t IMU_CONVERT_DATA(const task_info_t *task);
+#endif
+
+#if !LSM6DSO_POLLING
+    uint32_t IMU_READ_DATA(const task_info_t* task);
+#endif
 
 void IMU_DATA_READY_INTERRUPT_HANDLER(void);
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void);
 
-#define LSM6DSO_CONFIG_WRITE 0x7F
-#define LSM6DSO_CONFIG_READ 0x80
+typedef struct{
+    float w;
+    float x;
+    float y;
+    float z;
+}quat_t;
+
+#define LSM6DSO_WRITE 0x7F
+#define LSM6DSO_READ 0x80
 
 #define LSM6DSO_INT1_CTRL_ADDRESS 0x0D
 #define LSM6DSO_INT1_CTRL_DRDY_G 0x02
@@ -43,5 +59,7 @@ void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void);
 
 #define LSM6DSO_CTRL9_XL_ADDRESS 0x19
 #define LSM6DSO_CTRL9_XL_I3C_DISABLE (0x01 << 1)
+
+#define LSM6DSO_READ_START_REG 0x22
 
 #endif

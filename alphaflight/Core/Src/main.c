@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "stm32h723xx.h"
 #include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -32,6 +33,7 @@
 #include "usbd_cdc.h"
 #include "status_led.h"
 #include "usb.h"
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -160,34 +162,34 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM23_Init();
   /* USER CODE BEGIN 2 */
-  
-  HAL_NVIC_DisableIRQ(EXTI2_IRQn);
 
   STATUS_LED_INIT();
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
-  
   if(TIMER_START() != TIMER_OKAY) Error_Handler();
 
   SPI_INIT(SPI_DEVICE_IMU, SPI1, GPIOC, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_BARO, SPI4, GPIOE, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_MAGNETO, SPI4, GPIOC, LL_GPIO_PIN_13);
 
-  //SPI_ENABLE_DMA(SPI_DEVICE_IMU);
-
   if(IMU_INIT() != IMU_OKAY) Error_Handler();
 
   GPS_INIT(UART4, 20);
 
-
-  SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 600, true, 500, 800, 10, "Gyro Read");
-  SCHEDULER_REGISTER_TASK(STATUS_PULSE, 10000, false, 9000, 11000, 5, "Status LED Pulsing");
+  #if LSM6DSO_POLLING
+    SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 600, true, 500, 800, 10, "Gyro Read");
+  #endif
+  #if !LSM6DSO_POLLING
+    SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, false, 500, 700, 20, "Gyro Read Blocking");
+  #endif
   SCHEDULER_REGISTER_TASK(USB_STATUS, 100000, false, 90000, 110000, 50, "USB Stats");
 
-  uint8_t tx[13] = {0};
-  uint8_t rx[13] = {0};
-  tx[0] = 0x22 | LSM6DSO_CONFIG_READ;
-  SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx[0], &rx[0], 13);
+  #if LSM6DSO_POLLING
+    uint8_t tx[13] = {0};
+    uint8_t rx[13] = {0};
+    tx[0] = 0x22 | LSM6DSO_CONFIG_READ;
+    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx[0], &rx[0], 13);
+  #endif
 
   /* USER CODE END 2 */
 
@@ -1907,7 +1909,7 @@ static void MX_GPIO_Init(void)
   NVIC_SetPriority(EXTI0_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),13, 0));
   NVIC_EnableIRQ(EXTI0_IRQn);
   NVIC_SetPriority(EXTI2_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),5, 0));
-  NVIC_EnableIRQ(EXTI2_IRQn);
+  //NVIC_EnableIRQ(EXTI2_IRQn);
   NVIC_SetPriority(EXTI3_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),14, 0));
   NVIC_EnableIRQ(EXTI3_IRQn);
   NVIC_SetPriority(EXTI4_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),6, 0));
