@@ -4,6 +4,8 @@
 #include "usbd_cdc_if.h"
 #include "timer.h"
 
+#include "lsm6dso.h"
+
 
 
 void USB_PRINTLN(const char *format, ...){
@@ -25,9 +27,11 @@ void USB_PRINTLN(const char *format, ...){
 }
 
 uint32_t USB_STATUS(const task_info_t *task){
-    const task_stat_t* stat = SCHEDULER_GET_TASK_STAT_BY_INDEX(0);
-    USB_PRINTLN("%dus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
+    //const task_stat_t* stat = SCHEDULER_GET_TASK_STAT_BY_INDEX(0);
+    //USB_PRINTLN("%luus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
     //USB_PRINTLN("Data Length: %d", LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_0));
+    IMU_PROCESSED_T imu = IMU_GET_DATA();
+    USB_PRINTLN("%f°/s x",UTILS_DEGREES(imu.rate.wx));
     return 0;
 }
 

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "spi.h"
 #include "scheduler.h"
+#include <stdint.h>
 
 #ifndef LSM6DSO_H
 #define LSM6DSO_H
@@ -13,6 +14,53 @@ typedef enum{
     IMU_SETUP_FAILED,
     IMU_FAIL
 } IMU_RETURN_TYPE;
+
+typedef struct{
+    float w;
+    float x;
+    float y;
+    float z;
+}quat_t;
+
+typedef struct{
+    float wx;
+    float wy;
+    float wz;
+}rate_t;
+
+typedef struct{
+    float x;
+    float y;
+    float z;
+}accel_t;
+
+typedef struct{
+    int16_t wx;
+    int16_t wy;
+    int16_t wz;
+}rate_raw_t;
+
+typedef struct{
+    int16_t x;
+    int16_t y;
+    int16_t z;
+}accel_raw_t;
+
+typedef struct{
+    quat_t quat;
+    rate_t rate;
+    accel_t accel;
+}IMU_PROCESSED_T;
+
+typedef struct{
+    rate_raw_t rate_raw;
+    accel_raw_t accel_raw;
+}imu_raw_t;
+
+typedef struct{
+    IMU_PROCESSED_T processed;
+    imu_raw_t raw;
+}IMU_T;
 
 IMU_RETURN_TYPE IMU_INIT();
 
@@ -27,12 +75,7 @@ IMU_RETURN_TYPE IMU_INIT();
 void IMU_DATA_READY_INTERRUPT_HANDLER(void);
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void);
 
-typedef struct{
-    float w;
-    float x;
-    float y;
-    float z;
-}quat_t;
+IMU_PROCESSED_T IMU_GET_DATA();
 
 #define LSM6DSO_WRITE 0x7F
 #define LSM6DSO_READ 0x80
