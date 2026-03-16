@@ -35,14 +35,14 @@ static quat_t attitude_quat = {1.0f, 0.0f, 0.0f, 0.0f};
 static uint8_t read_register(uint8_t address){
     uint8_t tx_buff[2] = {LSM6DSO_READ | address, 0};
     uint8_t rx_buff[2] = {0};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2, 100);
+    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2, 100);
     return rx_buff[1];
 }
 
 static IMU_RETURN_TYPE write_register(uint8_t address, uint8_t data){
     uint8_t tx_buff[2] = {LSM6DSO_WRITE & address, data};
     uint8_t rx_buff[2] = {0};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2, 100);
+    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2, 100);
     return IMU_OKAY;
 }
 
@@ -63,7 +63,7 @@ static IMU_RETURN_TYPE imu_setup(){
 IMU_RETURN_TYPE IMU_INIT(){
     uint8_t tx_buff_imu[2] = {0x8F, 0x00};  // check if IMU is recognized
     uint8_t rx_buff_imu[2] = {0x00, 0x00};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, tx_buff_imu, rx_buff_imu, 2, 100);
+    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, tx_buff_imu, rx_buff_imu, 2, 100000);
     if(rx_buff_imu[1] != 108) return IMU_WRONG_ID;
 
     if(imu_setup() != IMU_OKAY) return IMU_SETUP_FAILED;
@@ -94,7 +94,7 @@ uint32_t IMU_READ_DATA(const task_info_t* task){
     uint8_t g_a_tx[13] = {0};
     uint8_t g_a_rx[13] = {0};
     g_a_tx[0] = LSM6DSO_READ_START_REG | LSM6DSO_READ;
-    SPI_TRANSFER_FIFO(SPI_DEVICE_IMU, &g_a_tx[0], &g_a_rx[0], 13, 100);
+    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &g_a_tx[0], &g_a_rx[0], 13, 100);
     return 0;
 }
 

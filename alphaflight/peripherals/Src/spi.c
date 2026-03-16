@@ -4,6 +4,7 @@
 #include "stm32h7xx_ll_gpio.h"
 #include "stm32h7xx_ll_spi.h"
 #include "timer.h"
+#include "main.h"
 
 #define num_devices 3   // baro, IMU, Magneto
 
@@ -18,7 +19,6 @@ SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_TypeDef* SPIx, GPIO_TypeDef* cs_
     spi_device[device].spi_peripheral = SPIx;
     spi_device[device].cs_port = cs_port;
     spi_device[device].cs_pin = cs_pin;
-    LL_SPI_Enable(SPIx);
     LL_GPIO_SetOutputPin(cs_port, cs_pin);
     spi_device[device].configured = true;
     return SPI_OKAY;
@@ -45,7 +45,7 @@ SPI_RETURN_TYPE SPI_STOP_CS(SPI_DEVICE device){
     return SPI_OKAY;
 }
 
-SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len, uint32_t timeout){
+SPI_RETURN_TYPE SPI_TRANSFER_BLOCKING(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len, uint32_t timeout){
     uint32_t start = MICROS32();
     timeout *= 1000;
 
@@ -56,7 +56,7 @@ SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* 
 
     SPI_TypeDef* spi_peripheral = spi_device[device].spi_peripheral;
 
-    // clear RX FIFO
+        // clear RX FIFO
     while(LL_SPI_IsActiveFlag_RXP(spi_peripheral)){
         if((MICROS32() - start) >= timeout) goto timeout_cleanup;
 
@@ -65,29 +65,21 @@ SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* 
 
     LL_SPI_SetTransferSize(spi_peripheral, len);
 
+    LL_SPI_Enable(spi_peripheral);
+
     // pull CS low
     SPI_START_CS(device);
 
     LL_SPI_StartMasterTransfer(spi_peripheral);
 
-    // preload TX FIFO
-    while(LL_SPI_IsActiveFlag_TXP(spi_peripheral) && tx_index < len){
-        if((MICROS32() - start) >= timeout) goto timeout_cleanup;
-
-        LL_SPI_TransmitData8(spi_peripheral, tx_buff[tx_index]);
-        tx_index++;
-    }
-
-    while(rx_index < len){
+    while(rx_index < len || tx_index < len){
         if((MICROS32() - start) >= timeout) goto timeout_cleanup;
 
         if(LL_SPI_IsActiveFlag_TXP(spi_peripheral) && tx_index < len){
-            LL_SPI_TransmitData8(spi_peripheral, tx_buff[tx_index]);
-            tx_index++;
+            LL_SPI_TransmitData8(spi_peripheral, tx_buff[tx_index++]);
         }
-        if(LL_SPI_IsActiveFlag_RXP(spi_peripheral)){
-            rx_buff[rx_index] = LL_SPI_ReceiveData8(spi_peripheral);
-            rx_index++;
+        if(LL_SPI_IsActiveFlag_RXP(spi_peripheral) && rx_index < len){
+            rx_buff[rx_index++] = LL_SPI_ReceiveData8(spi_peripheral);
         }
     }
 
@@ -97,10 +89,13 @@ SPI_RETURN_TYPE SPI_TRANSFER_FIFO(SPI_DEVICE device, uint8_t* tx_buff, uint8_t* 
     // pull CS high
     SPI_STOP_CS(device);
 
+    LL_SPI_Disable(spi_peripheral);
+
     return SPI_OKAY;
 
     timeout_cleanup:
         SPI_STOP_CS(device);
+        LL_SPI_Disable(spi_peripheral);
         return SPI_FAIL;
 }
 
