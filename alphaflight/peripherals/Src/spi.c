@@ -70,6 +70,8 @@ SPI_RETURN_TYPE SPI_TRANSFER_BLOCKING(SPI_DEVICE device, uint8_t* tx_buff, uint8
     // pull CS low
     SPI_START_CS(device);
 
+    *((__IO uint8_t*)&spi_peripheral->TXDR) = tx_buff[tx_index++];      // preload the FIFO with the first byte
+
     spi_peripheral->CR1 |= SPI_CR1_CSTART;
 
     while(rx_index < len || tx_index < len){
@@ -89,6 +91,14 @@ SPI_RETURN_TYPE SPI_TRANSFER_BLOCKING(SPI_DEVICE device, uint8_t* tx_buff, uint8
 
     // pull CS high
     SPI_STOP_CS(device);
+
+    while(spi_peripheral->SR & SPI_SR_RXP){     // loop while rx data is in register
+        if((MICROS32() - start) >= timeout) goto timeout_cleanup;
+
+        (void)spi_peripheral->RXDR;   // flush rx data
+    }
+
+    spi_peripheral->IFCR |= SPI_IFCR_TXTFC;      // transmit transfer filled flag
 
     spi_peripheral->CR1 &= ~SPI_CR1_SPE;    // disable SPI peripheral
 

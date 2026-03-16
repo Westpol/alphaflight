@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<moduletable>
+  <module name="SPI1" address="0x40013000">
+    <register name="CR1" address="0x40013000" size="32" value="0x00001000">
+      <bitfield name="SPE" bitrange="[0:0]" value="0x00000000"></bitfield>
+      <bitfield name="MASRX" bitrange="[8:8]" value="0x00000000"></bitfield>
+      <bitfield name="CSTART" bitrange="[9:9]" value="0x00000000"></bitfield>
+      <bitfield name="CSUSP" bitrange="[10:10]" value="0x00000000"></bitfield>
+      <bitfield name="HDDIR" bitrange="[11:11]" value="0x00000000"></bitfield>
+      <bitfield name="SSI" bitrange="[12:12]" value="0x00000001"></bitfield>
+      <bitfield name="CRC33_17" bitrange="[13:13]" value="0x00000000"></bitfield>
+      <bitfield name="RCRCI" bitrange="[14:14]" value="0x00000000"></bitfield>
+      <bitfield name="TCRCI" bitrange="[15:15]" value="0x00000000"></bitfield>
+      <bitfield name="IOLOCK" bitrange="[16:16]" value="0x00000000"></bitfield>
+    </register>
+    <register name="CR2" address="0x40013004" size="32" value="0x00000002">
+      <bitfield name="TSIZE" bitrange="[15:0]" value="0x00000002"></bitfield>
+      <bitfield name="TSER" bitrange="[31:16]" value="0x00000000"></bitfield>
+    </register>
+    <register name="CFG1" address="0x40013008" size="32" value="0x00070007">
+      <bitfield name="DSIZE" bitrange="[4:0]" value="0x00000007"></bitfield>
+      <bitfield name="FTHVL" bitrange="[8:5]" value="0x00000000"></bitfield>
+      <bitfield name="UDRCFG" bitrange="[10:9]" value="0x00000000"></bitfield>
+      <bitfield name="UDRDET" bitrange="[12:11]" value="0x00000000"></bitfield>
+      <bitfield name="RXDMAEN" bitrange="[14:14]" value="0x00000000"></bitfield>
+      <bitfield name="TXDMAEN" bitrange="[15:15]" value="0x00000000"></bitfield>
+      <bitfield name="CRCSIZE" bitrange="[20:16]" value="0x00000007"></bitfield>
+      <bitfield name="CRCEN" bitrange="[22:22]" value="0x00000000"></bitfield>
+      <bitfield name="MBR" bitrange="[30:28]" value="0x00000000"></bitfield>
+    </register>
+    <register name="CFG2" address="0x4001300c" size="32" value="0x44400000">
+      <bitfield name="MSSI" bitrange="[3:0]" value="0x00000000"></bitfield>
+      <bitfield name="MIDI" bitrange="[7:4]" value="0x00000000"></bitfield>
+      <bitfield name="IOSWP" bitrange="[15:15]" value="0x00000000"></bitfield>
+      <bitfield name="COMM" bitrange="[18:17]" value="0x00000000"></bitfield>
+      <bitfield name="SP" bitrange="[21:19]" value="0x00000000"></bitfield>
+      <bitfield name="MASTER" bitrange="[22:22]" value="0x00000001"></bitfield>
+      <bitfield name="LSBFRST" bitrange="[23:23]" value="0x00000000"></bitfield>
+      <bitfield name="CPHA" bitrange="[24:24]" value="0x00000000"></bitfield>
+      <bitfield name="CPOL" bitrange="[25:25]" value="0x00000000"></bitfield>
+      <bitfield name="SSM" bitrange="[26:26]" value="0x00000001"></bitfield>
+      <bitfield name="SSIOP" bitrange="[28:28]" value="0x00000000"></bitfield>
+      <bitfield name="SSOE" bitrange="[29:29]" value="0x00000000"></bitfield>
+      <bitfield name="SSOM" bitrange="[30:30]" value="0x00000001"></bitfield>
+      <bitfield name="AFCNTR" bitrange="[31:31]" value="0x00000000"></bitfield>
+    </register>
+    <register name="IER" address="0x40013010" size="32" value="0x00000000">
+      <bitfield name="RXPIE" bitrange="[0:0]" value="0x00000000"></bitfield>
+      <bitfield name="TXPIE" bitrange="[1:1]" value="0x00000000"></bitfield>
+      <bitfield name="DPXPIE" bitrange="[2:2]" value="0x00000000"></bitfield>
+      <bitfield name="EOTIE" bitrange="[3:3]" value="0x00000000"></bitfield>
+      <bitfield name="TXTFIE" bitrange="[4:4]" value="0x00000000"></bitfield>
+      <bitfield name="UDRIE" bitrange="[5:5]" value="0x00000000"></bitfield>
+      <bitfield name="OVRIE" bitrange="[6:6]" value="0x00000000"></bitfield>
+      <bitfield name="CRCEIE" bitrange="[7:7]" value="0x00000000"></bitfield>
+      <bitfield name="TIFREIE" bitrange="[8:8]" value="0x00000000"></bitfield>
+      <bitfield name="MODFIE" bitrange="[9:9]" value="0x00000000"></bitfield>
+      <bitfield name="TSERFIE" bitrange="[10:10]" value="0x00000000"></bitfield>
+    </register>
+    <register name="SR" address="0x40013014" size="32" value="0x0000c017">
+      <bitfield name="RXP" bitrange="[0:0]" value="0x00000001"></bitfield>
+      <bitfield name="TXP" bitrange="[1:1]" value="0x00000001"></bitfield>
+      <bitfield name="DXP" bitrange="[2:2]" value="0x00000001"></bitfield>
+      <bitfield name="EOT" bitrange="[3:3]" value="0x00000000"></bitfield>
+      <bitfield name="TXTF" bitrange="[4:4]" value="0x00000001"></bitfield>
+      <bitfield name="UDR" bitrange="[5:5]" value="0x00000000"></bitfield>
+      <bitfield name="OVR" bitrange="[6:6]" value="0x00000000"></bitfield>
+      <bitfield name="CRCE" bitrange="[7:7]" value="0x00000000"></bitfield>
+      <bitfield name="TIFRE" bitrange="[8:8]" value="0x00000000"></bitfield>
+      <bitfield name="MODF" bitrange="[9:9]" value="0x00000000"></bitfield>
+      <bitfield name="TSERF" bitrange="[10:10]" value="0x00000000"></bitfield>
+      <bitfield name="SUSP" bitrange="[11:11]" value="0x00000000"></bitfield>
+      <bitfield name="TXC" bitrange="[12:12]" value="0x00000000"></bitfield>
+      <bitfield name="RXPLVL" bitrange="[14:13]" value="0x00000002"></bitfield>
+      <bitfield name="RXWNE" bitrange="[15:15]" value="0x00000001"></bitfield>
+      <bitfield name="CTSIZE" bitrange="[31:16]" value="0x00000000"></bitfield>
+    </register>
+    <register name="IFCR" address="0x40013018" size="32" value="0x00000000">
+      <bitfield name="EOTC" bitrange="[3:3]" value="0x00000000"></bitfield>
+      <bitfield name="TXTFC" bitrange="[4:4]" value="0x00000000"></bitfield>
+      <bitfield name="UDRC" bitrange="[5:5]" value="0x00000000"></bitfield>
+      <bitfield name="OVRC" bitrange="[6:6]" value="0x00000000"></bitfield>
+      <bitfield name="CRCEC" bitrange="[7:7]" value="0x00000000"></bitfield>
+      <bitfield name="TIFREC" bitrange="[8:8]" value="0x00000000"></bitfield>
+      <bitfield name="MODFC" bitrange="[9:9]" value="0x00000000"></bitfield>
+      <bitfield name="TSERFC" bitrange="[10:10]" value="0x00000000"></bitfield>
+      <bitfield name="SUSPC" bitrange="[11:11]" value="0x00000000"></bitfield>
+    </register>
+    <register name="TXDR" address="0x40013020" size="32" value="0x00000000">
+      <bitfield name="TXDR" bitrange="[31:0]" value="0x00000000"></bitfield>
+    </register>
+    <register name="RXDR" address="0x40013030" size="32" value="0x00000000">
+      <bitfield name="RXDR" bitrange="[31:0]" value="0x00000000"></bitfield>
+    </register>
+    <register name="CRCPOLY" address="0x40013040" size="32" value="0x00000107">
+      <bitfield name="CRCPOLY" bitrange="[31:0]" value="0x00000107"></bitfield>
+    </register>
+    <register name="TXCRC" address="0x40013044" size="32" value="0x00000000">
+      <bitfield name="TXCRC" bitrange="[31:0]" value="0x00000000"></bitfield>
+    </register>
+    <register name="RXCRC" address="0x40013048" size="32" value="0x00000000">
+      <bitfield name="RXCRC" bitrange="[31:0]" value="0x00000000"></bitfield>
+    </register>
+    <register name="UDRDR" address="0x4001304c" size="32" value="0x00000000">
+      <bitfield name="UDRDR" bitrange="[31:0]" value="0x00000000"></bitfield>
+    </register>
+    <register name="I2SCFGR" address="0x40013050" size="32" value="0x00000000">
+      <bitfield name="I2SMOD" bitrange="[0:0]" value="0x00000000"></bitfield>
+      <bitfield name="I2SCFG" bitrange="[3:1]" value="0x00000000"></bitfield>
+      <bitfield name="I2SSTD" bitrange="[5:4]" value="0x00000000"></bitfield>
+      <bitfield name="PCMSYNC" bitrange="[7:7]" value="0x00000000"></bitfield>
+      <bitfield name="DATLEN" bitrange="[9:8]" value="0x00000000"></bitfield>
+      <bitfield name="CHLEN" bitrange="[10:10]" value="0x00000000"></bitfield>
+      <bitfield name="CKPOL" bitrange="[11:11]" value="0x00000000"></bitfield>
+      <bitfield name="FIXCH" bitrange="[12:12]" value="0x00000000"></bitfield>
+      <bitfield name="WSINV" bitrange="[13:13]" value="0x00000000"></bitfield>
+      <bitfield name="DATFMT" bitrange="[14:14]" value="0x00000000"></bitfield>
+      <bitfield name="I2SDIV" bitrange="[23:16]" value="0x00000000"></bitfield>
+      <bitfield name="ODD" bitrange="[24:24]" value="0x00000000"></bitfield>
+      <bitfield name="MCKOE" bitrange="[25:25]" value="0x00000000"></bitfield>
+    </register>
+  </module>
+</moduletable>
