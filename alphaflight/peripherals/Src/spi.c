@@ -1,5 +1,4 @@
 #include "spi.h"
-#include "stm32h723xx.h"
 #include "stm32h7xx_ll_gpio.h"
 
 #define num_devices 3   // baro, IMU, Magneto
@@ -15,17 +14,19 @@ SPI_RETURN_TYPE SPI_INIT(SPI_DEVICE device, SPI_HandleTypeDef* SPIx, GPIO_TypeDe
     spi_device[device].spi_peripheral = SPIx;
     spi_device[device].cs_port = cs_port;
     spi_device[device].cs_pin = cs_pin;
-    LL_GPIO_SetOutputPin(cs_port, cs_pin);
     spi_device[device].configured = true;
+    SPI_STOP_CS(device);
     return SPI_OKAY;
 }
 
 SPI_RETURN_TYPE SPI_START_CS(SPI_DEVICE device){
+    if(!spi_device[device].configured) return SPI_FAIL;
     LL_GPIO_ResetOutputPin(spi_device[device].cs_port, spi_device[device].cs_pin);
     return SPI_OKAY;
 }
 
 SPI_RETURN_TYPE SPI_STOP_CS(SPI_DEVICE device){
+    if(!spi_device[device].configured) return SPI_FAIL;
     LL_GPIO_SetOutputPin(spi_device[device].cs_port, spi_device[device].cs_pin);
     return SPI_OKAY;
 }
@@ -37,14 +38,13 @@ SPI_RETURN_TYPE SPI_TRANSFER_DMA(SPI_DEVICE device, const uint8_t* tx_buff, uint
     return SPI_OKAY;
 }
 
-SPI_RETURN_TYPE SPI_TRANSFER(SPI_DEVICE device, const uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len){
-    if(len > 16) return SPI_TOO_MUCH_DATA;
+SPI_RETURN_TYPE SPI_TRANSFER_BLOCKING(SPI_DEVICE device, const uint8_t* tx_buff, uint8_t* rx_buff, uint8_t len, uint32_t timeout){
     if(!spi_device[device].configured) return SPI_NOT_INITIALIZED;
 
     // pull CS low
     SPI_START_CS(device);
 
-    HAL_SPI_TransmitReceive(spi_device[device].spi_peripheral, &tx_buff[0], &rx_buff[0], len, 100);
+    HAL_SPI_TransmitReceive(spi_device[device].spi_peripheral, &tx_buff[0], &rx_buff[0], len, timeout);
 
     // pull CS high
     SPI_STOP_CS(device);
