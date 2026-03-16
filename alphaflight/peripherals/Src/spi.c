@@ -57,45 +57,46 @@ SPI_RETURN_TYPE SPI_TRANSFER_BLOCKING(SPI_DEVICE device, uint8_t* tx_buff, uint8
     SPI_TypeDef* spi_peripheral = spi_device[device].spi_peripheral;
 
         // clear RX FIFO
-    while(LL_SPI_IsActiveFlag_RXP(spi_peripheral)){
+    while(spi_peripheral->SR & SPI_SR_RXP){     // loop while rx data is in register
         if((MICROS32() - start) >= timeout) goto timeout_cleanup;
 
-        (void)LL_SPI_ReceiveData8(spi_peripheral);
+        (void)spi_peripheral->RXDR;   // flush rx data
     }
 
-    LL_SPI_SetTransferSize(spi_peripheral, len);
+    spi_peripheral->CR2 = len;     // set transfer length
 
-    LL_SPI_Enable(spi_peripheral);
+    spi_peripheral->CR1 |= SPI_CR1_SPE;  // enable SPI peripheral
 
     // pull CS low
     SPI_START_CS(device);
 
-    LL_SPI_StartMasterTransfer(spi_peripheral);
+    spi_peripheral->CR1 |= SPI_CR1_CSTART;
 
     while(rx_index < len || tx_index < len){
         if((MICROS32() - start) >= timeout) goto timeout_cleanup;
 
-        if(LL_SPI_IsActiveFlag_TXP(spi_peripheral) && tx_index < len){
-            LL_SPI_TransmitData8(spi_peripheral, tx_buff[tx_index++]);
+        if(spi_peripheral->SR & SPI_SR_TXP && tx_index < len){
+            *((__IO uint8_t*)&spi_peripheral->TXDR) = tx_buff[tx_index++];
         }
-        if(LL_SPI_IsActiveFlag_RXP(spi_peripheral) && rx_index < len){
-            rx_buff[rx_index++] = LL_SPI_ReceiveData8(spi_peripheral);
+        if(spi_peripheral->SR & SPI_SR_RXP && rx_index < len){
+            rx_buff[rx_index++] = *((__IO uint8_t*)&spi_peripheral->RXDR);
         }
     }
 
-    while(!LL_SPI_IsActiveFlag_EOT(spi_peripheral)) if((MICROS32() - start) >= timeout) goto timeout_cleanup;
-    LL_SPI_ClearFlag_EOT(spi_peripheral);
+    while(!(spi_peripheral->SR & SPI_SR_EOT)) if((MICROS32() - start) >= timeout) goto timeout_cleanup;     // wait for end of transfer flag
+
+    spi_peripheral->IFCR |= SPI_IFCR_EOTC;  // clear end of transfer flag
 
     // pull CS high
     SPI_STOP_CS(device);
 
-    LL_SPI_Disable(spi_peripheral);
+    spi_peripheral->CR1 &= ~SPI_CR1_SPE;    // disable SPI peripheral
 
     return SPI_OKAY;
 
     timeout_cleanup:
         SPI_STOP_CS(device);
-        LL_SPI_Disable(spi_peripheral);
+        spi_peripheral->CR1 &= ~SPI_CR1_SPE;    // disable SPI peripheral
         return SPI_FAIL;
 }
 

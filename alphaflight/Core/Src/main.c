@@ -180,7 +180,7 @@ int main(void)
     SCHEDULER_REGISTER_TASK(IMU_CONVERT_DATA, 600, true, 500, 800, 10, "Gyro Read");
   #endif
   #if !LSM6DSO_POLLING
-    SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, false, 500, 700, 20, "Gyro Read Blocking");
+    SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 1500, false, 500, 700, 20, "Gyro Read Blocking");
   #endif
   SCHEDULER_REGISTER_TASK(USB_STATUS, 100000, false, 90000, 110000, 50, "USB Stats");
 

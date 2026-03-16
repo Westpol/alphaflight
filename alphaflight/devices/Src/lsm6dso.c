@@ -94,7 +94,7 @@ uint32_t IMU_READ_DATA(const task_info_t* task){
     uint8_t g_a_tx[13] = {0};
     uint8_t g_a_rx[13] = {0};
     g_a_tx[0] = LSM6DSO_READ_START_REG | LSM6DSO_READ;
-    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &g_a_tx[0], &g_a_rx[0], 13, 100);
+    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &g_a_tx[0], &g_a_rx[0], 13, 1);
     return 0;
 }
 
