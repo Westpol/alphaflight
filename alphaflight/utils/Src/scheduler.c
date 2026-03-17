@@ -1,12 +1,13 @@
 #include "scheduler.h"
 #include "timer.h"
+#include "usb.h"
 
-#define num_tasks 50
+#define num_tasks 100
 #define min_call_delta 100      // in us
 
 static struct{
     task_t task[num_tasks];
-    uint8_t num_registered_tasks;
+    uint32_t num_registered_tasks;
 } scheduler = {0};
 
 
@@ -68,4 +69,27 @@ int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dyna
     scheduler.task[task_num].info.activated = true;
 
     return task_num;
+}
+
+uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
+    USB_PRINTLN_BLOCKING("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");   // a few newlines
+    USB_PRINTLN_BLOCKING("%-16s | %-15s | %-14s | %-10s |",
+                     "Task Name",
+                     "Next Execution",
+                     "Execution Time",
+                     "CPU Usage");   // print header
+
+    USB_PRINTLN_BLOCKING("---------------------------------------------------------------------");  // header seperator
+
+    for(uint32_t i = 0; i < scheduler.num_registered_tasks; i++){
+        if(!scheduler.task[i].info.activated) continue;
+        task_t task = scheduler.task[i];
+        float cpu_usage = (float)task.stat.average_exec_time / task.info.call_delta_norm;
+        USB_PRINTLN_BLOCKING("%-16s | %12lu us | %11d us | %8.2f %% |",
+                     task.info.task_name,
+                     task.info.next_execution_timestamp,
+                     task.stat.average_exec_time,
+                     cpu_usage * 100.0f);
+    }
+    return 0;
 }

@@ -47,6 +47,13 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
+static inline uint32_t HZ_TO_US(float hz){
+    if (hz <= 0.0f) return 0xFFFFFFFF; // avoid div by zero
+    float period = 1.0f / hz * 1e6f;
+    if (period > 0xFFFFFFFF) return 0xFFFFFFFF; // clamp to max uint32
+    return (uint32_t)period;
+}
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -196,7 +203,7 @@ int main(void)
 
 
   SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 10, "Gyro Read");
-  SCHEDULER_REGISTER_TASK(USB_STATUS, 100000, false, 90000, 110000, 50, "USB Stats");
+  SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 50, "USB Stats");
 
   /* USER CODE END 2 */
 
