@@ -54,7 +54,7 @@ int32_t SCHEDULER_DISABLE_TASK_BY_INDEX(uint32_t index){
     return 0;
 }
 
-int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, uint32_t max_execution_time, char* task_name){
+int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, uint32_t max_execution_time_us, char* task_name){
 
     if(scheduler.num_registered_tasks >= num_tasks) return -1;
 
@@ -79,17 +79,26 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
                      "Execution Time",
                      "CPU Usage");   // print header
 
-    USB_PRINTLN_BLOCKING("---------------------------------------------------------------------");  // header seperator
+    USB_PRINTLN_BLOCKING("------------------------------------------------------------------");  // header seperator
+    float cpu_usage_total = 0;
 
     for(uint32_t i = 0; i < scheduler.num_registered_tasks; i++){
         if(!scheduler.task[i].info.activated) continue;
         task_t task = scheduler.task[i];
         float cpu_usage = (float)task.stat.average_exec_time / task.info.call_delta_norm;
+        cpu_usage_total += cpu_usage;
         USB_PRINTLN_BLOCKING("%-16s | %12lu us | %11d us | %8.2f %% |",
                      task.info.task_name,
                      task.info.next_execution_timestamp,
                      task.stat.average_exec_time,
                      cpu_usage * 100.0f);
     }
+
+    USB_PRINTLN_BLOCKING("------------------------------------------------------------------");  // total seperator
+    USB_PRINTLN_BLOCKING("%-16s | %-15s | %-14s | %8.2f %% |",
+                    "Total",
+                    "",
+                    "",
+                    cpu_usage_total * 100.0f);   // print header
     return 0;
 }

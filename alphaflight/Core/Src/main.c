@@ -26,12 +26,14 @@
 #include "sd.h"
 #include "gps.h"
 #include "lsm6dso.h"
+#include "bmp390.h"
 #include "timer.h"
 #include "scheduler.h"
 #include "spi.h"
 #include "usbd_cdc.h"
 #include "status_led.h"
 #include "usb.h"
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -197,13 +199,15 @@ int main(void)
   SPI_INIT(SPI_DEVICE_BARO, &hspi4, GPIOE, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_MAGNETO, &hspi4, GPIOC, LL_GPIO_PIN_13);
 
-  if(IMU_INIT() != IMU_OKAY) Error_Handler();
+  if(IMU_INIT(SPI_DEVICE_IMU) != IMU_OKAY) Error_Handler();
+  if(BARO_INIT(SPI_DEVICE_BARO) != BARO_OKAY) Error_Handler();
 
   GPS_INIT(UART4, 20);
 
 
-  SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 10, "Gyro Read");
-  SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 50, "USB Stats");
+  SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 25, "Gyro Read");
+  SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
+  SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
 
   /* USER CODE END 2 */
 

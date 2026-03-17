@@ -11,7 +11,9 @@
 #define imu_execution_delta_offset 20       // offset in us
 #define imu_execution_averaging_bias 9
 
-IMU_T imu = {0};
+static IMU_T imu = {0};
+
+static SPI_DEVICE spi_device;
 
 #if LSM6DSO_POLLING
     #define IMU_DMA_PROCESSED 0x00
@@ -39,14 +41,14 @@ static IMU_RETURN_TYPE imu_setup();
 static uint8_t read_register(uint8_t address){
     uint8_t tx_buff[2] = {LSM6DSO_READ | address, 0};
     uint8_t rx_buff[2] = {0};
-    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2, 1);
+    SPI_TRANSFER_BLOCKING(spi_device, &tx_buff[0], &rx_buff[0], 2, 1);
     return rx_buff[1];
 }
 
 static IMU_RETURN_TYPE write_register(uint8_t address, uint8_t data){
     uint8_t tx_buff[2] = {LSM6DSO_WRITE & address, data};
     uint8_t rx_buff[2] = {0};
-    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &tx_buff[0], &rx_buff[0], 2, 1);
+    SPI_TRANSFER_BLOCKING(spi_device, &tx_buff[0], &rx_buff[0], 2, 1);
     return IMU_OKAY;
 }
 
@@ -64,12 +66,10 @@ static IMU_RETURN_TYPE imu_setup(){
 }
 
 
-IMU_RETURN_TYPE IMU_INIT(){
+IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device){
+    spi_device = device;
     imu.processed.quat.w = 1.0f;    // set to standard orientation
-    uint8_t tx_buff_imu[2] = {0x8F, 0x00};  // check if IMU is recognized
-    uint8_t rx_buff_imu[2] = {0x00, 0x00};
-    SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, tx_buff_imu, rx_buff_imu, 2, 1);
-    if(rx_buff_imu[1] != 108) return IMU_WRONG_ID;
+    if(read_register(0x8F) != 108) return IMU_WRONG_ID; // check if IMU is registered
 
     if(imu_setup() != IMU_OKAY) return IMU_SETUP_FAILED;
 
@@ -122,7 +122,7 @@ uint32_t IMU_READ_DATA(const task_info_t* task){
     uint8_t g_a_tx[13] = {0};
     uint8_t g_a_rx[13] = {0};
     g_a_tx[0] = LSM6DSO_READ_START_REG | LSM6DSO_READ;
-    if(SPI_TRANSFER_BLOCKING(SPI_DEVICE_IMU, &g_a_tx[0], &g_a_rx[0], 13, 1) == SPI_OKAY){
+    if(SPI_TRANSFER_BLOCKING(spi_device, &g_a_tx[0], &g_a_rx[0], 13, 1) == SPI_OKAY){
         imu_convert_data(&g_a_rx[1]);
     }
     return 0;
