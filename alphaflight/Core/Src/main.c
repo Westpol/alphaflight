@@ -204,10 +204,6 @@ int main(void)
 
   GPS_INIT(UART4, 20);
 
-  uint8_t buffer[4092] = {0};
-  buffer[0] = 0xFF;
-  SD_WRITE_BLOCK_BLOCKING(buffer, 10, 1000);
-
 
   SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 25, "Gyro Read");
   SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
