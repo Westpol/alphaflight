@@ -33,7 +33,6 @@
 #include "usbd_cdc.h"
 #include "status_led.h"
 #include "usb.h"
-#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
