@@ -5,10 +5,18 @@
 #ifndef SD_H_
 #define SD_H_
 
-#define sd_usable_block_size_bytes 508
+#define SD_USABLE_BLOCK_SIZE_BYTES 4092
+#define SD_SECTORS_PER_BLOCK 8
+#define SD_BLOCK_SIZE 4096
 
-void bump(void);
+typedef enum{
+    SD_OKAY,
+    SD_FAIL,
+    SD_WRONG_CRC,
+    SD_BUFF_FULL
+}SD_RETURN_TYPE;
 
-void SD_APPEND_TO_BUFFER(uint8_t* data_pointer, uint32_t len);
+SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t timeout);
+SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t timeout);
 
 #endif
