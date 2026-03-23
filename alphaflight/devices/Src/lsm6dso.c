@@ -190,3 +190,9 @@ IMU_PROCESSED_T IMU_GET_DATA(){
 void IMU_SET_CONFIG(imu_config_t new_config){
     config = new_config;
 }
+
+imu_config_t IMU_GET_DEFAULT_CONFIG(){
+    imu_config_t temp = {0};
+    temp.orientation = 0;
+    return temp;
+}

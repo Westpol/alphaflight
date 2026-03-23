@@ -55,6 +55,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "peripherals/Src/spi.c"
     "peripherals/Src/sd.c"
     "peripherals/Src/usb.c"
+    "peripherals/Src/dshot.c"
     "other/Src/config.c"
     # Add user sources here
 )
@@ -64,6 +65,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     "devices/Inc"
     "utils/Inc"
     "peripherals/Inc"
+    "other/Inc"
     # Add user defined include paths
 )
 

@@ -82,6 +82,7 @@ void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void);
 IMU_PROCESSED_T IMU_GET_DATA();
 
 void IMU_SET_CONFIG(imu_config_t new_config);
+imu_config_t IMU_GET_DEFAULT_CONFIG();
 
 #define LSM6DSO_WRITE 0x7F
 #define LSM6DSO_READ 0x80

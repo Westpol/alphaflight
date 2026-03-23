@@ -33,6 +33,7 @@
 #include "usbd_cdc.h"
 #include "status_led.h"
 #include "usb.h"
+#include "config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -189,6 +190,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
   
   STATUS_LED_INIT();
+
+  //if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
+
+  if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
   
