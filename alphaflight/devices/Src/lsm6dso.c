@@ -15,6 +15,8 @@ static IMU_T imu = {0};
 
 static SPI_DEVICE spi_device;
 
+static imu_config_t config = {0};
+
 #if LSM6DSO_POLLING
     #define IMU_DMA_PROCESSED 0x00
     #define IMU_DMA_READY 0x01
@@ -183,4 +185,8 @@ void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
 
 IMU_PROCESSED_T IMU_GET_DATA(){
     return imu.processed;
+}
+
+void IMU_SET_CONFIG(imu_config_t new_config){
+    config = new_config;
 }

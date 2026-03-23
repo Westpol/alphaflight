@@ -16,6 +16,10 @@ typedef enum{
 } IMU_RETURN_TYPE;
 
 typedef struct{
+    uint8_t orientation;
+}imu_config_t;
+
+typedef struct{
     float w;
     float x;
     float y;
@@ -76,6 +80,8 @@ void IMU_DATA_READY_INTERRUPT_HANDLER(void);
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void);
 
 IMU_PROCESSED_T IMU_GET_DATA();
+
+void IMU_SET_CONFIG(imu_config_t new_config);
 
 #define LSM6DSO_WRITE 0x7F
 #define LSM6DSO_READ 0x80
