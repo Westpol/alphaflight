@@ -191,7 +191,7 @@ int main(void)
   
   STATUS_LED_INIT();
 
-  //if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
+  if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
 
   if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();
 

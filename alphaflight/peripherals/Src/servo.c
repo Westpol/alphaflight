@@ -50,7 +50,7 @@ servo_config_t SERVO_GET_DEFAULT_CONFIG(){
     servo_config_t temp = {0};
     for(uint8_t i = 0; i < 8; i++){
         temp.servo_direction[i] = 1;
-        temp.servo_neutral_pos[i] = 1500;
+        temp.servo_neutral_pos[i] = 1501;
         temp.servo_function_map[i] = 1;
         temp.servo_idle_pos[i] = 1500;
         temp.servo_max[i] = 2000;
