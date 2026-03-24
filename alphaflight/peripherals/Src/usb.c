@@ -52,7 +52,7 @@ void USB_PRINTLN_BLOCKING(const char *format, ...){
 
 	    uint32_t start = HAL_GetTick();
 	    while (CDC_Transmit_HS((uint8_t *)message, len) == USBD_BUSY) {
-	        if (HAL_GetTick() - start > 100) break; // Timeout after 100ms
+	        if (HAL_GetTick() - start > 10) break; // Timeout after 100ms
 	    }
 }
 

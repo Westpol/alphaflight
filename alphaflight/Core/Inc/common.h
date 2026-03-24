@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "utils.h"
+#include "timer.h"
 
 #ifndef COMMON_H_
 #define COMMON_H_
