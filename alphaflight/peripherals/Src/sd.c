@@ -54,11 +54,11 @@ SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t
 }
 
 static uint32_t generate_crc32_hw(uint8_t* buffer_pointer){      // buffer pointer MUST BE pointing at first byte of block
-    CRC->CR = CRC_CR_RESET;    // reset crc engine
+    CRC->CR |= CRC_CR_RESET;    // reset crc engine
     uint32_t* p = (uint32_t*)buffer_pointer;
     for(size_t i = 0; i < SD_USABLE_BLOCK_SIZE_BYTES / 4; i++){       // sd_usable_block_size_bytes / 4 comes from 508 byte block size divided by 4 bytes (32 bit words used for CRC engine)
         CRC->DR = p[i];
     }
-    return CRC->DR;
+    return CRC->DR ^0xFFFFFFFF;
 }
 

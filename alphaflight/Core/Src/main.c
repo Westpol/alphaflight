@@ -34,6 +34,8 @@
 #include "status_led.h"
 #include "usb.h"
 #include "config.h"
+#include "dshot.h"
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -208,8 +210,13 @@ int main(void)
 
   GPS_INIT(UART4, 20);
 
+  SERVO_INIT();
+
+  DSHOT_INIT();
+  DSHOT_SET_THROTTLE(48);
 
   SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 25, "Gyro Read");
+  SCHEDULER_REGISTER_TASK(DSHOT_TRANSMIT, HZ_TO_US(100), false, 0, 0, 20, "DSHOT TX");
   SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
   SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
   //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
@@ -452,8 +459,8 @@ static void MX_CRC_Init(void)
   /* USER CODE BEGIN CRC_Init 1 */
 
   /* USER CODE END CRC_Init 1 */
-  LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_NONE);
-  LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_NONE);
+  LL_CRC_SetInputDataReverseMode(CRC, LL_CRC_INDATA_REVERSE_BYTE);
+  LL_CRC_SetOutputDataReverseMode(CRC, LL_CRC_OUTDATA_REVERSE_BIT);
   LL_CRC_SetPolynomialCoef(CRC, LL_CRC_DEFAULT_CRC32_POLY);
   LL_CRC_SetPolynomialSize(CRC, LL_CRC_POLYLENGTH_32B);
   LL_CRC_SetInitialData(CRC, LL_CRC_DEFAULT_CRC_INITVALUE);
@@ -712,7 +719,7 @@ static void MX_TIM1_Init(void)
   /* TIM1_UP Init */
   LL_DMA_SetPeriphRequest(DMA1, LL_DMA_STREAM_0, LL_DMAMUX1_REQ_TIM1_UP);
 
-  LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_STREAM_0, LL_DMA_DIRECTION_PERIPH_TO_MEMORY);
+  LL_DMA_SetDataTransferDirection(DMA1, LL_DMA_STREAM_0, LL_DMA_DIRECTION_MEMORY_TO_PERIPH);
 
   LL_DMA_SetStreamPriorityLevel(DMA1, LL_DMA_STREAM_0, LL_DMA_PRIORITY_VERYHIGH);
 

@@ -19,7 +19,6 @@ typedef struct{
     uint8_t version;
     imu_config_t imu;
     servo_config_t servo;
-    uint32_t crc32;
 }config_entrances_t;
 
 CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD();

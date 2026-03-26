@@ -24,8 +24,10 @@
 /* USER CODE BEGIN Includes */
 #include "gps.h"
 #include "stm32h723xx.h"
+#include "stm32h7xx_ll_dma.h"
 #include "stm32h7xx_ll_usart.h"
 #include "lsm6dso.h"
+#include "dshot.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -296,7 +298,7 @@ void EXTI4_IRQHandler(void)
 void DMA1_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
-
+  DSHOT_DMA_CPLT_CALLBACK();
   /* USER CODE END DMA1_Stream0_IRQn 0 */
   /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
 

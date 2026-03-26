@@ -7,7 +7,6 @@ static config_entrances_t config_entrances = {0};
 
 static CONFIG_RETURN_TYPE config_set_values_global(void);
 static CONFIG_RETURN_TYPE config_get_defaults_global(void);
-static uint32_t generate_crc32_hw(uint8_t* buffer_pointer, uint32_t len);
 
 CONFIG_RETURN_TYPE CONFIG_LOAD_FROM_SD(){
 
@@ -21,10 +20,6 @@ CONFIG_RETURN_TYPE CONFIG_LOAD_FROM_SD(){
         memcpy((uint8_t*)&config_entrances + i * SD_USABLE_BLOCK_SIZE_BYTES, &buff[0], UTILS_MIN_I(rest, SD_USABLE_BLOCK_SIZE_BYTES));
     }
 
-    uint32_t crc32 = generate_crc32_hw((uint8_t*)&config_entrances, offsetof(config_entrances_t, crc32));
-
-    if(crc32 != config_entrances.crc32) return CONFIG_FAIL;
-
     if(config_entrances.version != CONFIG_VERSION) return CONFIG_FAIL;
 
     config_loaded = true;
@@ -37,8 +32,6 @@ CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD(){
     config_get_defaults_global();
 
     if(sizeof(config_entrances_t) > SD_USABLE_BLOCK_SIZE_BYTES * CONFIG_SPACE_BLOCKS) return CONFIG_FAIL;   // check if config is bigger than assigned space
-
-    config_entrances.crc32 = generate_crc32_hw((uint8_t*)&config_entrances, offsetof(config_entrances_t, crc32));
 
     uint8_t buff[SD_USABLE_BLOCK_SIZE_BYTES] = {0};
 
@@ -63,29 +56,4 @@ static CONFIG_RETURN_TYPE config_get_defaults_global(void){
     config_entrances.servo = SERVO_GET_DEFAULT_CONFIG();
     config_entrances.version = CONFIG_VERSION;
     return CONFIG_OKAY;
-}
-
-static uint32_t generate_crc32_hw(uint8_t* buffer, uint32_t len)
-{
-    CRC->CR = 1;
-
-    uint32_t i = 0;
-
-    // Process 32-bit chunks
-    for (; i + 4 <= len; i += 4) {
-        uint32_t word;
-        memcpy(&word, buffer + i, 4);
-        CRC->DR = word;
-    }
-
-    // Handle remaining bytes safely
-    uint32_t last = 0;
-    uint32_t remaining = len - i;
-
-    if (remaining > 0) {
-        memcpy(&last, buffer + i, remaining);
-        CRC->DR = last;
-    }
-
-    return CRC->DR;
 }
