@@ -1,12 +1,11 @@
 #include "gps.h"
-#include "stm32h7xx_ll_usart.h"
 #include "timer.h"
 #include <stdint.h>
 
 #define recieve_to_parse_time_offset 1000       // in microseconds
 #define timing_filter_value 9
 
-static USART_TypeDef* gps_uart;
+static UART_HandleTypeDef* gps_uart;
 
 static volatile struct{
     uint32_t package_recieved_timestamp;        // package timestamps
@@ -78,18 +77,10 @@ static bool validate_ubx_crc(uint8_t* buffer, uint8_t len, uint8_t checksum_a, u
     return (ck_a == checksum_a && ck_b == checksum_b);
 }
 
-GPS_RETURN_TYPE GPS_INIT(USART_TypeDef *uart, uint8_t update_rate){   // Assumes UART already initialized with correct settings
+GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* uart, uint8_t update_rate){   // Assumes UART already initialized with correct settings
     if(uart == NULL) return GPS_INIT_FAULT;
 
     gps_uart = uart;
-
-    LL_USART_DisableIT_RXNE(uart);   // RX data
-    LL_USART_DisableIT_TXE(uart);    // TX empty
-    LL_USART_DisableIT_TC(uart);     // TX complete
-    LL_USART_DisableIT_PE(uart);     // parity error
-    LL_USART_DisableIT_ERROR(uart);  // FE, NE, ORE
-
-    LL_USART_EnableIT_IDLE(uart);    // only IDLE
 
     // TODO: change GPS settings in blocking mode to desired specs
 

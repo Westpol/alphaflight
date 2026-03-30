@@ -51,6 +51,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "utils/Src/timer.c"
     "utils/Src/scheduler.c"
     "utils/Src/utils.c"
+    "utils/Src/serial_passthrough.c"
     "peripherals/Src/servo.c"
     "peripherals/Src/spi.c"
     "peripherals/Src/sd.c"

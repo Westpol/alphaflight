@@ -79,9 +79,7 @@ UART_HandleTypeDef huart7;
 UART_HandleTypeDef huart8;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
-DMA_HandleTypeDef hdma_uart4_rx;
-DMA_HandleTypeDef hdma_uart4_tx;
-DMA_HandleTypeDef hdma_uart5_rx;
+DMA_HandleTypeDef hdma_usart2_rx;
 
 /* USER CODE BEGIN PV */
 
@@ -208,12 +206,12 @@ int main(void)
   if(IMU_INIT(SPI_DEVICE_IMU) != IMU_OKAY) Error_Handler();
   if(BARO_INIT(SPI_DEVICE_BARO) != BARO_OKAY) Error_Handler();
 
-  GPS_INIT(UART4, 20);
+  GPS_INIT(&huart2, 20);
 
   SERVO_INIT();
 
   DSHOT_INIT();
-  DSHOT_SET_THROTTLE(48);
+  DSHOT_SET_THROTTLE(0);
 
   SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 25, "Gyro Read");
   SCHEDULER_REGISTER_TASK(DSHOT_TRANSMIT, HZ_TO_US(100), false, 0, 0, 20, "DSHOT TX");
@@ -1488,12 +1486,6 @@ static void MX_DMA_Init(void)
   /* DMA1_Stream2_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream2_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream2_IRQn);
-  /* DMA1_Stream3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
-  /* DMA1_Stream4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream4_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream4_IRQn);
   /* DMA2_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
