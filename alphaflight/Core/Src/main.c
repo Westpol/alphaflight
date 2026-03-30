@@ -35,7 +35,7 @@
 #include "usb.h"
 #include "config.h"
 #include "dshot.h"
-#include <stdbool.h>
+#include "serial_passthrough.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -190,6 +190,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   
   STATUS_LED_INIT();
+
+  PASSTHROUGH_START(&huart2, &hdma_usart2_rx);
 
   if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
 
@@ -1386,7 +1388,7 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
+  huart2.Init.BaudRate = 230400;
   huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
   huart2.Init.Parity = UART_PARITY_NONE;
