@@ -5,15 +5,18 @@
 #include "usbd_def.h"
 #include <string.h>
 
+
+// TODO: IMPORTANT! PUT BUFFERS INTO PASSTHROUGH_START FUNCTION AND ONLY CREATE TWO GLOBAL POINTERS, CHECK IN ISR IF POINTER != NULL, OTHERWISE RETURN
+
 __attribute__((section(".dma_rx"))) static uint8_t dma_buffer[STM32_WORD_SIZE * 16] = {0};
 
-struct{
+static struct{
     uint8_t buff[STM32_WORD_SIZE * 4];   // buffer up to 10 messages if CDC gets stuck (128 bytes each *CHECK AGAINST BIGGEST UBX PACKAGE, INCREASE IF NEEDED*)
     volatile uint16_t tx_len;
 } dma_buffer_sec[10];
 
 volatile uint8_t dma_buffer_sec_fill_point = 0; // keep track of num of UBX messages in buffer
-volatile uint16_t old_pos = 1;  // DMA buffer pos marker
+volatile uint16_t old_pos = 0;  // DMA buffer pos marker
 volatile bool modify_buff = false;
 
 volatile UART_HandleTypeDef* local_huart = NULL;
@@ -29,7 +32,8 @@ PASSTHROUGH_RETURN_TYPE PASSTHROUGH_START(UART_HandleTypeDef* huart, DMA_HandleT
     while(1){
         if(dma_buffer_sec_fill_point > 0){  // if buff isn't empty, try to start transaction
             modify_buff = true;
-            if(CDC_Transmit_HS(dma_buffer_sec[dma_buffer_sec_fill_point].buff, dma_buffer_sec[dma_buffer_sec_fill_point].tx_len) == USBD_OK) dma_buffer_sec_fill_point--;
+            uint16_t idx = dma_buffer_sec_fill_point - 1;
+            if(CDC_Transmit_HS(dma_buffer_sec[idx].buff, dma_buffer_sec[idx].tx_len) == USBD_OK) dma_buffer_sec_fill_point--;
             modify_buff = false;
         }
     }
@@ -41,14 +45,21 @@ PASSTHROUGH_RETURN_TYPE PASSTHROUGH_UART2_CALLBACK(){
 
         uint16_t dma_buff_pos = STM32_WORD_SIZE * 16 - __HAL_DMA_GET_COUNTER(local_dma);    // calc buffer pos
 
-        if(dma_buffer_sec_fill_point >= 10) return PASSTHROUGH_FAIL;    // buffer already filled
-        if(modify_buff) return PASSTHROUGH_FAIL;
+        if(dma_buffer_sec_fill_point >= 10){
+            old_pos = dma_buff_pos;
+            return PASSTHROUGH_FAIL;
+        }
+        if(modify_buff){
+            old_pos = dma_buff_pos;
+            return PASSTHROUGH_FAIL;
+        }
         if(old_pos > dma_buff_pos){
             old_pos = dma_buff_pos;
             return PASSTHROUGH_FAIL;
         }
 
         memcpy(dma_buffer_sec[dma_buffer_sec_fill_point++].buff, &dma_buffer[old_pos], dma_buff_pos - old_pos);  // copy packet into next buffer
+        dma_buffer_sec[dma_buffer_sec_fill_point - 1].tx_len = dma_buff_pos - old_pos;
         old_pos = dma_buff_pos;
     }
     return PASSTHROUGH_OKAY;
