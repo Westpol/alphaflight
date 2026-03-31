@@ -2,7 +2,6 @@
 #include "stm32h723xx.h"
 #include "stm32h7xx_ll_dma.h"
 #include "stm32h7xx_ll_tim.h"
-#include <stdint.h>
 
 static __attribute__((section(".dma_tx"))) uint16_t dma_timings[18] = {0};
 volatile static uint16_t throttle_data_buffer;
@@ -10,11 +9,24 @@ volatile static uint16_t throttle_data_buffer;
 volatile static bool transmitting = false;
 volatile static bool new_data = false;
 
+static dshot_config_t config = {0};
+
 DSHOT_RETURN_TYPE dshot_start_transmission(void);
 DSHOT_RETURN_TYPE dshot_set_packet(void);
 
 DSHOT_RETURN_TYPE DSHOT_INIT(void){
     LL_DMA_EnableIT_TC(DMA1, LL_DMA_STREAM_0);
+
+    DSHOT_SET_THROTTLE(0);
+
+    uint32_t start = MICROS32();
+    for(int i = 0; i < 2000; i++){
+        DSHOT_TRANSMIT(NULL);
+        while(MICROS32() - start <= 1000);  // send 0 command for 1500ms at 1kHz (init ESC(s))
+        start += 1000;
+    }
+
+    DSHOT_SET_THROTTLE(0); // set throttle zero / disarm
 
     return DSHOT_OKAY;
 }
@@ -24,9 +36,12 @@ uint32_t DSHOT_TRANSMIT(const task_info_t* task){
     return 0;
 }
 
-DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle){
-    if(throttle > 2047) return DSHOT_FAIL;
-    if(!transmitting){  // usual case
+DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle){    // between 0 and 2000
+    if(throttle > 2000) return DSHOT_FAIL;  // discard change if bad data comes in
+
+    if(throttle != 0) throttle = UTILS_MIN_I(config.motor_max, UTILS_MAX_I(throttle, config.motor_idle)) + 47;   // Map throttle 1–2000 to ESC range 48–2047; 0 remains disarmed
+
+    if(!transmitting){
         throttle_data_buffer = throttle;
         dshot_set_packet();
         return DSHOT_OKAY;
@@ -38,6 +53,11 @@ DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle){
 
 DSHOT_RETURN_TYPE dshot_start_transmission(void){
     if(transmitting) return DSHOT_FAIL;
+
+    if(new_data){
+        dshot_set_packet();    // prepare DMA buffer in case new data came in while transferring DMA
+        new_data = false;
+    }
 
     LL_DMA_SetMemoryAddress(DMA1, LL_DMA_STREAM_0, (uint32_t)dma_timings);
     LL_DMA_SetPeriphAddress(DMA1, LL_DMA_STREAM_0, (uint32_t)&TIM1->CCR1);
@@ -62,7 +82,7 @@ DSHOT_RETURN_TYPE dshot_start_transmission(void){
 }
 
 #define DSHOT_TELEMETRY false
-#define DSHOT600_CCR_HIGH 125
+#define DSHOT600_CCR_HIGH 150
 #define DSHOT600_CCR_LOW 75
 DSHOT_RETURN_TYPE dshot_set_packet(void){
     uint16_t packet;
@@ -89,7 +109,17 @@ DSHOT_RETURN_TYPE DSHOT_DMA_CPLT_CALLBACK(void){
     LL_TIM_DisableCounter(TIM1);
     LL_TIM_DisableDMAReq_UPDATE(TIM1);
     transmitting = false;
-    if(new_data) dshot_set_packet();    // prepare DMA buffer in case new data came in while transferring DMA
-    new_data = false;
     return DSHOT_OKAY;
+}
+
+DSHOT_RETURN_TYPE DSHOT_SET_CONFIG(dshot_config_t conf){
+    config = conf;
+    return DSHOT_OKAY;
+}
+
+dshot_config_t DSHOT_GET_DEFAULT_CONFIG(void){
+    dshot_config_t temp = {0};
+    temp.motor_idle = 50;
+    temp.motor_max = 2000;
+    return temp;
 }
