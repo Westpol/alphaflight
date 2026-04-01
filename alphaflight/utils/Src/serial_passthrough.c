@@ -21,8 +21,10 @@ volatile bool modify_buff = false;
 
 volatile UART_HandleTypeDef* local_huart = NULL;
 volatile DMA_HandleTypeDef* local_dma = NULL;
+volatile bool passthrough_active = false;
 
 PASSTHROUGH_RETURN_TYPE PASSTHROUGH_START(UART_HandleTypeDef* huart, DMA_HandleTypeDef* hdma_rx){
+    passthrough_active = true;
     local_huart = huart;
     local_dma = hdma_rx;
 
@@ -40,6 +42,8 @@ PASSTHROUGH_RETURN_TYPE PASSTHROUGH_START(UART_HandleTypeDef* huart, DMA_HandleT
 }
 
 PASSTHROUGH_RETURN_TYPE PASSTHROUGH_UART2_CALLBACK(){
+    if(!passthrough_active) return PASSTHROUGH_FAIL;    // skip ISR if passtrhogh is not activated
+
     if (__HAL_UART_GET_FLAG(local_huart, UART_FLAG_IDLE)){
         __HAL_UART_CLEAR_IDLEFLAG(local_huart); // clear idle flag
 

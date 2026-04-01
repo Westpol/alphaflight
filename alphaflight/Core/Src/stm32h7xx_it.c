@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "gps.h"
 #include "stm32h723xx.h"
+#include "stm32h7xx_hal.h"
 #include "stm32h7xx_ll_dma.h"
 #include "stm32h7xx_ll_usart.h"
 #include "lsm6dso.h"
@@ -353,6 +354,8 @@ void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
   PASSTHROUGH_UART2_CALLBACK();
+  GPS_UART_IDLE_CALLBACK();
+  if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE)) __HAL_UART_CLEAR_IDLEFLAG(&huart2);
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */

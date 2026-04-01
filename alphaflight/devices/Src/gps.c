@@ -1,23 +1,16 @@
 #include "gps.h"
 #include "timer.h"
-#include <stdint.h>
-
-#define recieve_to_parse_time_offset 1000       // in microseconds
-#define timing_filter_value 9
+#include <string.h>
 
 static UART_HandleTypeDef* gps_uart;
+static DMA_HandleTypeDef* gps_dma;
+
+static volatile int32_t gps_parser_task_index = -1;
 
 static volatile struct{
-    uint32_t package_recieved_timestamp;        // package timestamps
-    uint32_t last_package_recieved_timestamp;
-    bool new_package;
-    uint32_t package_skipped;
-
-    uint32_t average_package_delta;
-    uint32_t next_execution_delta;
-} gps_task_timing;
-
-uint8_t buffer_point;
+    uint16_t write_point;
+    uint16_t read_point;
+} gps_parser;
 
 static bool new_uart_data_arrived = false;
 
@@ -54,19 +47,24 @@ typedef struct __attribute__((packed)){
     uint8_t reserved[4];
     int32_t headVeh; // 1e-5 deg
     int16_t magDec; // 1e-2 deg
-    uint32_t magAcc; // 1e-2 deg
+    uint16_t magAcc; // 1e-2 deg
 } gps_nav_pvt_t;
 
-static struct{
-    uint16_t preamble;
+static struct __attribute__((packed)){
+    uint8_t header_1;
+    uint8_t header_2;
     uint8_t class;
     uint8_t id;
+    uint16_t len;
     gps_nav_pvt_t data;
-} gps_nav_pvt = {0x625b, 0x01, 0x07, {0}};
+    uint8_t checksum_a;
+    uint8_t checksum_b;
+} gps_nav_pvt;
 
-__attribute__((section(".dma_rx"))) static uint8_t dma_buffer[STM32_WORD_SIZE * 16] = {0};
+#define DMA_BUFFER_SIZE STM32_WORD_SIZE * 16
+__attribute__((section(".dma_rx"))) static uint8_t dma_buffer[DMA_BUFFER_SIZE] = {0};
 
-static bool validate_ubx_crc(uint8_t* buffer, uint8_t len, uint8_t checksum_a, uint8_t checksum_b){
+static bool validate_ubx_crc(uint8_t* buffer, uint16_t len, uint8_t checksum_a, uint8_t checksum_b){
     uint8_t ck_a = 0, ck_b = 0;
 
     for(uint8_t i = 0; i < len; i++){
@@ -77,42 +75,78 @@ static bool validate_ubx_crc(uint8_t* buffer, uint8_t len, uint8_t checksum_a, u
     return (ck_a == checksum_a && ck_b == checksum_b);
 }
 
-GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* uart, uint8_t update_rate){   // Assumes UART already initialized with correct settings
+GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* gps_uart_dma){   // Assumes UART already initialized with correct settings
     if(uart == NULL) return GPS_INIT_FAULT;
-
+    if(gps_uart_dma == NULL) return GPS_INIT_FAULT;
+    gps_dma = gps_uart_dma;
     gps_uart = uart;
 
-    // TODO: change GPS settings in blocking mode to desired specs
+    HAL_UART_Receive_DMA(gps_uart, dma_buffer, DMA_BUFFER_SIZE);
+    __HAL_UART_ENABLE_IT(gps_uart, UART_IT_IDLE);
 
     return GPS_INIT_OKAY;
 }
 
-uint32_t GPS_PARSE_BUFFER(){
 
-    if(!gps_task_timing.new_package) return 2000UL;      // try again in 2 ms
+uint32_t GPS_PARSE_DMA(const task_info_t* task){
+    new_uart_data_arrived = false;
 
-    // TODO: add parsing logic
+    uint16_t read_so_far = gps_parser.read_point;
+    uint16_t write_so_far = gps_parser.write_point;
 
-    validate_ubx_crc(&dma_buffer[10], 120, 0, 0);
+    if(read_so_far < write_so_far){ // no buffer wrap
+        for(uint16_t i = read_so_far; i < write_so_far - 5; i++){   // search new data for header
+            if(0xb5 == dma_buffer[i] && 0x62 == dma_buffer[i + 1]){ // check for header
+                uint8_t class = dma_buffer[i + 2];
+                uint8_t id = dma_buffer[i + 3];
+                if(class == 0x01 && id == 0x07){    // nav pvt
+                    uint16_t len = ((uint16_t)dma_buffer[i + 5] << 8) | dma_buffer[i + 4];
+                    if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
 
-    gps_task_timing.new_package = false;
+                    if(len != sizeof(gps_nav_pvt_t)) continue;  // lengths don't match, start parsing from new position
+                    // crc doesn't match, start parsing from new position
+                    if(!validate_ubx_crc(&dma_buffer[i + 2], len + 4, dma_buffer[i + len + 6], dma_buffer[i + len + 7])) continue;
 
-    uint32_t package_delta = gps_task_timing.package_recieved_timestamp - gps_task_timing.last_package_recieved_timestamp;
-    gps_task_timing.last_package_recieved_timestamp = gps_task_timing.package_recieved_timestamp;       // set last timestamp to now for next delta calculation when new package has arrived
+                    for(uint16_t f = 0; f < sizeof(gps_nav_pvt); f++){  // copy message bytewise over to padded struct
+                        *((uint8_t*)&gps_nav_pvt + f) = dma_buffer[i + f];
+                    }
 
-    gps_task_timing.average_package_delta = (timing_filter_value * gps_task_timing.average_package_delta + package_delta) / (timing_filter_value + 1);      // simple lowpass filter to avoid jittering
-    gps_task_timing.next_execution_delta = gps_task_timing.package_recieved_timestamp + gps_task_timing.average_package_delta + recieve_to_parse_time_offset;
+                    gps_parser.read_point = i + len + 8;
+                    goto found_packet;
+                }
+                else if(class == 0x01 && id == 0x12){   // velned
+                    uint16_t len = ((uint16_t)dma_buffer[i + 5] << 8) | dma_buffer[i + 4];
+                    if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
+                    gps_parser.read_point = i + len + 8;
+                    goto found_packet;
+                }
+            }
+        }
+        gps_parser.read_point = UTILS_MAX_I(write_so_far - 7, 0);
+    }
+    else{
+        gps_parser.read_point = write_so_far;   // skip wrapped around package
+    }
 
-    return gps_task_timing.next_execution_delta;
+    found_packet:
+        if(!new_uart_data_arrived) SCHEDULER_DISABLE_TASK_BY_INDEX(gps_parser_task_index);  // only deactivate if no new interrupt fired while parsing
+        return 0;
 }
 
-// TODO: code state machine and feed it new UART data when UART_IDLE interrupt fires (scheduler task running at 500Hz checking flags and calling functions so that interrupts are kept tight)
 
 GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK(){
+    if(gps_parser_task_index == -1) return GPS_FAIL;
     new_uart_data_arrived = true;
+    gps_parser.write_point = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(gps_dma);
+    SCHEDULER_ENABLE_TASK_BY_INDEX(gps_parser_task_index);
     return GPS_CALLBACK_OKAY;
 }
 
 bool GPS_UART_NEW_DATA_FLAG(){
     return new_uart_data_arrived;
+}
+
+GPS_RETURN_TYPE GPS_SET_PARSER_TASK_INDEX(int32_t index){
+    gps_parser_task_index = index;
+    return GPS_OKAY;
 }

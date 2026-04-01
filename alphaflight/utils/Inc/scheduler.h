@@ -51,6 +51,7 @@ int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dyna
 void SCHEDULER_LOOP(void);
 
 int32_t SCHEDULER_DISABLE_TASK_BY_INDEX(uint32_t index);
+int32_t SCHEDULER_ENABLE_TASK_BY_INDEX(uint32_t index);
 
 const task_stat_t* SCHEDULER_GET_TASK_STAT_BY_INDEX(uint32_t index);
 uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task);

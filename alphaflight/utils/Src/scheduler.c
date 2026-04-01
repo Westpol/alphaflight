@@ -54,6 +54,16 @@ int32_t SCHEDULER_DISABLE_TASK_BY_INDEX(uint32_t index){
     return 0;
 }
 
+int32_t SCHEDULER_ENABLE_TASK_BY_INDEX(uint32_t index){
+    if(index > scheduler.num_registered_tasks) return -1;
+    if(scheduler.task[index].info.activated){
+        return 1;
+    }
+    scheduler.task[index].info.activated = true;
+    scheduler.task[index].info.next_execution_timestamp = MICROS32();
+    return 0;
+}
+
 int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dynamic_delta, uint32_t delta_min, uint32_t delta_max, uint32_t max_execution_time_us, char* task_name){
 
     if(scheduler.num_registered_tasks >= num_tasks) return -1;
@@ -83,7 +93,7 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
     float cpu_usage_total = 0;
 
     for(uint32_t i = 0; i < scheduler.num_registered_tasks; i++){
-        if(!scheduler.task[i].info.activated) continue;
+        //if(!scheduler.task[i].info.activated) continue;
         task_t task = scheduler.task[i];
         float cpu_usage = (float)task.stat.average_exec_time / task.info.call_delta_norm;
         cpu_usage_total += cpu_usage;
