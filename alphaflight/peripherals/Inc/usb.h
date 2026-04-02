@@ -10,6 +10,8 @@
 
 #define USB_PRINT_BUFFER_SIZE STM32_WORD_SIZE * 64
 
+void USB_CHANGE_CONSOLE_STATUS(bool connection);
+
 void USB_PRINTLN(const char *format, ...);
 uint32_t USB_STATUS(const task_info_t *task);
 void USB_PRINTLN_BLOCKING(const char *format, ...);

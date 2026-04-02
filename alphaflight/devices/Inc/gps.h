@@ -18,7 +18,6 @@ typedef enum{
 GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* gps_uart, DMA_HandleTypeDef* gps_uart_dma);
 uint32_t GPS_PARSE_DMA(const task_info_t* task);
 GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK();
-bool GPS_UART_NEW_DATA_FLAG();
 
 GPS_RETURN_TYPE GPS_SET_PARSER_TASK_INDEX(int32_t index);
 

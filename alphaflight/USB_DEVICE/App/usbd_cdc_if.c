@@ -22,7 +22,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "usb.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -231,7 +231,12 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
     break;
 
   case CDC_SET_CONTROL_LINE_STATE:
-
+    if(pbuf[0] & 0x01){
+      USB_CHANGE_CONSOLE_STATUS(true);
+    }
+    else {
+      USB_CHANGE_CONSOLE_STATUS(false);
+    }
     break;
 
   case CDC_SEND_BREAK:

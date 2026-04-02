@@ -36,6 +36,7 @@
 #include "config.h"
 #include "dshot.h"
 #include "serial_passthrough.h"
+#include "crossfire.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -215,14 +216,17 @@ int main(void)
 
   SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 25, "Gyro Read");
   SCHEDULER_REGISTER_TASK(DSHOT_TRANSMIT, HZ_TO_US(1000), false, 0, 0, 20, "DSHOT TX");
+  int32_t crsf_task_index = SCHEDULER_REGISTER_TASK(CRSF_PARSE_DMA, 100, false, 50, 150, 50, "CRSF Parsing");
   int32_t gps_task_index = SCHEDULER_REGISTER_TASK(GPS_PARSE_DMA, 100, false, 50, 150, 50, "GPS Parsing");
   SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
   SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
   //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
 
   GPS_SET_PARSER_TASK_INDEX(gps_task_index);
+  CRSF_SET_PARSER_TASK_INDEX(crsf_task_index);
 
   GPS_INIT(&huart2, &hdma_usart2_rx);
+  CRSF_INIT(&huart3, &hdma_usart3_rx);
   STATUS_LED_SET_ALL(990);
 
 

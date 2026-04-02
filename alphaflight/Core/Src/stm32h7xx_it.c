@@ -30,6 +30,7 @@
 #include "lsm6dso.h"
 #include "dshot.h"
 #include "serial_passthrough.h"
+#include "crossfire.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -385,7 +386,8 @@ void USART2_IRQHandler(void)
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */
-
+  CRSF_UART_IDLE_CALLBACK();
+  if(__HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE)) __HAL_UART_CLEAR_IDLEFLAG(&huart3);
   /* USER CODE END USART3_IRQn 0 */
   HAL_UART_IRQHandler(&huart3);
   /* USER CODE BEGIN USART3_IRQn 1 */

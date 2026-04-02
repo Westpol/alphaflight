@@ -1,6 +1,5 @@
 #include "gps.h"
 #include "timer.h"
-#include <string.h>
 
 static UART_HandleTypeDef* gps_uart;
 static DMA_HandleTypeDef* gps_dma;
@@ -62,7 +61,7 @@ static struct __attribute__((packed)){
 } gps_nav_pvt;
 
 #define DMA_BUFFER_SIZE STM32_WORD_SIZE * 16
-__attribute__((section(".dma_rx"))) static uint8_t dma_buffer[DMA_BUFFER_SIZE] = {0};
+__attribute__((section(".dma_rx"))) static uint8_t gps_dma_buffer[DMA_BUFFER_SIZE] = {0};
 
 static bool validate_ubx_crc(uint8_t* buffer, uint16_t len, uint8_t checksum_a, uint8_t checksum_b){
     uint8_t ck_a = 0, ck_b = 0;
@@ -81,7 +80,7 @@ GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* gps_uart_d
     gps_dma = gps_uart_dma;
     gps_uart = uart;
 
-    HAL_UART_Receive_DMA(gps_uart, dma_buffer, DMA_BUFFER_SIZE);
+    HAL_UART_Receive_DMA(gps_uart, gps_dma_buffer, DMA_BUFFER_SIZE);
     __HAL_UART_ENABLE_IT(gps_uart, UART_IT_IDLE);
 
     return GPS_INIT_OKAY;
@@ -96,26 +95,26 @@ uint32_t GPS_PARSE_DMA(const task_info_t* task){
 
     if(read_so_far < write_so_far){ // no buffer wrap
         for(uint16_t i = read_so_far; i < write_so_far - 5; i++){   // search new data for header
-            if(0xb5 == dma_buffer[i] && 0x62 == dma_buffer[i + 1]){ // check for header
-                uint8_t class = dma_buffer[i + 2];
-                uint8_t id = dma_buffer[i + 3];
+            if(0xb5 == gps_dma_buffer[i] && 0x62 == gps_dma_buffer[i + 1]){ // check for header
+                uint8_t class = gps_dma_buffer[i + 2];
+                uint8_t id = gps_dma_buffer[i + 3];
                 if(class == 0x01 && id == 0x07){    // nav pvt
-                    uint16_t len = ((uint16_t)dma_buffer[i + 5] << 8) | dma_buffer[i + 4];
+                    uint16_t len = ((uint16_t)gps_dma_buffer[i + 5] << 8) | gps_dma_buffer[i + 4];
                     if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
 
                     if(len != sizeof(gps_nav_pvt_t)) continue;  // lengths don't match, start parsing from new position
                     // crc doesn't match, start parsing from new position
-                    if(!validate_ubx_crc(&dma_buffer[i + 2], len + 4, dma_buffer[i + len + 6], dma_buffer[i + len + 7])) continue;
+                    if(!validate_ubx_crc(&gps_dma_buffer[i + 2], len + 4, gps_dma_buffer[i + len + 6], gps_dma_buffer[i + len + 7])) continue;
 
                     for(uint16_t f = 0; f < sizeof(gps_nav_pvt); f++){  // copy message bytewise over to padded struct
-                        *((uint8_t*)&gps_nav_pvt + f) = dma_buffer[i + f];
+                        *((uint8_t*)&gps_nav_pvt + f) = gps_dma_buffer[i + f];
                     }
 
                     gps_parser.read_point = i + len + 8;
                     goto found_packet;
                 }
                 else if(class == 0x01 && id == 0x12){   // velned
-                    uint16_t len = ((uint16_t)dma_buffer[i + 5] << 8) | dma_buffer[i + 4];
+                    uint16_t len = ((uint16_t)gps_dma_buffer[i + 5] << 8) | gps_dma_buffer[i + 4];
                     if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
                     gps_parser.read_point = i + len + 8;
                     goto found_packet;
@@ -142,11 +141,8 @@ GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK(){
     return GPS_CALLBACK_OKAY;
 }
 
-bool GPS_UART_NEW_DATA_FLAG(){
-    return new_uart_data_arrived;
-}
-
 GPS_RETURN_TYPE GPS_SET_PARSER_TASK_INDEX(int32_t index){
     gps_parser_task_index = index;
+    SCHEDULER_DISABLE_TASK_BY_INDEX(gps_parser_task_index);
     return GPS_OKAY;
 }

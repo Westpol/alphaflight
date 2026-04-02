@@ -84,6 +84,7 @@ int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dyna
 }
 
 uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
+    if(MICROS32() == 0) return 0; // avoid division by zero
     USB_PRINTLN_BLOCKING("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");   // a few newlines
     USB_PRINTLN_BLOCKING("%-16s | %-15s | %-14s | %-10s |",
                      "Task Name",

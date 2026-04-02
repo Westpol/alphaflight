@@ -4,10 +4,12 @@
 #include "timer.h"
 
 #include "lsm6dso.h"
+#include "usbd_def.h"
 
-
+volatile static bool connection_detected = false;
 
 void USB_PRINTLN(const char *format, ...){
+    if(!connection_detected) return;
     char message[USB_PRINT_BUFFER_SIZE];
     va_list args;
     va_start(args, format);
@@ -26,6 +28,7 @@ void USB_PRINTLN(const char *format, ...){
 }
 
 uint32_t USB_STATUS(const task_info_t *task){
+    if(!connection_detected) return 0;
     //const task_stat_t* stat = SCHEDULER_GET_TASK_STAT_BY_INDEX(0);
     //USB_PRINTLN("%luus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
     //USB_PRINTLN("Data Length: %d", LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_0));
@@ -35,6 +38,7 @@ uint32_t USB_STATUS(const task_info_t *task){
 }
 
 void USB_PRINTLN_BLOCKING(const char *format, ...){
+    if(!connection_detected) return;
 	char message[USB_PRINT_BUFFER_SIZE];
 	    va_list args;
 	    va_start(args, format);
@@ -53,6 +57,10 @@ void USB_PRINTLN_BLOCKING(const char *format, ...){
 	    while (CDC_Transmit_HS((uint8_t *)message, len) == USBD_BUSY) {
 	        if (HAL_GetTick() - start > 10) break; // Timeout after 100ms
 	    }
+}
+
+void USB_CHANGE_CONSOLE_STATUS(bool connection){
+    connection_detected = connection;
 }
 
 void UTIL_USB_PRINT(const char *format, ...){
