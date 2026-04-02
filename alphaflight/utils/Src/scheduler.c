@@ -25,7 +25,9 @@ void SCHEDULER_LOOP(void){
             uint32_t delta = task->func(&task->info);       // run task
             task->info.running = false;
             // v averaging task execution times v
-            task->stat.average_exec_time = (task->stat.average_exec_time * task->stat.filter_value + (uint32_t)(MICROS32() - timestamp_func_start)) / (task->stat.filter_value + 1);
+            uint32_t exec_time = MICROS32() - timestamp_func_start;
+            task->stat.average_exec_time = (task->stat.average_exec_time * task->stat.filter_value + exec_time) / (task->stat.filter_value + 1);
+            task->stat.total_exec_time += exec_time;
 
             if(!task->info.dynamic_execution_management){     // task decides next execution time (clamped) or default is being applied
                 task->info.next_execution_timestamp += task->info.call_delta_norm;
@@ -95,7 +97,7 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
     for(uint32_t i = 0; i < scheduler.num_registered_tasks; i++){
         //if(!scheduler.task[i].info.activated) continue;
         task_t task = scheduler.task[i];
-        float cpu_usage = (float)task.stat.average_exec_time / task.info.call_delta_norm;
+        float cpu_usage = (float)task.stat.total_exec_time / MICROS32();
         cpu_usage_total += cpu_usage;
         USB_PRINTLN_BLOCKING("%-16s | %12lu us | %11d us | %8.2f %% |",
                      task.info.task_name,
