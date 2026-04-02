@@ -9,7 +9,7 @@ static volatile int32_t gps_parser_task_index = -1;
 static volatile struct{
     uint16_t write_point;
     uint16_t read_point;
-} gps_parser;
+} gps_parser = {0};
 
 static bool new_uart_data_arrived = false;
 
