@@ -33,7 +33,7 @@ uint32_t USB_STATUS(const task_info_t *task){
     //USB_PRINTLN("%luus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
     //USB_PRINTLN("Data Length: %d", LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_0));
     IMU_PROCESSED_T imu = IMU_GET_DATA();
-    USB_PRINTLN("%f°/s x",UTILS_DEGREES(imu.rate.wx));
+    USB_PRINTLN("%f,%f,%f,%f", imu.quat.w, imu.quat.x, imu.quat.y, imu.quat.z);
     return 0;
 }
 
