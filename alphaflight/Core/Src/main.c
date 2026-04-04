@@ -195,32 +195,33 @@ int main(void)
 
   //PASSTHROUGH_START(&huart2, &hdma_usart2_rx);
 
-  if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
+  //if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
 
-  if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();
+  if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();   // load complete FC config
 
-  if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();
+  if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();  // timer init for MICROS32 and MILLIS32
   
-  if(TIMER_START() != TIMER_OKAY) Error_Handler();
+  if(TIMER_START() != TIMER_OKAY) Error_Handler();    // start MICROS32 and MILLIS32 timers
 
-  SPI_INIT(SPI_DEVICE_IMU, &hspi1, GPIOC, LL_GPIO_PIN_4);
+  SPI_INIT(SPI_DEVICE_IMU, &hspi1, GPIOC, LL_GPIO_PIN_4);   // initialize SPI devices
   SPI_INIT(SPI_DEVICE_BARO, &hspi4, GPIOE, LL_GPIO_PIN_4);
   SPI_INIT(SPI_DEVICE_MAGNETO, &hspi4, GPIOC, LL_GPIO_PIN_13);
 
-  if(IMU_INIT(SPI_DEVICE_IMU) != IMU_OKAY) Error_Handler();
+  int32_t imu_task_index = SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 25, "Gyro Read");  // init IMU and register task in case 
+  if(IMU_INIT(SPI_DEVICE_IMU, imu_task_index) != IMU_OKAY) Error_Handler();
+
   if(BARO_INIT(SPI_DEVICE_BARO) != BARO_OKAY) Error_Handler();
 
   SERVO_INIT();
 
   DSHOT_INIT();
 
-  SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, true, 500, 800, 25, "Gyro Read");
   SCHEDULER_REGISTER_TASK(DSHOT_TRANSMIT, HZ_TO_US(1000), false, 0, 0, 20, "DSHOT TX");
   int32_t crsf_task_index = SCHEDULER_REGISTER_TASK(CRSF_PARSE_DMA, 100, false, 50, 150, 50, "CRSF Parsing");
   int32_t gps_task_index = SCHEDULER_REGISTER_TASK(GPS_PARSE_DMA, 100, false, 50, 150, 50, "GPS Parsing");
   SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
-  //SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
-  SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
+  SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
+  //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(60), false, 90000, 110000, 500, "USB Stats");
 
   GPS_SET_PARSER_TASK_INDEX(gps_task_index);
   CRSF_SET_PARSER_TASK_INDEX(crsf_task_index);

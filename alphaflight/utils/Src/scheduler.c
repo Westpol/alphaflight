@@ -97,6 +97,7 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
 
     for(uint32_t i = 0; i < scheduler.num_registered_tasks; i++){
         //if(!scheduler.task[i].info.activated) continue;
+        if(task->task_index == i) continue;
         task_t task = scheduler.task[i];
         float cpu_usage = (float)task.stat.total_exec_time / MICROS32();
         cpu_usage_total += cpu_usage;

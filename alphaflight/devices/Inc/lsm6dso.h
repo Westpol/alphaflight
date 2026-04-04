@@ -66,7 +66,7 @@ typedef struct{
     imu_raw_t raw;
 }IMU_T;
 
-IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device);
+IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index);
 
 #if LSM6DSO_POLLING
     uint32_t IMU_CONVERT_DATA(const task_info_t *task);

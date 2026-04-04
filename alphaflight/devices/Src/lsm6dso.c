@@ -13,6 +13,11 @@ static imu_config_t config = {0};
 
 static uint32_t last_integration = 0;
 
+static int32_t imu_convert_task_index = -1;
+
+float twoKp = 2.0f * 1.0f;   // proportional gain (tune this!)
+float twoKi = 2.0f * 0.0f;   // integral gain (start with 0)
+float integralFB[3] = {0};
 
 static IMU_RETURN_TYPE imu_convert_data();
 static uint8_t read_register(uint8_t address);
@@ -35,8 +40,9 @@ static IMU_RETURN_TYPE imu_setup(){
 }
 
 
-IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device){
+IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index){
     spi_device = device;
+    imu_convert_task_index = gyro_convert_task_index;
     imu.processed.quat.w = 1.0f;    // set to standard orientation
     if(read_register(0x8F) != 108) return IMU_WRONG_ID; // check if IMU is registered
 
@@ -49,38 +55,74 @@ static IMU_RETURN_TYPE imu_update_quat(void){
     float dt = (float)(MICROS32() - last_integration) / 1000000.0f;
     last_integration = MICROS32();
 
-    float q[4] = {
-        imu.processed.quat.w,
-        imu.processed.quat.x,
-        imu.processed.quat.y,
-        imu.processed.quat.z
-    };
+    float q0 = imu.processed.quat.w;
+    float q1 = imu.processed.quat.x;
+    float q2 = imu.processed.quat.y;
+    float q3 = imu.processed.quat.z;
 
-    float omega[4] = {
-        0.0f,
-        imu.processed.rate.wx,
-        imu.processed.rate.wy,
-        imu.processed.rate.wz
-    };
+    float gx = imu.processed.rate.wx;
+    float gy = imu.processed.rate.wy;
+    float gz = imu.processed.rate.wz;
 
-    float dq[4];
-    UTILS_QUATERNION_PRODUCT(q, omega, dq);
+    float ax = imu.processed.accel.x;
+    float ay = imu.processed.accel.y;
+    float az = imu.processed.accel.z;
 
-    // q_dot = 0.5 * dq
-    for (int i = 0; i < 4; i++){
-        q[i] += 0.5f * dq[i] * dt;
+    // normalize accelerometer
+    float norm = sqrtf(ax*ax + ay*ay + az*az);
+    if (norm == 0.0f) return IMU_OKAY;
+    ax /= norm;
+    ay /= norm;
+    az /= norm;
+
+    // estimated gravity direction
+    float vx = 2.0f * (q1*q3 - q0*q2);
+    float vy = 2.0f * (q0*q1 + q2*q3);
+    float vz = q0*q0 - q1*q1 - q2*q2 + q3*q3;
+
+    // error = cross product
+    float ex = (ay * vz - az * vy);
+    float ey = (az * vx - ax * vz);
+    float ez = (ax * vy - ay * vx);
+
+    // integral feedback
+    if(twoKi > 0.0f){
+        integralFB[0] += twoKi * ex * dt;
+        integralFB[1] += twoKi * ey * dt;
+        integralFB[2] += twoKi * ez * dt;
+
+        gx += integralFB[0];
+        gy += integralFB[1];
+        gz += integralFB[2];
     }
 
-    // normalize
-    float norm = sqrtf(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
-    for (int i = 0; i < 4; i++){
-        q[i] /= norm;
-    }
+    // proportional feedback
+    gx += twoKp * ex;
+    gy += twoKp * ey;
+    gz += twoKp * ez;
 
-    imu.processed.quat.w = q[0];
-    imu.processed.quat.x = q[1];
-    imu.processed.quat.y = q[2];
-    imu.processed.quat.z = q[3];
+    // integrate quaternion (same as before)
+    float dq0 = 0.5f * (-q1*gx - q2*gy - q3*gz);
+    float dq1 = 0.5f * ( q0*gx + q2*gz - q3*gy);
+    float dq2 = 0.5f * ( q0*gy - q1*gz + q3*gx);
+    float dq3 = 0.5f * ( q0*gz + q1*gy - q2*gx);
+
+    q0 += dq0 * dt;
+    q1 += dq1 * dt;
+    q2 += dq2 * dt;
+    q3 += dq3 * dt;
+
+    // normalize quaternion
+    norm = sqrtf(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+    q0 /= norm;
+    q1 /= norm;
+    q2 /= norm;
+    q3 /= norm;
+
+    imu.processed.quat.w = q0;
+    imu.processed.quat.x = q1;
+    imu.processed.quat.y = q2;
+    imu.processed.quat.z = q3;
 
     return IMU_OKAY;
 }
