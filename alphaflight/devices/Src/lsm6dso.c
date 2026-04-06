@@ -19,6 +19,12 @@ float twoKp = 2.0f * 1.0f;   // proportional gain (tune this!)
 float twoKi = 2.0f * 0.0f;   // integral gain (start with 0)
 float integralFB[3] = {0};
 
+#if LSM6DSO_INTERRUPT
+volatile static bool spi_transfer = false;
+__attribute__((section(".dma_rx"))) static uint8_t imu_dma_rx[STM32_WORD_SIZE] = {0};
+__attribute__((section(".dma_tx"))) static uint8_t imu_dma_tx[STM32_WORD_SIZE] = {0};
+#endif
+
 static IMU_RETURN_TYPE imu_convert_data();
 static uint8_t read_register(uint8_t address);
 static IMU_RETURN_TYPE write_register(uint8_t address, uint8_t data);
@@ -33,20 +39,26 @@ static IMU_RETURN_TYPE imu_setup(){
     write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_1666 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
     write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_1666 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
     write_register(LSM6DSO_CRTL4_C_ADDRESS, LSM6DSO_CTRL4_C_DRDY_MASK & LSM6DSO_CTRL4_C_MASK_AND);
-    #if LSM6DSO_POLLING
+    #if LSM6DSO_INTERRUPT
         write_register(LSM6DSO_INT1_CTRL_ADDRESS, LSM6DSO_INT1_CTRL_DRDY_G);
     #endif
     return IMU_OKAY;
 }
 
 
-IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index){
+IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA_HandleTypeDef* spi_rx_dma){
     spi_device = device;
     imu_convert_task_index = gyro_convert_task_index;
     imu.processed.quat.w = 1.0f;    // set to standard orientation
     if(read_register(0x8F) != 108) return IMU_WRONG_ID; // check if IMU is registered
 
     if(imu_setup() != IMU_OKAY) return IMU_SETUP_FAILED;
+
+    #if LSM6DSO_INTERRUPT
+
+    __HAL_DMA_ENABLE_IT(spi_rx_dma, DMA_IT_TC);
+
+    #endif
 
     return IMU_OKAY;
 }
@@ -161,13 +173,27 @@ uint32_t IMU_READ_DATA(const task_info_t* task){
     return 0;
 }
 
-#if !LSM6DSO_POLLING
+#if !LSM6DSO_INTERRUPT
 void IMU_DATA_READY_INTERRUPT_HANDLER(void){
     Error_Handler();
 }
 
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
     Error_Handler();
+}
+#endif
+
+#if LSM6DSO_INTERRUPT
+void IMU_DATA_READY_INTERRUPT_HANDLER(void){
+    if(spi_transfer) return;
+    spi_transfer = true;
+    SPI_START_CS(SPI_DEVICE_IMU);
+    HAL_SPI_TransmitReceive_DMA(SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE_IMU), imu_dma_tx, imu_dma_rx, 13);
+}
+
+void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
+    spi_transfer = false;
+    SPI_STOP_CS(SPI_DEVICE_IMU);
 }
 #endif
 

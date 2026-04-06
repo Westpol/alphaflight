@@ -1,12 +1,12 @@
 #include "common.h"
 #include "spi.h"
 #include "scheduler.h"
-#include <stdint.h>
+#include "stm32h7xx_hal.h"
 
 #ifndef LSM6DSO_H
 #define LSM6DSO_H
 
-#define LSM6DSO_POLLING false   // switch between fixed interval blocked SPI polling (true) and DRDY based DMA SPI (false)
+#define LSM6DSO_INTERRUPT true   // switch between fixed interval blocked SPI polling (true) and DRDY based DMA SPI (false)
 
 typedef enum{
     IMU_OKAY,
@@ -66,7 +66,7 @@ typedef struct{
     imu_raw_t raw;
 }IMU_T;
 
-IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index);
+IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA_HandleTypeDef* spi_rx_dma);
 
 #if LSM6DSO_POLLING
     uint32_t IMU_CONVERT_DATA(const task_info_t *task);
