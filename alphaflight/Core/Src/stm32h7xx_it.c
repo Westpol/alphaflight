@@ -342,17 +342,17 @@ void DMA1_Stream2_IRQHandler(void)
 void DMA1_Stream3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
-  CRSF_DMA_CALLBACK();
 
   // Clear Half-Transfer (HT) flag
-  __HAL_DMA_CLEAR_FLAG(&hdma_usart3_rx, __HAL_DMA_GET_HT_FLAG_INDEX(&hdma_usart3_rx));
+  //__HAL_DMA_CLEAR_FLAG(&hdma_usart3_rx, __HAL_DMA_GET_HT_FLAG_INDEX(&hdma_usart3_rx));
 
   // Clear Transfer-Complete (TC) flag
-  __HAL_DMA_CLEAR_FLAG(&hdma_usart3_rx, __HAL_DMA_GET_TC_FLAG_INDEX(&hdma_usart3_rx));
+  //__HAL_DMA_CLEAR_FLAG(&hdma_usart3_rx, __HAL_DMA_GET_TC_FLAG_INDEX(&hdma_usart3_rx));
   
   /* USER CODE END DMA1_Stream3_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_usart3_rx);
   /* USER CODE BEGIN DMA1_Stream3_IRQn 1 */
+  CRSF_DMA_CALLBACK();
 
   /* USER CODE END DMA1_Stream3_IRQn 1 */
 }
@@ -377,12 +377,13 @@ void SPI1_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-  PASSTHROUGH_UART2_CALLBACK();
-  GPS_UART_IDLE_CALLBACK();
   if(__HAL_UART_GET_FLAG(&huart2, UART_FLAG_IDLE)) __HAL_UART_CLEAR_IDLEFLAG(&huart2);
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
+
+  PASSTHROUGH_UART2_CALLBACK();
+  GPS_UART_IDLE_CALLBACK();
 
   /* USER CODE END USART2_IRQn 1 */
 }
@@ -435,11 +436,10 @@ void UART5_IRQHandler(void)
 void DMA2_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream0_IRQn 0 */
-  IMU_DMA_FINISHED_INTERRUPT_HANDLER();
   /* USER CODE END DMA2_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_spi1_rx);
   /* USER CODE BEGIN DMA2_Stream0_IRQn 1 */
-
+  IMU_DMA_FINISHED_INTERRUPT_HANDLER();
   /* USER CODE END DMA2_Stream0_IRQn 1 */
 }
 

@@ -230,7 +230,6 @@ int main(void)
   CRSF_INIT(&huart3, &hdma_usart3_rx);
   STATUS_LED_SET_ALL(20);
 
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -1707,7 +1706,7 @@ void Error_Handler(void)
   bool led_toggle = false;
   while (1)
   {
-    if(((int32_t)(MILLIS32() - now) >= 200 && led_toggle) || ((int32_t)(MILLIS32() - now) >= 400 && !led_toggle)){
+    if(((int32_t)(MILLIS32() - now) >= 400 && led_toggle) || ((int32_t)(MILLIS32() - now) >= 50 && !led_toggle)){
       if(led_toggle){
         STATUS_LED_SET_R(999);
       }

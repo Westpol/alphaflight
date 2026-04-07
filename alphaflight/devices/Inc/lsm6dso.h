@@ -68,13 +68,9 @@ typedef struct{
 
 IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA_HandleTypeDef* spi_rx_dma);
 
-#if LSM6DSO_POLLING
-    uint32_t IMU_CONVERT_DATA(const task_info_t *task);
-#endif
 
-#if !LSM6DSO_POLLING
-    uint32_t IMU_READ_DATA(const task_info_t* task);
-#endif
+uint32_t IMU_READ_DATA(const task_info_t* task);
+
 
 void IMU_DATA_READY_INTERRUPT_HANDLER(void);
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void);
@@ -89,6 +85,9 @@ imu_config_t IMU_GET_DEFAULT_CONFIG();
 
 #define LSM6DSO_INT1_CTRL_ADDRESS 0x0D
 #define LSM6DSO_INT1_CTRL_DRDY_G 0x02
+
+#define LSM6DSO_COUNTER_BDR_REG1_ADDRESS 0x0B
+#define LSM6DSO_COUNTER_BDR_REG1_DRDY_PULSED 0x80
 
 #define LSM6DSO_CTRL1_XL_ADDRESS 0x10
 #define LSM6DSO_CTRL1_XL_ODR_1666 (0x08 << 4)   // CORRECTLY SET CTLR6_C

@@ -14,6 +14,7 @@ static imu_config_t config = {0};
 static uint32_t last_integration = 0;
 
 static int32_t imu_convert_task_index = -1;
+volatile static bool imu_set_up = false;
 
 float twoKp = 2.0f * 1.0f;   // proportional gain (tune this!)
 float twoKi = 2.0f * 0.0f;   // integral gain (start with 0)
@@ -41,7 +42,9 @@ static IMU_RETURN_TYPE imu_setup(){
     write_register(LSM6DSO_CRTL4_C_ADDRESS, LSM6DSO_CTRL4_C_DRDY_MASK & LSM6DSO_CTRL4_C_MASK_AND);
     #if LSM6DSO_INTERRUPT
         write_register(LSM6DSO_INT1_CTRL_ADDRESS, LSM6DSO_INT1_CTRL_DRDY_G);
+        write_register(LSM6DSO_COUNTER_BDR_REG1_ADDRESS, LSM6DSO_COUNTER_BDR_REG1_DRDY_PULSED);
     #endif
+    imu_set_up = true;
     return IMU_OKAY;
 }
 
@@ -50,6 +53,7 @@ IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA
     spi_device = device;
     imu_convert_task_index = gyro_convert_task_index;
     imu.processed.quat.w = 1.0f;    // set to standard orientation
+    imu_dma_tx[0] = LSM6DSO_READ_START_REG | LSM6DSO_READ;
     if(read_register(0x8F) != 108) return IMU_WRONG_ID; // check if IMU is registered
 
     if(imu_setup() != IMU_OKAY) return IMU_SETUP_FAILED;
@@ -159,10 +163,18 @@ static IMU_RETURN_TYPE imu_convert_data(const uint8_t* rx_data){
     imu.processed.accel.x = imu.raw.accel_raw.x * ACCEL_SCALING_G;
     imu.processed.accel.y = imu.raw.accel_raw.y * ACCEL_SCALING_G;
     imu.processed.accel.z = imu.raw.accel_raw.z * ACCEL_SCALING_G;
+
     return IMU_OKAY;
 }
 
 uint32_t IMU_READ_DATA(const task_info_t* task){
+    #if LSM6DSO_INTERRUPT
+    if(!spi_transfer){
+        imu_convert_data(&imu_dma_rx[1]);
+        imu_update_quat();
+    }
+    SCHEDULER_DISABLE_TASK_BY_INDEX(imu_convert_task_index);
+    #else
     uint8_t g_a_tx[13] = {0};
     uint8_t g_a_rx[13] = {0};
     g_a_tx[0] = LSM6DSO_READ_START_REG | LSM6DSO_READ;
@@ -170,22 +182,13 @@ uint32_t IMU_READ_DATA(const task_info_t* task){
         imu_convert_data(&g_a_rx[1]);
         imu_update_quat();
     }
+    #endif
     return 0;
 }
 
-#if !LSM6DSO_INTERRUPT
-void IMU_DATA_READY_INTERRUPT_HANDLER(void){
-    Error_Handler();
-}
-
-void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
-    Error_Handler();
-}
-#endif
-
 #if LSM6DSO_INTERRUPT
 void IMU_DATA_READY_INTERRUPT_HANDLER(void){
-    if(spi_transfer) return;
+    if(spi_transfer || !imu_set_up) return;
     spi_transfer = true;
     SPI_START_CS(SPI_DEVICE_IMU);
     HAL_SPI_TransmitReceive_DMA(SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE_IMU), imu_dma_tx, imu_dma_rx, 13);
@@ -194,6 +197,15 @@ void IMU_DATA_READY_INTERRUPT_HANDLER(void){
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
     spi_transfer = false;
     SPI_STOP_CS(SPI_DEVICE_IMU);
+    SCHEDULER_ENABLE_TASK_BY_INDEX(imu_convert_task_index);
+}
+#else
+void IMU_DATA_READY_INTERRUPT_HANDLER(void){
+    Error_Handler();
+}
+
+void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
+    Error_Handler();
 }
 #endif
 
