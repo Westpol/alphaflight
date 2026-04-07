@@ -8,6 +8,7 @@
 static IMU_T imu = {0};
 
 static SPI_DEVICE spi_device;
+DMA_HandleTypeDef* rx_dma = NULL;
 
 static imu_config_t config = {0};
 
@@ -51,6 +52,7 @@ static IMU_RETURN_TYPE imu_setup(){
 
 IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA_HandleTypeDef* spi_rx_dma){
     spi_device = device;
+    rx_dma = spi_rx_dma;
     imu_convert_task_index = gyro_convert_task_index;
     imu.processed.quat.w = 1.0f;    // set to standard orientation
     imu_dma_tx[0] = LSM6DSO_READ_START_REG | LSM6DSO_READ;
@@ -188,14 +190,14 @@ uint32_t IMU_READ_DATA(const task_info_t* task){
 
 #if LSM6DSO_INTERRUPT
 void IMU_DATA_READY_INTERRUPT_HANDLER(void){
-    if(spi_transfer || !imu_set_up) return;
+    if(!imu_set_up) return;
+    if (HAL_DMA_GetState(rx_dma) != HAL_DMA_STATE_READY) return;
     spi_transfer = true;
     SPI_START_CS(SPI_DEVICE_IMU);
     HAL_SPI_TransmitReceive_DMA(SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE_IMU), imu_dma_tx, imu_dma_rx, 13);
 }
 
 void IMU_DMA_FINISHED_INTERRUPT_HANDLER(void){
-    spi_transfer = false;
     SPI_STOP_CS(SPI_DEVICE_IMU);
     SCHEDULER_ENABLE_TASK_BY_INDEX(imu_convert_task_index);
 }
