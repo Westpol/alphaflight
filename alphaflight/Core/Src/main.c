@@ -237,18 +237,6 @@ int main(void)
   while (1)
   {
     SCHEDULER_LOOP();
-    /*
-    uint8_t tx_buff_baro[3] = {0x80, 0x00, 0x00};
-    uint8_t rx_buff_baro[3] = {0x00, 0x00, 0x00};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_BARO, tx_buff_baro, rx_buff_baro, 3);
-    HAL_Delay(1000);
-    uint8_t tx_buff_magneto[2] = {0x2F | 0x80, 0x00};
-    uint8_t rx_buff_magneto[2] = {0x00, 0x00};
-    SPI_TRANSFER_FIFO(SPI_DEVICE_MAGNETO, tx_buff_magneto, rx_buff_magneto, 2);
-    HAL_Delay(1000);
-    uint8_t sd_block[512] = {0};
-    HAL_SD_ReadBlocks(&hsd1, sd_block, 99, 1, 1000);
-    HAL_Delay(1000);*/
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

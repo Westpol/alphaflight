@@ -29,6 +29,9 @@ void SCHEDULER_LOOP(void){
             task->stat.average_exec_time = (task->stat.average_exec_time * task->stat.filter_value + exec_time) / (task->stat.filter_value + 1);
             task->stat.total_exec_time += exec_time;
 
+            task->stat.average_delta_time = (task->stat.average_delta_time * 99 + (timestamp_func_start - task->stat.last_exec_time)) / 100;
+            task->stat.last_exec_time = timestamp_func_start;
+
             if(!task->info.dynamic_execution_management){     // task decides next execution time (clamped) or default is being applied
                 task->info.next_execution_timestamp += task->info.call_delta_norm;
             }
@@ -89,7 +92,7 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
     USB_PRINTLN_BLOCKING("%-16s | %-15s | %-14s | %-10s |",
                      "Task Name",
                      "Next Execution",
-                     "Execution Time",
+                     "Exec Delta",
                      "CPU Usage");   // print header
 
     USB_PRINTLN_BLOCKING("------------------------------------------------------------------");  // header seperator
@@ -104,7 +107,7 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
         USB_PRINTLN_BLOCKING("%-16s | %12lu us | %11d us | %8.2f %% |",
                      task.info.task_name,
                      task.info.next_execution_timestamp,
-                     task.stat.average_exec_time,
+                     task.stat.average_delta_time,
                      cpu_usage * 100.0f);
     }
 

@@ -13,6 +13,8 @@ typedef enum{
 
 typedef struct{
     uint32_t average_exec_time;     // time a process takes in us
+    uint32_t average_delta_time;
+    uint32_t last_exec_time;
     uint32_t max_exec_time;     // max time a process takes in us (gets cleared every n seconds by special function)
     uint32_t total_exec_time;       // all execution deltas added together
     uint32_t run_count;     // gets increased every time task gets executed
