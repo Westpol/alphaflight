@@ -1,5 +1,6 @@
 #include "crossfire.h"
 #include "stm32h723xx.h"
+#include "stm32h7xx_hal_uart.h"
 #include "timer.h"
 #include <stdint.h>
 
@@ -46,9 +47,11 @@ CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* crsf_uar
     crsf_dma = crsf_uart_dma;
     crsf_uart = uart;
 
+    __HAL_UART_ENABLE_IT(crsf_uart, UART_IT_IDLE);
+
     HAL_UART_Receive_DMA(crsf_uart, crsf_dma_buffer, DMA_BUFFER_SIZE);
-    __HAL_DMA_ENABLE_IT(crsf_dma, DMA_IT_HT);
-    __HAL_DMA_ENABLE_IT(crsf_dma, DMA_IT_TC);
+    //__HAL_DMA_ENABLE_IT(crsf_dma, DMA_IT_HT);
+    //__HAL_DMA_ENABLE_IT(crsf_dma, DMA_IT_TC);
 
     return CRSF_OKAY;
 }
@@ -114,8 +117,7 @@ uint32_t CRSF_PARSE_DMA(const task_info_t* task){
     return 0;
 }
 
-
-CRSF_RETURN_TYPE CRSF_DMA_CALLBACK(){
+CRSF_RETURN_TYPE CRSF_UART_IDLE_CALLBACK(){
     if(crsf_parser_task_index == -1) return CRSF_FAIL;
     crsf_parser.write_point = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(crsf_dma);
     SCHEDULER_ENABLE_TASK_BY_INDEX(crsf_parser_task_index);

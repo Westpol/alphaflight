@@ -352,7 +352,7 @@ void DMA1_Stream3_IRQHandler(void)
   /* USER CODE END DMA1_Stream3_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_usart3_rx);
   /* USER CODE BEGIN DMA1_Stream3_IRQn 1 */
-  CRSF_DMA_CALLBACK();
+  //CRSF_DMA_CALLBACK();
 
   /* USER CODE END DMA1_Stream3_IRQn 1 */
 }
@@ -394,11 +394,11 @@ void USART2_IRQHandler(void)
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */
-
   /* USER CODE END USART3_IRQn 0 */
   HAL_UART_IRQHandler(&huart3);
   /* USER CODE BEGIN USART3_IRQn 1 */
-
+  if(__HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE)) __HAL_UART_CLEAR_IDLEFLAG(&huart3);
+  CRSF_UART_IDLE_CALLBACK();
   /* USER CODE END USART3_IRQn 1 */
 }
 
