@@ -10,7 +10,7 @@ static struct{
     uint32_t num_registered_tasks;
 } scheduler = {0};
 
-
+#define avgr_delta_filter 10
 void SCHEDULER_LOOP(void){
     uint32_t now = MICROS32();
 
@@ -29,7 +29,7 @@ void SCHEDULER_LOOP(void){
             task->stat.average_exec_time = (task->stat.average_exec_time * task->stat.filter_value + exec_time) / (task->stat.filter_value + 1);
             task->stat.total_exec_time += exec_time;
 
-            task->stat.average_delta_time = (task->stat.average_delta_time * 99 + (timestamp_func_start - task->stat.last_exec_time)) / 100;
+            task->stat.average_delta_time = (task->stat.average_delta_time * (avgr_delta_filter - 1) + (timestamp_func_start - task->stat.last_exec_time + (avgr_delta_filter / 2))) / avgr_delta_filter;
             task->stat.last_exec_time = timestamp_func_start;
 
             if(!task->info.dynamic_execution_management){     // task decides next execution time (clamped) or default is being applied

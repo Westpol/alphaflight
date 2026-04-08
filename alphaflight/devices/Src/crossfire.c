@@ -15,7 +15,7 @@ static volatile struct{
 
 static bool new_uart_data_arrived = false;
 
-#define DMA_BUFFER_SIZE STM32_WORD_SIZE * 4
+#define DMA_BUFFER_SIZE STM32_WORD_SIZE * 2
 __attribute__((section(".dma_rx"))) static uint8_t crsf_dma_buffer[DMA_BUFFER_SIZE] = {0};
 static uint8_t crsf_packet[64] = {0};
 

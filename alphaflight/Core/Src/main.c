@@ -240,6 +240,21 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    /*
+    Debug pin on S1:
+    volatile static bool debug = false;
+
+    GPIOA->MODER &= ~(uint32_t)0x03;
+    GPIOA->MODER |= (uint32_t)0x01;
+
+    if(debug){
+        GPIOA->BSRR = 0x01;
+    }
+    else{
+        GPIOA->BSRR = 0x01 << 16;
+    }
+    debug = !debug;
+    */
   }
   /* USER CODE END 3 */
 }
