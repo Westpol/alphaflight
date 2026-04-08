@@ -224,7 +224,7 @@ int main(void)
   //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(60), false, 90000, 110000, 500, "USB Stats");
 
   GPS_SET_PARSER_TASK_INDEX(gps_task_index);
-  CRSF_SET_PARSER_TASK_INDEX(crsf_task_index);
+  CRSF_SET_PARSER_TASK_PID(crsf_task_index);
 
   GPS_INIT(&huart2, &hdma_usart2_rx);
   CRSF_INIT(&huart3, &hdma_usart3_rx);

@@ -7,18 +7,21 @@
 static UART_HandleTypeDef* crsf_uart;
 static DMA_HandleTypeDef* crsf_dma;
 
-static volatile int32_t crsf_parser_task_index = -1;
+static volatile int32_t crsf_parser_pid = -1;
 
 static volatile struct{
-    uint16_t write_point;
-    uint16_t read_point;
+    uint16_t current_interrupt;
+    uint16_t last_interrupt;
 } crsf_parser = {0};
 
-static bool new_uart_data_arrived = false;
-
-#define DMA_BUFFER_SIZE STM32_WORD_SIZE * 2
+#define DMA_BUFFER_SIZE (STM32_WORD_SIZE * 4)
 __attribute__((section(".dma_rx"))) static uint8_t crsf_dma_buffer[DMA_BUFFER_SIZE] = {0};
 static uint8_t crsf_packet[64] = {0};
+
+static volatile struct{
+    uint32_t correct_parsed;
+    uint32_t parse_fail;
+}parse_stats = {0};
 
 static struct{
     uint8_t     up_rssi_ant1;       // Uplink RSSI Antenna 1 (dBm * -1)
@@ -58,74 +61,77 @@ CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* crsf_uar
 
 
 uint32_t CRSF_PARSE_DMA(const task_info_t* task){
-    new_uart_data_arrived = false;
+    uint16_t package_start = crsf_parser.last_interrupt;
+    uint16_t package_end = crsf_parser.current_interrupt;
 
-    uint16_t write_so_far = crsf_parser.write_point;
+    if(crsf_dma_buffer[package_start] != 0xC8) goto parsing_error;  // check header
+    uint8_t len = crsf_dma_buffer[package_start + 1];   // store length
+    if(len < 2 || len > 62) goto parsing_error;     // sanity check length
+    uint16_t last_package_byte_pos = (package_start + 2 + len) % DMA_BUFFER_SIZE;
+    if(last_package_byte_pos > package_end) goto parsing_error_wrap;     // check if whole message has already arrived
+    
+    for(uint8_t i = 0; i < len; i++){
+        crsf_packet[i] = crsf_dma_buffer[(package_start + i + 2) % DMA_BUFFER_SIZE];
+    }
 
-    for(uint16_t i = crsf_parser.read_point; i + 1 < write_so_far; i++){
-        if(crsf_dma_buffer[i] == 0xC8){ // packets for FC (link stats and channels)
-            uint8_t len = crsf_dma_buffer[i + 1];
-            if(len < 2 || len > 62) continue;   // invalid len, probably picked up stray header
+    uint8_t crc = crc8(crsf_packet, len -1);
+    if(crc != crsf_packet[len - 1]) goto parsing_error_crc;
 
-            if(i + 2 + len < DMA_BUFFER_SIZE){  // no wrap around
-                if(i + 2 + len > write_so_far){    // if not all data recieved yet, stay at parsing point and wait for complete packet
-                    crsf_parser.read_point = i;
-                    break;
-                }
-                for(uint8_t f = 0; f < len; f++){   // all data recieved
-                    crsf_packet[f] = crsf_dma_buffer[f + i + 2];    // load packet in buffer starting from type (needed for CRC)
-                }
-                uint32_t crc = crc8(crsf_packet, len - 1);
-                if(crc != crsf_packet[len - 1]) continue;   // wrong CRC, skip packet
-                uint8_t type = crsf_packet[0];
-                if(type == 0x16){   // channels
-                    // crsf_packet[0] = Type (0x16)
-                    // Channel data starts at crsf_packet[1]
+    uint8_t type = crsf_packet[0];
 
-                    crsf_fc_channels.channel[0]  = (crsf_packet[1]       | crsf_packet[2] << 8) & 0x07FF;
-                    crsf_fc_channels.channel[1]  = (crsf_packet[2] >> 3  | crsf_packet[3] << 5) & 0x07FF;
-                    crsf_fc_channels.channel[2]  = (crsf_packet[3] >> 6  | crsf_packet[4] << 2 | crsf_packet[5] << 10) & 0x07FF;
-                    crsf_fc_channels.channel[3]  = (crsf_packet[5] >> 1  | crsf_packet[6] << 7) & 0x07FF;
-                    crsf_fc_channels.channel[4]  = (crsf_packet[6] >> 4  | crsf_packet[7] << 4) & 0x07FF;
-                    crsf_fc_channels.channel[5]  = (crsf_packet[7] >> 7  | crsf_packet[8] << 1 | crsf_packet[9] << 9) & 0x07FF;
-                    crsf_fc_channels.channel[6]  = (crsf_packet[9] >> 2  | crsf_packet[10] << 6) & 0x07FF;
-                    crsf_fc_channels.channel[7]  = (crsf_packet[10] >> 5 | crsf_packet[11] << 3) & 0x07FF;
+    if(type == 0x16){   // channels
+        crsf_fc_channels.channel[0]  = (crsf_packet[1]       | crsf_packet[2] << 8) & 0x07FF;
+        crsf_fc_channels.channel[1]  = (crsf_packet[2] >> 3  | crsf_packet[3] << 5) & 0x07FF;
+        crsf_fc_channels.channel[2]  = (crsf_packet[3] >> 6  | crsf_packet[4] << 2 | crsf_packet[5] << 10) & 0x07FF;
+        crsf_fc_channels.channel[3]  = (crsf_packet[5] >> 1  | crsf_packet[6] << 7) & 0x07FF;
+        crsf_fc_channels.channel[4]  = (crsf_packet[6] >> 4  | crsf_packet[7] << 4) & 0x07FF;
+        crsf_fc_channels.channel[5]  = (crsf_packet[7] >> 7  | crsf_packet[8] << 1 | crsf_packet[9] << 9) & 0x07FF;
+        crsf_fc_channels.channel[6]  = (crsf_packet[9] >> 2  | crsf_packet[10] << 6) & 0x07FF;
+        crsf_fc_channels.channel[7]  = (crsf_packet[10] >> 5 | crsf_packet[11] << 3) & 0x07FF;
 
-                    crsf_fc_channels.channel[8]  = (crsf_packet[12]      | crsf_packet[13] << 8) & 0x07FF;
-                    crsf_fc_channels.channel[9]  = (crsf_packet[13] >> 3 | crsf_packet[14] << 5) & 0x07FF;
-                    crsf_fc_channels.channel[10] = (crsf_packet[14] >> 6 | crsf_packet[15] << 2 | crsf_packet[16] << 10) & 0x07FF;
-                    crsf_fc_channels.channel[11] = (crsf_packet[16] >> 1 | crsf_packet[17] << 7) & 0x07FF;
-                    crsf_fc_channels.channel[12] = (crsf_packet[17] >> 4 | crsf_packet[18] << 4) & 0x07FF;
-                    crsf_fc_channels.channel[13] = (crsf_packet[18] >> 7 | crsf_packet[19] << 1 | crsf_packet[20] << 9) & 0x07FF;
-                    crsf_fc_channels.channel[14] = (crsf_packet[20] >> 2 | crsf_packet[21] << 6) & 0x07FF;
-                    crsf_fc_channels.channel[15] = (crsf_packet[21] >> 5 | crsf_packet[22] << 3) & 0x07FF;
-                }
-                if(type == 0x14){   // link stats
-                    for(uint8_t f = 0; f < len - 2; f++){
-                        *((uint8_t*)&crsf_fc_link_statistics + f) = crsf_packet[f + 1];
-                    }
-                }
-                i += len + 2 - 1;   // move to next packet, subtract one because of for loop increment
-            }
-            else{
-                // handle buffer wrap
-            }
+        crsf_fc_channels.channel[8]  = (crsf_packet[12]      | crsf_packet[13] << 8) & 0x07FF;
+        crsf_fc_channels.channel[9]  = (crsf_packet[13] >> 3 | crsf_packet[14] << 5) & 0x07FF;
+        crsf_fc_channels.channel[10] = (crsf_packet[14] >> 6 | crsf_packet[15] << 2 | crsf_packet[16] << 10) & 0x07FF;
+        crsf_fc_channels.channel[11] = (crsf_packet[16] >> 1 | crsf_packet[17] << 7) & 0x07FF;
+        crsf_fc_channels.channel[12] = (crsf_packet[17] >> 4 | crsf_packet[18] << 4) & 0x07FF;
+        crsf_fc_channels.channel[13] = (crsf_packet[18] >> 7 | crsf_packet[19] << 1 | crsf_packet[20] << 9) & 0x07FF;
+        crsf_fc_channels.channel[14] = (crsf_packet[20] >> 2 | crsf_packet[21] << 6) & 0x07FF;
+        crsf_fc_channels.channel[15] = (crsf_packet[21] >> 5 | crsf_packet[22] << 3) & 0x07FF;
+    }
+
+    if(type == 0x14){   // link stats
+        for(uint8_t f = 0; f < len - 2; f++){
+            *((uint8_t*)&crsf_fc_link_statistics + f) = crsf_packet[f + 1];
         }
     }
-    crsf_parser.read_point = write_so_far;
-    SCHEDULER_DISABLE_TASK_BY_INDEX(crsf_parser_task_index);
+
+    parse_stats.correct_parsed++;
+    crsf_parser.last_interrupt = package_end;
+    SCHEDULER_DISABLE_TASK_BY_INDEX(crsf_parser_pid);
     return 0;
+
+    parsing_error:
+        parse_stats.parse_fail++;
+        crsf_parser.last_interrupt = package_end;
+        SCHEDULER_DISABLE_TASK_BY_INDEX(crsf_parser_pid);
+        return 0;
+
+    parsing_error_crc:
+        goto parsing_error;
+
+    parsing_error_wrap:
+        goto parsing_error;
 }
 
 CRSF_RETURN_TYPE CRSF_UART_IDLE_CALLBACK(){
-    if(crsf_parser_task_index == -1) return CRSF_FAIL;
-    crsf_parser.write_point = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(crsf_dma);
-    SCHEDULER_ENABLE_TASK_BY_INDEX(crsf_parser_task_index);
+    if(crsf_parser_pid == -1) return CRSF_FAIL;
+    crsf_parser.current_interrupt = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(crsf_dma);
+    SCHEDULER_ENABLE_TASK_BY_INDEX(crsf_parser_pid);
     return CRSF_OKAY;
 }
 
-CRSF_RETURN_TYPE CRSF_SET_PARSER_TASK_INDEX(int32_t index){
-    crsf_parser_task_index = index;
+CRSF_RETURN_TYPE CRSF_SET_PARSER_TASK_PID(int32_t index){
+    crsf_parser_pid = index;
     return CRSF_OKAY;
 }
 

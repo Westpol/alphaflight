@@ -14,6 +14,6 @@ CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* crsf_uar
 uint32_t CRSF_PARSE_DMA(const task_info_t* task);
 CRSF_RETURN_TYPE CRSF_UART_IDLE_CALLBACK();
 
-CRSF_RETURN_TYPE CRSF_SET_PARSER_TASK_INDEX(int32_t index);
+CRSF_RETURN_TYPE CRSF_SET_PARSER_TASK_PID(int32_t index);
 
 #endif
