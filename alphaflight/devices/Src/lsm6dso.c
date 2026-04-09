@@ -22,7 +22,6 @@ float twoKi = 2.0f * 0.0f;   // integral gain (start with 0)
 float integralFB[3] = {0};
 
 #if LSM6DSO_INTERRUPT
-volatile static bool spi_transfer = false;
 __attribute__((section(".dma_rx"))) static uint8_t imu_dma_rx[STM32_WORD_SIZE] = {0};
 __attribute__((section(".dma_tx"))) static uint8_t imu_dma_tx[STM32_WORD_SIZE] = {0};
 #endif
@@ -38,8 +37,26 @@ static IMU_RETURN_TYPE imu_setup(){
     write_register(LSM6DSO_CRTL3_C_ADDRESS, LSM6DSO_CTRL3_C_RESET);
     while((read_register(LSM6DSO_CRTL3_C_ADDRESS) & 0x01));
     write_register(LSM6DSO_CTRL9_XL_ADDRESS, LSM6DSO_CTRL9_XL_I3C_DISABLE);
-    write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_1666 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
-    write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_1666 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
+
+    switch (config.odr) {
+        case IMU_ODR_833Hz:
+            write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_833 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
+            write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_833 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
+        break;
+        case IMU_ODR_1666Hz:
+            write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_1666 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
+            write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_1666 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
+        break;
+        case IMU_ODR_3333Hz:
+            write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_3333 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
+            write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_3333 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
+        break;
+        case IMU_ODR_6666Hz:
+            write_register(LSM6DSO_CTRL1_XL_ADDRESS, (LSM6DSO_CTRL1_XL_ODR_6666 | LSM6DSO_CTRL1_XL_FS_16) & LSM6DSO_CTRL1_XL_MASK_AND);
+            write_register(LSM6DSO_CTRL2_G_ADDRESS, (LSM6DSO_CTRL2_G_ODR_6666 | LSM6DSO_CTRL2_G_FS_2500) & LSM6DSO_CTRL2_G_MASK_AND);
+        break;
+    }
+
     write_register(LSM6DSO_CRTL4_C_ADDRESS, LSM6DSO_CTRL4_C_DRDY_MASK & LSM6DSO_CTRL4_C_MASK_AND);
     #if LSM6DSO_INTERRUPT
         write_register(LSM6DSO_INT1_CTRL_ADDRESS, LSM6DSO_INT1_CTRL_DRDY_G);
@@ -171,10 +188,9 @@ static IMU_RETURN_TYPE imu_convert_data(const uint8_t* rx_data){
 
 uint32_t IMU_READ_DATA(const task_info_t* task){
     #if LSM6DSO_INTERRUPT
-    if(!spi_transfer){
-        imu_convert_data(&imu_dma_rx[1]);
-        imu_update_quat();
-    }
+    if (HAL_DMA_GetState(rx_dma) != HAL_DMA_STATE_READY) return 0;
+    imu_convert_data(&imu_dma_rx[1]);
+    imu_update_quat();
     SCHEDULER_DISABLE_TASK_BY_INDEX(imu_convert_task_index);
     #else
     uint8_t g_a_tx[13] = {0};
@@ -192,7 +208,6 @@ uint32_t IMU_READ_DATA(const task_info_t* task){
 void IMU_DATA_READY_INTERRUPT_HANDLER(void){
     if(!imu_set_up) return;
     if (HAL_DMA_GetState(rx_dma) != HAL_DMA_STATE_READY) return;
-    spi_transfer = true;
     SPI_START_CS(SPI_DEVICE_IMU);
     HAL_SPI_TransmitReceive_DMA(SPI_GET_DEVICE_PERIPHERAL(SPI_DEVICE_IMU), imu_dma_tx, imu_dma_rx, 13);
 }
@@ -222,6 +237,7 @@ void IMU_SET_CONFIG(imu_config_t new_config){
 imu_config_t IMU_GET_DEFAULT_CONFIG(){
     imu_config_t temp = {0};
     temp.orientation = 0;
+    temp.odr = IMU_ODR_6666Hz;
     return temp;
 }
 

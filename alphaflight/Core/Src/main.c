@@ -195,7 +195,7 @@ int main(void)
 
   //PASSTHROUGH_START(&huart2, &hdma_usart2_rx);
 
-  //if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
+  if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
 
   if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();   // load complete FC config
 
