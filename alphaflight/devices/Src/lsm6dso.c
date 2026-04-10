@@ -237,7 +237,7 @@ void IMU_SET_CONFIG(imu_config_t new_config){
 imu_config_t IMU_GET_DEFAULT_CONFIG(){
     imu_config_t temp = {0};
     temp.orientation = 0;
-    temp.odr = IMU_ODR_6666Hz;
+    temp.odr = IMU_ODR_3333Hz;
     return temp;
 }
 

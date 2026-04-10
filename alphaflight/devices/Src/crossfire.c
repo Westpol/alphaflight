@@ -18,11 +18,6 @@ static volatile struct{
 __attribute__((section(".dma_rx"))) static uint8_t crsf_dma_buffer[DMA_BUFFER_SIZE] = {0};
 static uint8_t crsf_packet[64] = {0};
 
-static volatile struct{
-    uint32_t correct_parsed;
-    uint32_t parse_fail;
-}parse_stats = {0};
-
 static struct{
     uint8_t     up_rssi_ant1;       // Uplink RSSI Antenna 1 (dBm * -1)
     uint8_t     up_rssi_ant2;       // Uplink RSSI Antenna 2 (dBm * -1)
@@ -105,13 +100,11 @@ uint32_t CRSF_PARSE_DMA(const task_info_t* task){
         }
     }
 
-    parse_stats.correct_parsed++;
     crsf_parser.last_interrupt = package_end;
     SCHEDULER_DISABLE_TASK_BY_INDEX(crsf_parser_pid);
     return 0;
 
     parsing_error:
-        parse_stats.parse_fail++;
         crsf_parser.last_interrupt = package_end;
         SCHEDULER_DISABLE_TASK_BY_INDEX(crsf_parser_pid);
         return 0;

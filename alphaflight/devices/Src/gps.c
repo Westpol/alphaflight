@@ -1,5 +1,6 @@
 #include "gps.h"
 #include "timer.h"
+#include <time.h>
 
 static UART_HandleTypeDef* gps_uart;
 static DMA_HandleTypeDef* gps_dma;
@@ -12,7 +13,7 @@ static volatile struct{
 } gps_parser = {0};
 
 static bool new_uart_data_arrived = false;
-
+//mktime(struct tm *_timeptr)
 typedef struct __attribute__((packed)){
     uint32_t iTOW;
     uint16_t year;
