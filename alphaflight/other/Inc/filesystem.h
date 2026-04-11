@@ -3,6 +3,7 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
+
 typedef struct{
     uint32_t magic;     // 0x464C4D44 / "FLMD"
     uint32_t version;
@@ -31,5 +32,7 @@ typedef struct{
     uint32_t data_block_start;
     uint32_t data_block_end;
 } superblock;
+
+void reset_superblock();
 
 #endif

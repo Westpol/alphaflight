@@ -17,8 +17,8 @@ typedef enum{
     SD_BUFF_FULL
 }SD_RETURN_TYPE;
 
-SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t timeout);
-SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t timeout);
+SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t copy_size, uint32_t timeout);
+SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t copy_size, uint32_t timeout);
 SD_RETURN_TYPE SD_WRITE_BLOCK_DMA(uint8_t* buff, uint32_t address);
 
 #endif

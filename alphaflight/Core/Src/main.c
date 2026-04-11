@@ -200,6 +200,8 @@ int main(void)
 
   if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();   // load complete FC config
 
+  reset_superblock();
+
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();  // timer init for MICROS32 and MILLIS32
   
@@ -221,6 +223,7 @@ int main(void)
 
 
   DSHOT_INIT();
+
 
   uint8_t buff[SD_USABLE_BLOCK_SIZE_BYTES] = {0};
   SD_WRITE_BLOCK_DMA(buff, 1000);

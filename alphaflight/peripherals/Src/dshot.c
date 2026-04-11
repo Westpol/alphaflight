@@ -103,7 +103,7 @@ DSHOT_RETURN_TYPE dshot_set_packet(void){
 }
 
 DSHOT_RETURN_TYPE DSHOT_DMA_CPLT_CALLBACK(void){
-    __IO uint32_t flags = DMA1->LISR;
+    //__IO uint32_t flags = DMA1->LISR;
     DMA1->LIFCR |= DMA_LIFCR_CTCIF0 | DMA_LIFCR_CTEIF0 | DMA_LIFCR_CDMEIF0 | DMA_LIFCR_CFEIF0;  // clear all flags
     // add error flag handling later
     LL_TIM_DisableCounter(TIM1);

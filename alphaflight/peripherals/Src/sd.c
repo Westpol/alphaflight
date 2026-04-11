@@ -4,18 +4,19 @@
 #include "stm32h723xx.h"
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_ll_crc.h"
-#include "string.h"
+#include <string.h>
 
 extern SD_HandleTypeDef hsd1;
 
 __attribute__((section(".dma_tx"), aligned(32))) static uint8_t sd_dma_buffer_1[SD_BLOCK_SIZE] = {0};
 __attribute__((section(".dma_tx"), aligned(32))) static uint8_t sd_dma_buffer_2[SD_BLOCK_SIZE] = {0};
+uint32_t buffer2_used = 0;
 
 static __attribute__((aligned(32))) uint8_t tmp_buff[SD_BLOCK_SIZE] = {0};  // create write buffer for safer CRC logic
 
 static uint32_t generate_crc32_hw(uint8_t* buffer_pointer);
 
-SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t timeout){
+SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t copy_size, uint32_t timeout){
 
     uint32_t start = MILLIS32();
 
@@ -34,15 +35,17 @@ SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t 
     return SD_OKAY;
 }
 
-SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t timeout){
+SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t copy_size, uint32_t timeout){
+    if(copy_size > SD_USABLE_BLOCK_SIZE_BYTES) return SD_FAIL;
 
     uint32_t start = MILLIS32();
 
     while(HAL_SD_GetCardState(&hsd1) != HAL_SD_CARD_TRANSFER || hsd1.State != HAL_SD_STATE_READY){
         if((MILLIS32() - start) >= timeout) return SD_FAIL;
     }
-
-    memcpy(tmp_buff, buff, SD_USABLE_BLOCK_SIZE_BYTES);
+    
+    memset(tmp_buff, 0, sizeof(tmp_buff));
+    memcpy(tmp_buff, buff, copy_size);
 
     uint32_t block_crc = generate_crc32_hw(tmp_buff);
     memcpy(&tmp_buff[SD_USABLE_BLOCK_SIZE_BYTES], &block_crc, sizeof(uint32_t));
@@ -54,6 +57,12 @@ SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t
 SD_RETURN_TYPE SD_WRITE_BLOCK_DMA(uint8_t* buff, uint32_t address){
     if(HAL_SD_GetCardState(&hsd1) != HAL_SD_CARD_TRANSFER || hsd1.State != HAL_SD_STATE_READY){
         memcpy(sd_dma_buffer_2, buff, SD_USABLE_BLOCK_SIZE_BYTES);
+        
+        uint32_t block_crc = generate_crc32_hw(sd_dma_buffer_2);
+        memcpy(&sd_dma_buffer_2[SD_USABLE_BLOCK_SIZE_BYTES], &block_crc, sizeof(uint32_t));
+
+        //__HAL_SD_ENABLE_IT(&hsd1, HAL_SD_)
+        buffer2_used++;
         return SD_BUSY;
     }
     memcpy(sd_dma_buffer_1, buff, SD_USABLE_BLOCK_SIZE_BYTES);

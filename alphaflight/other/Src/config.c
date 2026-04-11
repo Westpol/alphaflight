@@ -16,7 +16,7 @@ CONFIG_RETURN_TYPE CONFIG_LOAD_FROM_SD(){
 
     for(uint32_t i = 0; i * SD_USABLE_BLOCK_SIZE_BYTES < sizeof(config_entrances_t); i++){
         uint32_t rest = sizeof(config_entrances_t) - i * SD_USABLE_BLOCK_SIZE_BYTES;
-        if(SD_READ_BLOCK_BLOCKING(buff, CONFIG_SPACE_START_BLOCK + i, 100) != SD_OKAY) return CONFIG_FAIL;
+        if(SD_READ_BLOCK_BLOCKING(buff, CONFIG_SPACE_START_BLOCK + i, sizeof(buff), 100) != SD_OKAY) return CONFIG_FAIL;
         memcpy((uint8_t*)&config_entrances + i * SD_USABLE_BLOCK_SIZE_BYTES, &buff[0], UTILS_MIN_I(rest, SD_USABLE_BLOCK_SIZE_BYTES));
     }
 
@@ -38,7 +38,7 @@ CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD(){
     for(uint32_t i = 0; i * SD_USABLE_BLOCK_SIZE_BYTES < sizeof(config_entrances_t); i++){
         uint32_t rest = sizeof(config_entrances_t) - i * SD_USABLE_BLOCK_SIZE_BYTES;
         memcpy(&buff[0], (uint8_t*)&config_entrances + i * SD_USABLE_BLOCK_SIZE_BYTES, UTILS_MIN_I(rest, SD_USABLE_BLOCK_SIZE_BYTES));
-        if(SD_WRITE_BLOCK_BLOCKING(buff, CONFIG_SPACE_START_BLOCK + i, 100) != SD_OKAY) return CONFIG_FAIL;
+        if(SD_WRITE_BLOCK_BLOCKING(buff, CONFIG_SPACE_START_BLOCK + i, sizeof(buff), 100) != SD_OKAY) return CONFIG_FAIL;
     }
 
     return CONFIG_OKAY;
