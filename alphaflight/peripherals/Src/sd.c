@@ -17,6 +17,7 @@ static __attribute__((aligned(32))) uint8_t tmp_buff[SD_BLOCK_SIZE] = {0};  // c
 static uint32_t generate_crc32_hw(uint8_t* buffer_pointer);
 
 SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t copy_size, uint32_t timeout){
+    if(copy_size > SD_USABLE_BLOCK_SIZE_BYTES) return SD_FAIL;
 
     uint32_t start = MILLIS32();
 
@@ -25,12 +26,13 @@ SD_RETURN_TYPE SD_READ_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t 
     }
 
     if(HAL_SD_ReadBlocks(&hsd1, tmp_buff, address * SD_SECTORS_PER_BLOCK, SD_SECTORS_PER_BLOCK, timeout) != HAL_OK) return SD_FAIL;
+
     uint32_t crc_on_sd;
     memcpy(&crc_on_sd, &tmp_buff[SD_USABLE_BLOCK_SIZE_BYTES], sizeof(uint32_t));    // load CRC from end of block
 
     if(crc_on_sd != generate_crc32_hw(tmp_buff)) return SD_WRONG_CRC;   // check if CRC on SD matches with block content
 
-    memcpy(buff, &tmp_buff, SD_USABLE_BLOCK_SIZE_BYTES);
+    memcpy(buff, &tmp_buff, copy_size);
 
     return SD_OKAY;
 }

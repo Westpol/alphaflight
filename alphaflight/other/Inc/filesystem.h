@@ -3,6 +3,10 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
+typedef enum{
+    FS_OKAY,
+    FS_FAIL
+}FS_RETURN_TYPE;
 
 typedef struct{
     uint32_t magic;     // 0x464C4D44 / "FLMD"
@@ -33,6 +37,7 @@ typedef struct{
     uint32_t data_block_end;
 } superblock;
 
-void reset_superblock();
+void fs_reset_superblock();
+FS_RETURN_TYPE FS_LOAD_SUPERBLOCK(void);
 
 #endif
