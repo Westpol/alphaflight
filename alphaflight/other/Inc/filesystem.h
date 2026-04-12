@@ -39,5 +39,7 @@ typedef struct{
 
 void fs_reset_superblock();
 FS_RETURN_TYPE FS_LOAD_SUPERBLOCK(void);
+uint32_t FS_NEW_FLIGHT(void);
+FS_RETURN_TYPE FS_END_FLIGHT(uint32_t end_block);
 
 #endif

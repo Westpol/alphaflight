@@ -200,9 +200,12 @@ int main(void)
 
   if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();   // load complete FC config
 
-  fs_reset_superblock();
+  //fs_reset_superblock();
 
   FS_LOAD_SUPERBLOCK();
+
+  uint32_t start_block = FS_NEW_FLIGHT();
+  FS_END_FLIGHT(start_block + 100);
 
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();  // timer init for MICROS32 and MILLIS32
