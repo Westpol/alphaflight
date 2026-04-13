@@ -1,6 +1,7 @@
 #include "filesystem.h"
 #include "sd.h"
 #include "stm32h723xx.h"
+#include <stdint.h>
 #include <string.h>
 
 #define metadata_per_block (SD_USABLE_BLOCK_SIZE_BYTES / sizeof(metadata))
@@ -9,12 +10,11 @@
 static inline uint32_t rel_fn_to_index(uint32_t fn) {return fn % metadata_per_block;}
 static inline uint32_t rel_fn_to_block(uint32_t fn) {return fn / metadata_per_block;}
 
-superblock sb = {0};
-uint8_t active_sb = 0;
-metadata mb[metadata_per_block] = {0};
-metadata current_flight = {0};
+static superblock sb = {0};
+static uint8_t active_sb = 0;
+static metadata mb[metadata_per_block] = {0};
+static metadata current_flight = {0};
 
-FS_RETURN_TYPE fs_load_last_flight(void);
 static void fs_init_metadata(void);
 
 FS_RETURN_TYPE FS_LOAD_SUPERBLOCK(void){
@@ -90,6 +90,10 @@ FS_RETURN_TYPE FS_END_FLIGHT(uint32_t end_block){
     SD_WRITE_BLOCK_BLOCKING((uint8_t*)&sb, superblock_address_start + active_sb, sizeof(sb), 100);
     active_sb = (active_sb + 1) % 2;
     return FS_OKAY;
+}
+
+uint32_t FS_GET_FN(){
+    return current_flight.flight_num_abs;
 }
 
 FS_RETURN_TYPE FS_FORMAT_CARD(){
