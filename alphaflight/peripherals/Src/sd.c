@@ -58,7 +58,8 @@ SD_RETURN_TYPE SD_WRITE_BLOCK_BLOCKING(uint8_t* buff, uint32_t address, uint32_t
 }
 
 SD_RETURN_TYPE SD_WRITE_BLOCK_DMA(uint8_t* buff, uint32_t address){
-    if(HAL_SD_GetCardState(&hsd1) != HAL_SD_CARD_TRANSFER || hsd1.State != HAL_SD_STATE_READY){
+    HAL_SD_CardStateTypeDef ret1 = HAL_SD_GetCardState(&hsd1);
+    if(ret1 != HAL_SD_CARD_READY || hsd1.State != HAL_SD_STATE_READY){
         memcpy(sd_dma_buffer_2, buff, SD_USABLE_BLOCK_SIZE_BYTES);
         
         uint32_t block_crc = generate_crc32_hw(sd_dma_buffer_2);
