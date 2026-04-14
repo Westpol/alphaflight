@@ -49,6 +49,7 @@ static CONFIG_RETURN_TYPE config_set_values_global(void){
     IMU_SET_CONFIG(config_entrances.imu);
     SERVO_SET_CONFIG(config_entrances.servo);
     DSHOT_SET_CONFIG(config_entrances.dshot);
+    LOG_SET_CONFIG(config_entrances.logger);
     return CONFIG_OKAY;
 }
 
@@ -56,6 +57,7 @@ static CONFIG_RETURN_TYPE config_get_defaults_global(void){
     config_entrances.imu = IMU_GET_DEFAULT_CONFIG();
     config_entrances.servo = SERVO_GET_DEFAULT_CONFIG();
     config_entrances.dshot = DSHOT_GET_DEFAULT_CONFIG();
+    config_entrances.logger = LOG_GET_DEFAULT_CONFIG();
     config_entrances.version = CONFIG_VERSION;
     return CONFIG_OKAY;
 }

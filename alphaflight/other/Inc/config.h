@@ -2,6 +2,7 @@
 #include "lsm6dso.h"
 #include "servo.h"
 #include "dshot.h"
+#include "logger.h"
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -21,6 +22,8 @@ typedef struct{
     imu_config_t imu;
     servo_config_t servo;
     dshot_config_t dshot;
+    
+    log_config_t logger;
 }config_entrances_t;
 
 CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD();

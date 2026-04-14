@@ -37,7 +37,8 @@
 #include "dshot.h"
 #include "serial_passthrough.h"
 #include "crossfire.h"
-#include "filesystem.h"
+#include "logger.h"
+#include "flight_control.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -200,13 +201,6 @@ int main(void)
 
   if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();   // load complete FC config
 
-  //fs_reset_superblock();
-
-  FS_LOAD_SUPERBLOCK();
-
-  uint32_t start_block = FS_NEW_FLIGHT();
-  FS_END_FLIGHT(start_block + 100);
-
 
   if(TIMER_INIT(TIM23, TIM24) != TIMER_INIT_OKAY) Error_Handler();  // timer init for MICROS32 and MILLIS32
   
@@ -237,6 +231,7 @@ int main(void)
   SCHEDULER_REGISTER_TASK(DSHOT_TRANSMIT, HZ_TO_US(1000), false, 0, 0, 20, "DSHOT TX");
   int32_t crsf_task_index = SCHEDULER_REGISTER_TASK(CRSF_PARSE_DMA, 100, false, 50, 150, 50, "CRSF Parsing");
   int32_t gps_task_index = SCHEDULER_REGISTER_TASK(GPS_PARSE_DMA, 100, false, 50, 150, 50, "GPS Parsing");
+  SCHEDULER_REGISTER_TASK(FC_DIRECT_LAW, HZ_TO_US(200), false, 0, 0, 10, "FC Dir Law");
   SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
   SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
   //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(60), false, 90000, 110000, 500, "USB Stats");

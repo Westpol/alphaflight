@@ -203,3 +203,7 @@ GPS_RETURN_TYPE GPS_SET_PARSER_TASK_INDEX(int32_t index){
     SCHEDULER_DISABLE_TASK_BY_INDEX(gps_parser_task_index);
     return GPS_OKAY;
 }
+
+GPS_PROCESSED_T GPS_GET_DATA(){
+    return gps_processed;
+}

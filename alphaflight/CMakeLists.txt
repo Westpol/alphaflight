@@ -60,6 +60,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "peripherals/Src/dshot.c"
     "other/Src/config.c"
     "other/Src/filesystem.c"
+    "other/Src/logger.c"
+    "other/Src/flight_control.c"
     # Add user sources here
 )
 

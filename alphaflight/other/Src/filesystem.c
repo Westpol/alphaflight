@@ -14,6 +14,7 @@ static superblock sb = {0};
 static uint8_t active_sb = 0;
 static metadata mb[metadata_per_block] = {0};
 static metadata current_flight = {0};
+static bool sb_loaded = false;
 
 static void fs_init_metadata(void);
 
@@ -31,10 +32,13 @@ FS_RETURN_TYPE FS_LOAD_SUPERBLOCK(void){
         sb = sb_temp_2;
         active_sb = 1;
     }
+    sb_loaded = true;
     return FS_OKAY;
 }
 
 uint32_t FS_NEW_FLIGHT(void){
+    if(!sb_loaded) FS_LOAD_SUPERBLOCK();
+    
     memset((uint8_t*)&current_flight, 0, sizeof(current_flight));
     current_flight.magic = 0x464C4D44;
     current_flight.version = metadata_version;

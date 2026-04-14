@@ -18,23 +18,9 @@ static volatile struct{
 __attribute__((section(".dma_rx"))) static uint8_t crsf_dma_buffer[DMA_BUFFER_SIZE] = {0};
 static uint8_t crsf_packet[64] = {0};
 
-static struct{
-    uint8_t     up_rssi_ant1;       // Uplink RSSI Antenna 1 (dBm * -1)
-    uint8_t     up_rssi_ant2;       // Uplink RSSI Antenna 2 (dBm * -1)
-    uint8_t     up_link_quality;    // Uplink Package success rate / Link quality (%)
-    int8_t      up_snr;             // Uplink SNR (dB)
-    uint8_t     active_antenna;     // number of currently best antenna
-    uint8_t     rf_profile;         // enum {4fps = 0 , 50fps, 150fps}
-    uint8_t     up_rf_power;        // enum {0mW = 0, 10mW, 25mW, 100mW,
-                                    // 500mW, 1000mW, 2000mW, 250mW, 50mW}
-    uint8_t     down_rssi;          // Downlink RSSI (dBm * -1)
-    uint8_t     down_link_quality;  // Downlink Package success rate / Link quality (%)
-    int8_t      down_snr;           // Downlink SNR (dB)
-}crsf_fc_link_statistics;
+CRSF_LINK_T crsf_fc_link_statistics = {0};
 
-static struct{
-    uint16_t channel[16];
-}crsf_fc_channels;
+CRSF_CHANNELS_T crsf_fc_channels = {0};
 
 static uint8_t crc8(const uint8_t * ptr, uint8_t len);
 
@@ -48,12 +34,17 @@ CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* crsf_uar
     __HAL_UART_ENABLE_IT(crsf_uart, UART_IT_IDLE);
 
     HAL_UART_Receive_DMA(crsf_uart, crsf_dma_buffer, DMA_BUFFER_SIZE);
-    //__HAL_DMA_ENABLE_IT(crsf_dma, DMA_IT_HT);
-    //__HAL_DMA_ENABLE_IT(crsf_dma, DMA_IT_TC);
 
     return CRSF_OKAY;
 }
 
+CRSF_CHANNELS_T CRSF_GET_CHANNELS(void){
+    return crsf_fc_channels;
+}
+
+CRSF_LINK_T CRSF_GET_LINK(void){
+    return crsf_fc_link_statistics;
+}
 
 uint32_t CRSF_PARSE_DMA(const task_info_t* task){
     uint16_t package_start = crsf_parser.last_interrupt;
@@ -92,12 +83,14 @@ uint32_t CRSF_PARSE_DMA(const task_info_t* task){
         crsf_fc_channels.channel[13] = (crsf_packet[18] >> 7 | crsf_packet[19] << 1 | crsf_packet[20] << 9) & 0x07FF;
         crsf_fc_channels.channel[14] = (crsf_packet[20] >> 2 | crsf_packet[21] << 6) & 0x07FF;
         crsf_fc_channels.channel[15] = (crsf_packet[21] >> 5 | crsf_packet[22] << 3) & 0x07FF;
+        crsf_fc_channels.timestamp = MICROS32();
     }
 
     if(type == 0x14){   // link stats
         for(uint8_t f = 0; f < len - 2; f++){
             *((uint8_t*)&crsf_fc_link_statistics + f) = crsf_packet[f + 1];
         }
+        crsf_fc_link_statistics.timestamp = MICROS32();
     }
 
     crsf_parser.last_interrupt = package_end;
