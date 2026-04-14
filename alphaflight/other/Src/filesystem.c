@@ -40,13 +40,13 @@ uint32_t FS_NEW_FLIGHT(void){
     if(!sb_loaded) FS_LOAD_SUPERBLOCK();
     
     memset((uint8_t*)&current_flight, 0, sizeof(current_flight));
-    current_flight.magic = 0x464C4D44;
+    current_flight.magic = 0x444D4C46;
     current_flight.version = metadata_version;
 
     if(sb.curr_flight_num_rel != 0){    // not first ever flight after format
         if(rel_fn_to_index(sb.curr_flight_num_rel) != 0){   // not first flight of mb block
             // read block and store last flight data
-            SD_READ_BLOCK_BLOCKING((uint8_t*)&mb, rel_fn_to_block(sb.curr_flight_num_rel - 1), sizeof(mb), 100);
+            SD_READ_BLOCK_BLOCKING((uint8_t*)&mb, sb.metadata_block_start + rel_fn_to_block(sb.curr_flight_num_rel - 1), sizeof(mb), 100);
             metadata last_flight = mb[rel_fn_to_index(sb.curr_flight_num_rel - 1)];
             
             // read out new data from old data (start block = end block + 1)
@@ -56,7 +56,7 @@ uint32_t FS_NEW_FLIGHT(void){
             // add lat, lon, timestamp later after gps implementation
         }
         else{   // first flight of mb block
-            SD_READ_BLOCK_BLOCKING((uint8_t*)&mb, rel_fn_to_block(sb.curr_flight_num_rel - 1), sizeof(mb), 100);
+            SD_READ_BLOCK_BLOCKING((uint8_t*)&mb, sb.metadata_block_start + rel_fn_to_block(sb.curr_flight_num_rel - 1), sizeof(mb), 100);
             metadata last_flight = mb[rel_fn_to_index(sb.curr_flight_num_rel - 1)];
 
             // reset metadata block after loaded last flight
@@ -75,7 +75,7 @@ uint32_t FS_NEW_FLIGHT(void){
     }
 
     mb[rel_fn_to_index(sb.curr_flight_num_rel)] = current_flight;
-    SD_WRITE_BLOCK_BLOCKING((uint8_t*)&mb, rel_fn_to_block(sb.curr_flight_num_rel), sizeof(mb), 100);
+    SD_WRITE_BLOCK_BLOCKING((uint8_t*)&mb, sb.metadata_block_start + rel_fn_to_block(sb.curr_flight_num_rel), sizeof(mb), 100);
 
     return current_flight.start_block;
 }
@@ -85,7 +85,7 @@ FS_RETURN_TYPE FS_END_FLIGHT(uint32_t end_block){
     current_flight.end_block = end_block;
     current_flight.end_ms = MILLIS32();
     mb[rel_fn_to_index(sb.curr_flight_num_rel)] = current_flight;
-    SD_WRITE_BLOCK_BLOCKING((uint8_t*)&mb, rel_fn_to_block(sb.curr_flight_num_rel), sizeof(mb), 100);
+    SD_WRITE_BLOCK_BLOCKING((uint8_t*)&mb, sb.metadata_block_start + rel_fn_to_block(sb.curr_flight_num_rel), sizeof(mb), 100);
 
     // update superblock
     sb.curr_flight_num_abs++;
@@ -113,7 +113,7 @@ FS_RETURN_TYPE FS_FORMAT_CARD(){
 void fs_reset_superblock(){
     superblock sb_temp = {0};
     for(uint8_t i = 0; i < 2; i++){
-        sb_temp.magic = 0x53424C4B;
+        sb_temp.magic = 0x4B4C4253;
         sb_temp.version = 0;
         sb_temp.seq = i;
         sb_temp.curr_flight_num_abs = 0;
@@ -128,7 +128,7 @@ void fs_reset_superblock(){
 
 static void fs_init_metadata(void){
     for(int i = 0; i < metadata_per_block; i++){
-        mb[i].magic = 0x464C4D44;
+        mb[i].magic = 0x444D4C46;
         mb[i].version = metadata_version;
     }
 }

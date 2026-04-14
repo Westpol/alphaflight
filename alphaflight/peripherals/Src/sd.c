@@ -3,6 +3,7 @@
 #include "sd.h"
 #include "stm32h723xx.h"
 #include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal_def.h"
 #include "stm32h7xx_ll_crc.h"
 #include <string.h>
 
@@ -72,7 +73,8 @@ SD_RETURN_TYPE SD_WRITE_BLOCK_DMA(uint8_t* buff, uint32_t address){
     uint32_t block_crc = generate_crc32_hw(sd_dma_buffer_1);
     memcpy(&sd_dma_buffer_1[SD_USABLE_BLOCK_SIZE_BYTES], &block_crc, sizeof(uint32_t));
 
-    if(HAL_SD_WriteBlocks_DMA(&hsd1, sd_dma_buffer_1, address, SD_SECTORS_PER_BLOCK) != HAL_OK) return SD_FAIL;
+    HAL_StatusTypeDef ret = HAL_SD_WriteBlocks_DMA(&hsd1, sd_dma_buffer_1, address * SD_SECTORS_PER_BLOCK, SD_SECTORS_PER_BLOCK);
+    if(ret != HAL_OK) return SD_FAIL;
     return SD_OKAY;
 }
 
