@@ -107,7 +107,7 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
         USB_PRINTLN_BLOCKING("%-16s | %12lu us | %11d us | %8.2f %% |",
                      task.info.task_name,
                      task.info.next_execution_timestamp,
-                     task.stat.average_delta_time,
+                     task.stat.average_exec_time,
                      cpu_usage * 100.0f);
     }
 

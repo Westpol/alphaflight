@@ -64,6 +64,8 @@ static struct __attribute__((packed)){
 #define DMA_BUFFER_SIZE STM32_WORD_SIZE * 16
 __attribute__((section(".dma_rx"))) static uint8_t gps_dma_buffer[DMA_BUFFER_SIZE] = {0};
 
+static GPS_PROCESSED_T gps_processed = {0};
+
 static bool validate_ubx_crc(uint8_t* buffer, uint16_t len, uint8_t checksum_a, uint8_t checksum_b){
     uint8_t ck_a = 0, ck_b = 0;
 
@@ -73,6 +75,59 @@ static bool validate_ubx_crc(uint8_t* buffer, uint16_t len, uint8_t checksum_a, 
     }
 
     return (ck_a == checksum_a && ck_b == checksum_b);
+}
+
+static uint32_t GPS_DATETIME_TO_UNIX(uint16_t year, uint8_t month, uint8_t day,
+                                     uint8_t hour, uint8_t min, uint8_t sec) {
+    if (year < 2025) return 0;
+
+    // Days per month, non-leap year
+    static const uint8_t days_in_month[] = { 31,28,31,30,31,30,31,31,30,31,30,31 };
+
+    uint32_t days = 0;
+
+    // Add days for years since 1970
+    for (uint16_t y = 1970; y < year; y++) {
+        days += (y % 4 == 0 && (y % 100 != 0 || y % 400 == 0)) ? 366 : 365;
+    }
+
+    // Add days for months in current year
+    for (uint8_t m = 1; m < month; m++) {
+        days += days_in_month[m - 1];
+        if (m == 2 && (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))) {
+            days += 1; // Leap day
+        }
+    }
+
+    // Add days in current month
+    days += day - 1;
+
+    return days * 86400 + hour * 3600 + min * 60 + sec;
+}
+
+static GPS_RETURN_TYPE gps_convert_data(void){
+
+    gps_processed.pos.lat = gps_nav_pvt.data.lat;
+    gps_processed.pos.lon = gps_nav_pvt.data.lon;
+
+    gps_processed.movement.course_over_ground = gps_nav_pvt.data.headMot;
+    gps_processed.movement.gspeed = gps_nav_pvt.data.gSpeed;
+    gps_processed.movement.heightMSL = gps_nav_pvt.data.hMSL;
+    gps_processed.movement.velD = gps_nav_pvt.data.velD;
+    gps_processed.movement.velE = gps_nav_pvt.data.velE;
+    gps_processed.movement.velN = gps_nav_pvt.data.velN;
+
+    gps_processed.status.fix_type = gps_nav_pvt.data.fixType;
+    gps_processed.status.num_sv = gps_nav_pvt.data.numSV;
+
+    gps_processed.acc.heading_acc = gps_nav_pvt.data.headAcc;
+    gps_processed.acc.horizontal_acc = gps_nav_pvt.data.hAcc;
+    gps_processed.acc.speed_acc = gps_nav_pvt.data.sAcc;
+    gps_processed.acc.vertical_acc = gps_nav_pvt.data.vAcc;
+
+    gps_processed.timestamp = GPS_DATETIME_TO_UNIX(gps_nav_pvt.data.year, gps_nav_pvt.data.month, gps_nav_pvt.data.day, gps_nav_pvt.data.hour, gps_nav_pvt.data.min, gps_nav_pvt.data.sec);
+
+    return GPS_OKAY;
 }
 
 GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* gps_uart_dma){   // Assumes UART already initialized with correct settings
@@ -112,6 +167,7 @@ uint32_t GPS_PARSE_DMA(const task_info_t* task){
                     }
 
                     gps_parser.read_point = i + len + 8;
+                    gps_convert_data();
                     goto found_packet;
                 }
                 else if(class == 0x01 && id == 0x12){   // velned
