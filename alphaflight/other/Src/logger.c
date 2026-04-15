@@ -55,7 +55,7 @@ void LOG_SET_TASK_INDEX(int32_t index){
 
 log_config_t LOG_GET_DEFAULT_CONFIG(){
     log_config_t temp = {0};
-    temp.log_frequency = 100;
+    temp.log_frequency = 1000;
     temp.delta_mode = true;
 
     temp.imu_log_divider = 1;
