@@ -26,6 +26,11 @@ static void store_timestamp(void);
 LOG_RETURN_TYPE LOG_START(){
     current_block = FS_NEW_FLIGHT();
     flight_num = FS_GET_FN();
+
+    // set flight num at first log block
+    memcpy(log_buff, &flight_num, sizeof(flight_num));
+    buff_index = 4;
+
     log_active = true;
     SCHEDULER_ENABLE_TASK_BY_INDEX(task_index);
     return LOG_OKAY;
@@ -41,6 +46,7 @@ uint32_t LOG_RUN(const task_info_t* task){
 LOG_RETURN_TYPE LOG_END(){
     log_active = false;
     FS_END_FLIGHT(current_block);
+    SD_WRITE_BLOCK_DMA(log_buff, current_block);
     SCHEDULER_DISABLE_TASK_BY_INDEX(task_index);
     return LOG_OKAY;
 }

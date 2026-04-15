@@ -1,8 +1,8 @@
 #include "filesystem.h"
 #include "sd.h"
 #include "stm32h723xx.h"
-#include <stdint.h>
 #include <string.h>
+#include "gps.h"
 
 #define metadata_per_block (SD_USABLE_BLOCK_SIZE_BYTES / sizeof(metadata))
 #define metadata_version 0
@@ -51,9 +51,6 @@ uint32_t FS_NEW_FLIGHT(void){
             
             // read out new data from old data (start block = end block + 1)
             current_flight.start_block = last_flight.end_block + 1;
-            current_flight.flight_num_abs = sb.curr_flight_num_abs;
-            current_flight.start_ms = MILLIS32();
-            // add lat, lon, timestamp later after gps implementation
         }
         else{   // first flight of mb block
             SD_READ_BLOCK_BLOCKING((uint8_t*)&mb, sb.metadata_block_start + rel_fn_to_block(sb.curr_flight_num_rel - 1), sizeof(mb), 100);
@@ -64,15 +61,20 @@ uint32_t FS_NEW_FLIGHT(void){
 
             // read out new data from old data (start block = end block + 1)
             current_flight.start_block = last_flight.end_block + 1;
-            current_flight.flight_num_abs = sb.curr_flight_num_abs;
-            current_flight.start_ms = MILLIS32();
         }
     }
     else {  // first flight after format
         fs_init_metadata();
-        current_flight.start_ms = MILLIS32();
         current_flight.start_block = sb.data_block_start;
     }
+
+    // fill metadata with data
+    GPS_PROCESSED_T gps_data = GPS_GET_DATA();
+    current_flight.flight_num_abs = sb.curr_flight_num_abs;
+    current_flight.start_ms = MILLIS32();
+    current_flight.timestamp = gps_data.timestamp;
+    current_flight.lat = gps_data.pos.lat;
+    current_flight.lon = gps_data.pos.lon;
 
     mb[rel_fn_to_index(sb.curr_flight_num_rel)] = current_flight;
     SD_WRITE_BLOCK_BLOCKING((uint8_t*)&mb, sb.metadata_block_start + rel_fn_to_block(sb.curr_flight_num_rel), sizeof(mb), 100);
