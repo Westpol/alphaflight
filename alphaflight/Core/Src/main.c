@@ -247,6 +247,8 @@ int main(void)
   CRSF_INIT(&huart3, &hdma_usart3_rx);
   STATUS_LED_SET_ALL(20);
 
+  uint32_t now = MILLIS32();
+  uint8_t latch = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -254,6 +256,18 @@ int main(void)
   while (1)
   {
     SCHEDULER_LOOP();
+    if(latch == 0 && (MILLIS32() - now) > 20000){
+      LOG_START();
+      now = MILLIS32();
+      latch = 1;
+      STATUS_LED_SET_ALL(999);
+    }
+    
+    if(latch == 1 && (MILLIS32() - now) > 20000){
+      LOG_END();
+      latch = 2;
+      STATUS_LED_SET_ALL(20);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
