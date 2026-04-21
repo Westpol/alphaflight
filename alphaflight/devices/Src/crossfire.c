@@ -2,7 +2,6 @@
 #include "stm32h723xx.h"
 #include "stm32h7xx_hal_uart.h"
 #include "timer.h"
-#include <stdint.h>
 
 static UART_HandleTypeDef* crsf_uart;
 static DMA_HandleTypeDef* crsf_dma;

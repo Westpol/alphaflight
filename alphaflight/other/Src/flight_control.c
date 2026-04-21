@@ -6,10 +6,27 @@
 #include "logger.h"
 
 static bool logging = false;
+static bool armed = false;
+static bool arming_failed = false;
 
 uint32_t FC_DIRECT_LAW(const task_info_t* task){
     CRSF_CHANNELS_T crsf = CRSF_GET_CHANNELS();
-    if(crsf.channel[4] > 1500){  // Motor armed
+    if(crsf.channel[4] > 1500){
+        if(!armed){
+            if(!armed && !arming_failed && crsf.channel[0] - 173 == 0){
+                armed = true;
+            }
+            else {
+                arming_failed = true;
+            }
+        }
+    }
+
+    if(crsf.channel[4] < 1500){
+        arming_failed = false;
+        armed = false;
+    }
+    if(armed && !arming_failed){  // Motor armed
         DSHOT_SET_THROTTLE((crsf.channel[0] - 172) + 1, true);
     }
     else {  // Motor disarmed

@@ -19,15 +19,6 @@ DSHOT_RETURN_TYPE DSHOT_INIT(void){
 
     DSHOT_SET_THROTTLE(0, false);
 
-    uint32_t start = MICROS32();
-    for(int i = 0; i < 2000; i++){
-        DSHOT_TRANSMIT(NULL);
-        while(MICROS32() - start <= 1000);  // send 0 command for 1500ms at 1kHz (init ESC(s))
-        start += 1000;
-    }
-
-    DSHOT_SET_THROTTLE(0, false); // set throttle zero / disarm
-
     return DSHOT_OKAY;
 }
 
