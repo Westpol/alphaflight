@@ -21,7 +21,7 @@ typedef struct{
 DSHOT_RETURN_TYPE DSHOT_INIT(void);
 
 uint32_t DSHOT_TRANSMIT(const task_info_t* task);
-DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle);
+DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle, bool armed);
 
 DSHOT_RETURN_TYPE DSHOT_DMA_CPLT_CALLBACK(void);
 
