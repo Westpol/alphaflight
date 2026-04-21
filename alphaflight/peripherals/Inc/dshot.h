@@ -6,6 +6,8 @@
 #ifndef DSHOT_H
 #define DSHOT_H
 
+#define DSHOT_ENABLE_IDLE_SPINNING false
+
 typedef enum{
     DSHOT_OKAY,
     DSHOT_FAIL

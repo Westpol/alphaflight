@@ -9,6 +9,9 @@ volatile static uint16_t throttle_data_buffer;
 volatile static bool transmitting = false;
 volatile static bool new_data = false;
 
+static bool motor_armed = false;
+static bool motor_arming_failed = false;
+
 static dshot_config_t config = {0};
 
 DSHOT_RETURN_TYPE dshot_start_transmission(void);
@@ -39,7 +42,11 @@ uint32_t DSHOT_TRANSMIT(const task_info_t* task){
 DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle){    // between 0 and 2000
     if(throttle > 2000) return DSHOT_FAIL;  // discard change if bad data comes in
 
+    #if DSHOT_ENABLE_IDLE_SPINNING
+    throttle = UTILS_MIN_I(config.motor_max, UTILS_MAX_I(throttle, config.motor_idle)) + 47;   // Map throttle 1–2000 to ESC range 48–2047; 0 remains disarmed
+    #else
     if(throttle != 0) throttle = UTILS_MIN_I(config.motor_max, UTILS_MAX_I(throttle, config.motor_idle)) + 47;   // Map throttle 1–2000 to ESC range 48–2047; 0 remains disarmed
+    #endif
 
     if(!transmitting){
         throttle_data_buffer = throttle;
@@ -48,6 +55,21 @@ DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle){    // between 0 and 200
     }
     new_data = true;
     throttle_data_buffer = throttle;
+    return DSHOT_OKAY;
+}
+
+DSHOT_RETURN_TYPE DSHOT_ARM_MOTOR(void){
+    if(motor_armed) return DSHOT_OKAY;
+    if(throttle_data_buffer != 0){
+        motor_armed = false;
+        motor_arming_failed = true;
+    }
+    return DSHOT_OKAY;
+}
+
+DSHOT_RETURN_TYPE DSHOT_DISARM_MOTOR(void){
+    if(motor_arming_failed) motor_arming_failed = false;
+    motor_armed = false;
     return DSHOT_OKAY;
 }
 
@@ -86,8 +108,12 @@ DSHOT_RETURN_TYPE dshot_start_transmission(void){
 #define DSHOT600_CCR_LOW 75
 DSHOT_RETURN_TYPE dshot_set_packet(void){
     uint16_t packet;
-
-    packet = throttle_data_buffer << 1 | (DSHOT_TELEMETRY ? 1 : 0);  // "generate" DSHOT packet data
+    if(motor_armed){
+        packet = throttle_data_buffer << 1 | (DSHOT_TELEMETRY ? 1 : 0);  // "generate" DSHOT packet data
+    }
+    else{
+        packet = (uint16_t)0 << 1 | (DSHOT_TELEMETRY ? 1 : 0);  // "generate" DSHOT packet data
+    }
 
     uint16_t csum = (packet ^ (packet >> 4) ^ (packet >> 8)) & 0x0F;  // get raw CRC from DSHOT packet data
 

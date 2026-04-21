@@ -216,9 +216,6 @@ int main(void)
 
   int32_t imu_task_index = SCHEDULER_REGISTER_TASK(IMU_READ_DATA, 600, false, 500, 800, 25, "Gyro Read");  // init IMU and register task in case of DRDY mode
   if(IMU_INIT(SPI_DEVICE_IMU, imu_task_index, &hdma_spi1_rx) != IMU_OKAY) Error_Handler();
-
-  if(BARO_INIT(SPI_DEVICE_BARO) != BARO_OKAY) Error_Handler();
-
   
   FS_LOAD_SUPERBLOCK();
 
@@ -226,6 +223,7 @@ int main(void)
   SERVO_INIT();
 
 
+  if(BARO_INIT(SPI_DEVICE_BARO) != BARO_OKAY) Error_Handler();
   DSHOT_INIT();
 
 
