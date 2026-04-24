@@ -2,6 +2,9 @@
 #include "stm32h723xx.h"
 #include "stm32h7xx_hal_uart.h"
 #include "timer.h"
+#include "lsm6dso.h"
+#include "bmp390.h"
+#include "gps.h"
 
 static UART_HandleTypeDef* crsf_uart;
 static DMA_HandleTypeDef* crsf_dma;
@@ -15,6 +18,7 @@ static volatile struct{
 
 #define DMA_BUFFER_SIZE (STM32_WORD_SIZE * 4)
 __attribute__((section(".dma_rx"))) static uint8_t crsf_dma_buffer[DMA_BUFFER_SIZE] = {0};
+__attribute__((section(".dma_rx"))) static uint8_t telemetry_data[64] = {0};
 static uint8_t crsf_packet[64] = {0};
 
 CRSF_LINK_T crsf_fc_link_statistics = {0};
@@ -144,4 +148,201 @@ uint8_t crc8(const uint8_t * ptr, uint8_t len){
     for (uint8_t i=0; i<len; i++)
         crc = crc8tab[crc ^ *ptr++];
     return crc;
+}
+
+#define FC_BROADCAST_BYTE 0xC8
+
+void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
+
+    switch(telemetry_type){/*
+        case 0x07:  // vario
+            #define payload_length_vario 3
+            int16_t vertical_speed = (int16_t)ONBOARD_SENSORS.barometer.vertical_speed_cm_s;
+            uint8_t payload_data[payload_length_vario] = {0};
+
+            payload_data[0] = telemetry_type;
+
+            payload_data[1] = (vertical_speed >> 8) & 0xFF;
+            payload_data[2] = vertical_speed & 0xFF;
+
+            uint8_t crc = crc8(payload_data, payload_length_vario);
+
+            telemetry_data[0] = 0xC8;
+            telemetry_data[1] = payload_length_vario + 1;
+
+            telemetry_data[2] = payload_data[0];
+
+            telemetry_data[3] = payload_data[1];
+            telemetry_data[4] = payload_data[2];
+            telemetry_data[5] = crc;
+
+            HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_vario + 3);
+        break;*/
+
+        case 0x09:		// Baro / vertical speed
+            #define payload_length_baro 4
+            BARO_PROCESSED_T baro_data = BARO_GET_DATA();
+
+            uint16_t baro_height = (uint16_t)(baro_data.height * 10 + 10000) & 0x7FFF;
+
+            uint8_t payload_data[payload_length_baro] = {0};
+            payload_data[0] = telemetry_type;
+            payload_data[1] = (baro_height >> 8) & 0xFF;
+            payload_data[2] = baro_height & 0xFF;
+            payload_data[3] = 0;
+
+            uint8_t crc = crc8(payload_data, payload_length_baro);
+
+            telemetry_data[0] = 0xC8;
+            telemetry_data[1] = payload_length_baro + 1;
+
+            telemetry_data[2] = payload_data[0];
+
+            telemetry_data[3] = payload_data[1];
+            telemetry_data[4] = payload_data[2];
+            telemetry_data[5] = payload_data[3];
+            telemetry_data[6] = crc;
+
+            HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_baro + 3);
+        break;
+
+        case 0x1E:	// attitude
+            #define payload_length_attitude 7
+            uint8_t payload_data[payload_length_attitude] = {0};
+            int16_t pitch = (int16_t)(ONBOARD_SENSORS.gyro.pitch_angle * 10000.0f);
+            int16_t roll = (int16_t)(ONBOARD_SENSORS.gyro.roll_angle * 10000.0f);
+            int16_t yaw = (int16_t)(0);
+
+            payload_data[0] = telemetry_type;
+
+            payload_data[1] = (pitch >> 8) & 0xFF;
+            payload_data[2] = pitch & 0xFF;
+
+            payload_data[3] = (roll >> 8) & 0xFF;
+            payload_data[4] = roll & 0xFF;
+
+            payload_data[5] = (yaw >> 8) & 0xFF;
+            payload_data[6] = yaw & 0xFF;
+
+            uint8_t crc = crc8(payload_data, payload_length_attitude);
+            telemetry_data[0] = 0xC8;
+            telemetry_data[1] = payload_length_attitude + 1;
+            telemetry_data[2] = payload_data[0];
+
+            telemetry_data[3] = payload_data[1];
+            telemetry_data[4] = payload_data[2];
+
+            telemetry_data[5] = payload_data[3];
+            telemetry_data[6] = payload_data[4];
+
+            telemetry_data[7] = payload_data[5];
+            telemetry_data[8] = payload_data[6];
+
+            telemetry_data[9] = crc;
+            HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_attitude + 3);
+        break;
+
+        case 0x21:		// flight state
+            const uint8_t* message = FLIGHT_STATE_GET_STATE_STRING();
+            uint8_t length_counter = 0;
+            while(*(message + length_counter) != '\0'){
+                length_counter ++;
+                if(length_counter > 60) return;
+            }
+            uint8_t string_length = length_counter + 1;
+
+            uint8_t payload_data[string_length + 1];
+            payload_data[0] = telemetry_type;
+
+            for(int i = 0; i <= length_counter; i++){
+                payload_data[i + 1] = *(message + i);
+            }
+            uint8_t crc = crc8(payload_data, string_length + 1);
+
+            telemetry_data[0] = FC_BROADCAST_BYTE;
+            telemetry_data[1] = string_length + 2;
+            memcpy(&telemetry_data[2], payload_data, string_length + 1);
+            telemetry_data[string_length + 3] = crc;
+            HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, string_length + 4);
+        break;
+
+        case 0x02:		// GPS standard
+            #define payload_length_gps_simple 16
+            GPS_PROCESSED_T gps_data = GPS_GET_DATA();
+
+            int32_t latitude = gps_data.pos.lat;       // degree / 10`000`000
+            int32_t longitude = gps_data.pos.lon;      // degree / 10`000`000
+            uint16_t groundspeed = (uint16_t)(gps_data.movement.gspeed * 0.000036f);   // km/h / 100
+            uint16_t heading = (uint16_t)(gps_data.movement.course_over_ground / 1000.0f);       // degree / 100
+            uint16_t altitude = (uint16_t)((gps_data.movement.heightMSL / 1000) + 1000);      // meter - 1000m offset
+            uint8_t satellites = gps_data.status.num_sv;     // # of sats in view
+            uint8_t payload_data[payload_length_gps_simple] = {0};
+
+            payload_data[0] = telemetry_type;
+
+            payload_data[1] = (latitude >> 24) & 0xFF;
+            payload_data[2] = (latitude >> 16) & 0xFF;
+            payload_data[3] = (latitude >> 8) & 0xFF;
+            payload_data[4] = latitude & 0xFF;
+
+            payload_data[5] = (longitude >> 24) & 0xFF;
+            payload_data[6] = (longitude >> 16) & 0xFF;
+            payload_data[7] = (longitude >> 8) & 0xFF;
+            payload_data[8] = longitude & 0xFF;
+
+            payload_data[9] = (groundspeed >> 8) & 0xFF;
+            payload_data[10] = groundspeed & 0xFF;
+
+            payload_data[11] = (heading >> 8) & 0xFF;
+            payload_data[12] = heading & 0xFF;
+
+            payload_data[13] = (altitude >> 8) & 0xFF;
+            payload_data[14] = altitude & 0xFF;
+
+            payload_data[15] = satellites;
+
+            uint8_t crc = crc8(payload_data, payload_length_gps_simple);
+
+            telemetry_data[0] = FC_BROADCAST_BYTE;
+            telemetry_data[1] = payload_length_gps_simple + 1;		// payload with telemetry type included length byte with CRC bit added
+
+            memcpy(&telemetry_data[2], payload_data, payload_length_gps_simple);
+            telemetry_data[payload_length_gps_simple + 2] = crc;
+            HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_gps_simple + 3);
+        break;
+
+        case 0x0A:		// Airspeed
+            uint8_t payload_data[3] = {telemetry_type, 0x00, 0x64};
+            uint8_t crc = crc8(payload_data, 3);
+            telemetry_data[0] = 0xC8;
+            telemetry_data[1] = 4;
+            telemetry_data[2] = payload_data[0];
+            telemetry_data[3] = payload_data[1];
+            telemetry_data[4] = payload_data[2];
+            telemetry_data[5] = crc;
+            HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, 6);
+        break;
+
+        case 0x08:		//Batt Info
+            int16_t vbat = (int16_t)(ONBOARD_SENSORS.vbat.vbat * 10.0f);
+            uint8_t payload_data[9] = {telemetry_type, 0x00, 0x64, 0x00, 0x64, 0x00, 0x00, 0xff, 0x14};
+            payload_data[1] = (vbat >> 8) & 0xFF;
+            payload_data[2] = vbat & 0xFF;
+            uint8_t crc = crc8(payload_data, 9);
+            telemetry_data[0] = 0xC8;
+            telemetry_data[1] = 10;
+            telemetry_data[2] = payload_data[0];
+            telemetry_data[3] = payload_data[1];
+            telemetry_data[4] = payload_data[2];
+            telemetry_data[5] = payload_data[3];
+            telemetry_data[6] = payload_data[4];
+            telemetry_data[7] = payload_data[5];
+            telemetry_data[8] = payload_data[6];
+            telemetry_data[9] = payload_data[7];
+            telemetry_data[10] = payload_data[8];
+            telemetry_data[11] = crc;
+
+            HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, 12);
+        break;
+    }
 }
