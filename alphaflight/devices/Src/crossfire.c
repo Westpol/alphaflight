@@ -2,6 +2,8 @@
 #include "stm32h723xx.h"
 #include "stm32h7xx_hal_uart.h"
 #include "timer.h"
+#include <string.h>
+
 #include "lsm6dso.h"
 #include "bmp390.h"
 #include "gps.h"
@@ -179,7 +181,7 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_vario + 3);
         break;*/
 
-        case 0x09:		// Baro / vertical speed
+        case 0x09: {		// Baro / vertical speed
             #define payload_length_baro 4
             BARO_PROCESSED_T baro_data = BARO_GET_DATA();
 
@@ -205,8 +207,9 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
 
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_baro + 3);
         break;
+        }
 
-        case 0x1E:	// attitude
+        case 0x1E: {	// attitude
             #define payload_length_attitude 7
             uint8_t payload_data[payload_length_attitude] = {0};
             int16_t pitch = (int16_t)(ONBOARD_SENSORS.gyro.pitch_angle * 10000.0f);
@@ -241,9 +244,10 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
             telemetry_data[9] = crc;
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_attitude + 3);
         break;
+        }
 
-        case 0x21:		// flight state
-            const uint8_t* message = FLIGHT_STATE_GET_STATE_STRING();
+        case 0x21: {		// flight state
+            const uint8_t message[] = "normal operation";
             uint8_t length_counter = 0;
             while(*(message + length_counter) != '\0'){
                 length_counter ++;
@@ -265,8 +269,9 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
             telemetry_data[string_length + 3] = crc;
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, string_length + 4);
         break;
+        }
 
-        case 0x02:		// GPS standard
+        case 0x02: {		// GPS standard
             #define payload_length_gps_simple 16
             GPS_PROCESSED_T gps_data = GPS_GET_DATA();
 
@@ -310,8 +315,9 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
             telemetry_data[payload_length_gps_simple + 2] = crc;
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_gps_simple + 3);
         break;
+        }
 
-        case 0x0A:		// Airspeed
+        case 0x0A: {		// Airspeed
             uint8_t payload_data[3] = {telemetry_type, 0x00, 0x64};
             uint8_t crc = crc8(payload_data, 3);
             telemetry_data[0] = 0xC8;
@@ -322,8 +328,9 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
             telemetry_data[5] = crc;
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, 6);
         break;
+        }
 
-        case 0x08:		//Batt Info
+        case 0x08: {		//Batt Info
             int16_t vbat = (int16_t)(ONBOARD_SENSORS.vbat.vbat * 10.0f);
             uint8_t payload_data[9] = {telemetry_type, 0x00, 0x64, 0x00, 0x64, 0x00, 0x00, 0xff, 0x14};
             payload_data[1] = (vbat >> 8) & 0xFF;
@@ -344,5 +351,6 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
 
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, 12);
         break;
+        }
     }
 }
