@@ -87,6 +87,12 @@ IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA
 }
 
 static IMU_RETURN_TYPE imu_update_quat(void){
+
+    float w, x, y, z = {0};
+    float roll = atan2(2*(w*x + y*z), 1 - 2*(x*x + y*y));
+    float pitch = asin(2*(w*y - z*x));
+    float yaw = atan2(2*(w*z + x*y), 1 - 2*(y*y + z*z));
+
     float dt = (float)(MICROS32() - last_integration) / 1000000.0f;
     last_integration = MICROS32();
 
