@@ -36,7 +36,7 @@ void SCHEDULER_LOOP(void){
                 task->info.next_execution_timestamp += task->info.call_delta_norm;
             }
             else{
-                delta = UTILS_MIN_I(UTILS_MAX_I(delta, task->info.call_delta_min), task->info.call_delta_max);      // clamp values to user min / maxes
+                delta = UTILS_MIN_UI(UTILS_MAX_UI(delta, task->info.call_delta_min), task->info.call_delta_max);      // clamp values to user min / maxes
                 
                 task->info.next_execution_timestamp += delta;
             }

@@ -25,7 +25,7 @@ LOG_RETURN_TYPE LOG_END();
 void LOG_SET_CONFIG(log_config_t new_config);
 log_config_t LOG_GET_DEFAULT_CONFIG();
 
-void LOG_SET_TASK_INDEX(int32_t index);
+void LOG_SET_TASK_PID(int32_t index);
 
 uint32_t LOG_GET_FREQUENCY(void);
 

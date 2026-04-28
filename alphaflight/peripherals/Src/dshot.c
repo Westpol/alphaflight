@@ -34,7 +34,7 @@ DSHOT_RETURN_TYPE DSHOT_SET_THROTTLE(uint16_t throttle, bool armed){    // betwe
         #if DSHOT_ENABLE_IDLE_SPINNING
         throttle = UTILS_MIN_I(config.motor_max, UTILS_MAX_I(throttle, config.motor_idle)) + 47;   // Map throttle 1–2000 to ESC range 48–2047; 0 means idle spinning
         #else
-        if(throttle != 0) throttle = UTILS_MIN_I(config.motor_max, UTILS_MAX_I(throttle, config.motor_idle)) + 47;   // Map throttle 1–2000 to ESC range 48–2047; 0 remains disarmed
+        if(throttle != 0) throttle = UTILS_MIN_UI(config.motor_max, UTILS_MAX_UI(throttle, config.motor_idle)) + 47;   // Map throttle 1–2000 to ESC range 48–2047; 0 remains disarmed
         #endif
     }
     else{

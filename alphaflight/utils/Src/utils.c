@@ -1,12 +1,18 @@
 #include "utils.h"
 #include <math.h>
 
-uint32_t UTILS_MAX_I(uint32_t var1, uint32_t var2){
+uint32_t UTILS_MAX_UI(uint32_t var1, uint32_t var2){
     return var1 > var2 ? var1 : var2;
 }
-
-uint32_t UTILS_MIN_I(uint32_t var1, uint32_t var2){
+uint32_t UTILS_MIN_UI(uint32_t var1, uint32_t var2){
     return var1 < var2 ? var1 : var2;
+}
+
+int32_t UTILS_MAX_I(int32_t var1, int32_t var2){
+	return var1 > var2 ? var1 : var2;
+}
+int32_t UTILS_MIN_I(int32_t var1, int32_t var2){
+	return var1 < var2 ? var1 : var2;
 }
 
 float UTILS_MAX_F(float var1, float var2){

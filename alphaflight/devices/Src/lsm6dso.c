@@ -230,6 +230,10 @@ IMU_PROCESSED_T IMU_GET_DATA(){
     return imu.processed;
 }
 
+IMU_T IMU_GET_RAW_DATA(){
+    return imu;
+}
+
 void IMU_SET_CONFIG(imu_config_t new_config){
     config = new_config;
 }

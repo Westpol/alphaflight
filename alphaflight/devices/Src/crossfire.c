@@ -28,6 +28,7 @@ CRSF_LINK_T crsf_fc_link_statistics = {0};
 CRSF_CHANNELS_T crsf_fc_channels = {0};
 
 static uint8_t crc8(const uint8_t * ptr, uint8_t len);
+static void CRSF_SEND_TELEMETRY(uint8_t telemetry_type);
 
 
 CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* crsf_uart_dma){   // Assumes UART already initialized with correct settings
@@ -92,9 +93,7 @@ uint32_t CRSF_PARSE_DMA(const task_info_t* task){
     }
 
     if(type == 0x14){   // link stats
-        for(uint8_t f = 0; f < len - 2; f++){
-            *((uint8_t*)&crsf_fc_link_statistics + f) = crsf_packet[f + 1];
-        }
+        memcpy(&crsf_fc_link_statistics, &crsf_packet[1], len - 2);
         crsf_fc_link_statistics.timestamp = MICROS32();
     }
 
@@ -152,9 +151,15 @@ uint8_t crc8(const uint8_t * ptr, uint8_t len){
     return crc;
 }
 
+
+uint32_t CRSF_TELEMETRY(task_info_t* task){
+    CRSF_SEND_TELEMETRY(0x21);
+    return 0;
+}
+
 #define FC_BROADCAST_BYTE 0xC8
 
-void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
+static void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
 
     switch(telemetry_type){/*
         case 0x07:  // vario
@@ -209,7 +214,7 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
         break;
         }
 
-        case 0x1E: {	// attitude
+        /*case 0x1E: {	// attitude
             #define payload_length_attitude 7
             uint8_t payload_data[payload_length_attitude] = {0};
             int16_t pitch = (int16_t)(ONBOARD_SENSORS.gyro.pitch_angle * 10000.0f);
@@ -244,7 +249,7 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
             telemetry_data[9] = crc;
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, payload_length_attitude + 3);
         break;
-        }
+        }*/
 
         case 0x21: {		// flight state
             const uint8_t message[] = "normal operation";
@@ -330,7 +335,7 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
         break;
         }
 
-        case 0x08: {		//Batt Info
+        /*case 0x08: {		//Batt Info
             int16_t vbat = (int16_t)(ONBOARD_SENSORS.vbat.vbat * 10.0f);
             uint8_t payload_data[9] = {telemetry_type, 0x00, 0x64, 0x00, 0x64, 0x00, 0x00, 0xff, 0x14};
             payload_data[1] = (vbat >> 8) & 0xFF;
@@ -351,6 +356,9 @@ void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
 
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, 12);
         break;
-        }
+        }*/
+        
+        default:
+        break;
     }
 }

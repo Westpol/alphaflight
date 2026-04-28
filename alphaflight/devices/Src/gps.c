@@ -1,5 +1,6 @@
 #include "gps.h"
 #include "timer.h"
+#include <string.h>
 #include <time.h>
 
 static UART_HandleTypeDef* gps_uart;
@@ -162,9 +163,7 @@ uint32_t GPS_PARSE_DMA(const task_info_t* task){
                     // crc doesn't match, start parsing from new position
                     if(!validate_ubx_crc(&gps_dma_buffer[i + 2], len + 4, gps_dma_buffer[i + len + 6], gps_dma_buffer[i + len + 7])) continue;
 
-                    for(uint16_t f = 0; f < sizeof(gps_nav_pvt); f++){  // copy message bytewise over to padded struct
-                        *((uint8_t*)&gps_nav_pvt + f) = gps_dma_buffer[i + f];
-                    }
+                    memcpy(&gps_nav_pvt, &gps_dma_buffer[i], sizeof(gps_nav_pvt_t));
 
                     gps_parser.read_point = i + len + 8;
                     gps_convert_data();
@@ -178,7 +177,7 @@ uint32_t GPS_PARSE_DMA(const task_info_t* task){
                 }
             }
         }
-        gps_parser.read_point = UTILS_MAX_I(write_so_far - 7, 0);
+        gps_parser.read_point = UTILS_MAX_UI(write_so_far - 7, 0);
     }
     else{
         gps_parser.read_point = write_so_far;   // skip wrapped around package
@@ -198,7 +197,7 @@ GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK(){
     return GPS_CALLBACK_OKAY;
 }
 
-GPS_RETURN_TYPE GPS_SET_PARSER_TASK_INDEX(int32_t index){
+GPS_RETURN_TYPE GPS_SET_PARSER_TASK_PID(int32_t index){
     gps_parser_task_index = index;
     SCHEDULER_DISABLE_TASK_BY_INDEX(gps_parser_task_index);
     return GPS_OKAY;
