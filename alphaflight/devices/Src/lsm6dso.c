@@ -1,5 +1,6 @@
 #include "lsm6dso.h"
 #include "main.h"
+#include "math_types.h"
 #include "timer.h"
 
 #define imu_execution_delta_offset 20       // offset in us
@@ -17,9 +18,7 @@ static uint32_t last_integration = 0;
 static int32_t imu_convert_task_index = -1;
 volatile static bool imu_set_up = false;
 
-float twoKp = 2.0f * 1.0f;   // proportional gain (tune this!)
-float twoKi = 2.0f * 0.0f;   // integral gain (start with 0)
-float integralFB[3] = {0};
+VECT_3D_T e_i = {0};
 
 #if LSM6DSO_INTERRUPT
 __attribute__((section(".dma_rx"))) static uint8_t imu_dma_rx[STM32_WORD_SIZE] = {0};
@@ -88,82 +87,46 @@ IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA
 
 static IMU_RETURN_TYPE imu_update_quat(void){
 
-    float w, x, y, z = {0};
-    float roll = atan2(2*(w*x + y*z), 1 - 2*(x*x + y*y));
-    float pitch = asin(2*(w*y - z*x));
-    float yaw = atan2(2*(w*z + x*y), 1 - 2*(y*y + z*z));
+    uint32_t now = MICROS32();
+    float dt = (float)(now - last_integration) / 1000000.0f;
+    last_integration = now;
 
-    float dt = (float)(MICROS32() - last_integration) / 1000000.0f;
-    last_integration = MICROS32();
+    QUAT_T q_g_ref = {0, 0, 0, 1};  // create gravity reference quat
 
-    float q0 = imu.processed.quat.w;
-    float q1 = imu.processed.quat.x;
-    float q2 = imu.processed.quat.y;
-    float q3 = imu.processed.quat.z;
+    QUAT_T q_a = imu.processed.quat;    // save imu quat locally
 
-    float gx = imu.processed.rate.wx;
-    float gy = imu.processed.rate.wy;
-    float gz = imu.processed.rate.wz;
+    QUAT_T q_a_c = {-q_a.w, -q_a.x, -q_a.y, -q_a.z};    // create conjugated imu quat
 
-    float ax = imu.processed.accel.x;
-    float ay = imu.processed.accel.y;
-    float az = imu.processed.accel.z;
+    QUAT_T q_g_est = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_a, q_g_ref), q_a_c));   // rotate gravity estimation quat by imu attitude quat
 
-    // normalize accelerometer
-    float norm = sqrtf(ax*ax + ay*ay + az*az);
-    if (norm == 0.0f) return IMU_OKAY;
-    ax /= norm;
-    ay /= norm;
-    az /= norm;
+    VECT_3D_T g_est = {q_g_est.x, q_g_est.y, q_g_est.z};    // turn g est quat into vector
 
-    // estimated gravity direction
-    float vx = 2.0f * (q1*q3 - q0*q2);
-    float vy = 2.0f * (q0*q1 + q2*q3);
-    float vz = q0*q0 - q1*q1 - q2*q2 + q3*q3;
+    VECT_3D_T accel_vals = {imu.processed.accel.x, imu.processed.accel.y, imu.processed.accel.z};   // create accel vector
 
-    // error = cross product
-    float ex = (ay * vz - az * vy);
-    float ey = (az * vx - ax * vz);
-    float ez = (ax * vy - ay * vx);
+    accel_vals = UTILS_VECT_NORMALIZE(accel_vals);  // normalize vectors
 
-    // integral feedback
-    if(twoKi > 0.0f){
-        integralFB[0] += twoKi * ex * dt;
-        integralFB[1] += twoKi * ey * dt;
-        integralFB[2] += twoKi * ez * dt;
+    g_est = UTILS_VECT_NORMALIZE(g_est);
 
-        gx += integralFB[0];
-        gy += integralFB[1];
-        gz += integralFB[2];
-    }
+    VECT_3D_T e = UTILS_VECT_CROSS_PRODUCT(accel_vals, g_est);  // calculate error via cross product
 
-    // proportional feedback
-    gx += twoKp * ex;
-    gy += twoKp * ey;
-    gz += twoKp * ez;
+    e_i = UTILS_VECT_ADD(e_i, UTILS_VECT_SCALE(e, dt)); // update integral e part
 
-    // integrate quaternion (same as before)
-    float dq0 = 0.5f * (-q1*gx - q2*gy - q3*gz);
-    float dq1 = 0.5f * ( q0*gx + q2*gz - q3*gy);
-    float dq2 = 0.5f * ( q0*gy - q1*gz + q3*gx);
-    float dq3 = 0.5f * ( q0*gz + q1*gy - q2*gx);
+    VECT_3D_T w_gyro = imu.processed.rate;  // get gyro data
 
-    q0 += dq0 * dt;
-    q1 += dq1 * dt;
-    q2 += dq2 * dt;
-    q3 += dq3 * dt;
+    w_gyro = UTILS_VECT_SCALE(UTILS_VECT_ADD(UTILS_VECT_ADD(w_gyro, UTILS_VECT_SCALE(e, config.mahony_k)), UTILS_VECT_SCALE(e, config.mahony_i)), dt);    // add error correection to gyro data
 
-    // normalize quaternion
-    norm = sqrtf(q0*q0 + q1*q1 + q2*q2 + q3*q3);
-    q0 /= norm;
-    q1 /= norm;
-    q2 /= norm;
-    q3 /= norm;
+    QUAT_T q_gyro_rot = {0, w_gyro.x, w_gyro.y, w_gyro.z};
 
-    imu.processed.quat.w = q0;
-    imu.processed.quat.x = q1;
-    imu.processed.quat.y = q2;
-    imu.processed.quat.z = q3;
+    QUAT_T q_rot = UTILS_QUATERNION_SCALE(UTILS_QUATERNION_PRODUCT(q_a, q_gyro_rot), 0.5f);
+
+    q_a = UTILS_QUATERNION_ADD(q_a, q_rot);
+
+    q_a = UTILS_QUATERNION_NORMALIZE(q_a);
+
+    imu.processed.quat = q_a;
+
+    imu.processed.attitude.pitch = asin(UTILS_MIN_MAX_F(2*(q_a.w*q_a.y - q_a.z*q_a.x), -1, 1));
+    imu.processed.attitude.roll = atan2(2*(q_a.w*q_a.x + q_a.y*q_a.z), 1 - 2*(q_a.x*q_a.x + q_a.y*q_a.y));
 
     return IMU_OKAY;
 }
@@ -181,9 +144,9 @@ static IMU_RETURN_TYPE imu_convert_data(const uint8_t* rx_data){
     imu.raw.accel_raw.y = (int16_t)((rx_data[9] << 8) | rx_data[8]);
     imu.raw.accel_raw.z = (int16_t)((rx_data[11] << 8) | rx_data[10]);
 
-    imu.processed.rate.wx = imu.raw.rate_raw.wx * GYRO_SCALING_RAD;
-    imu.processed.rate.wy = imu.raw.rate_raw.wy * GYRO_SCALING_RAD;
-    imu.processed.rate.wz = imu.raw.rate_raw.wz * GYRO_SCALING_RAD;
+    imu.processed.rate.x = imu.raw.rate_raw.wx * GYRO_SCALING_RAD;
+    imu.processed.rate.y = imu.raw.rate_raw.wy * GYRO_SCALING_RAD;
+    imu.processed.rate.z = imu.raw.rate_raw.wz * GYRO_SCALING_RAD;
 
     imu.processed.accel.x = imu.raw.accel_raw.x * ACCEL_SCALING_G;
     imu.processed.accel.y = imu.raw.accel_raw.y * ACCEL_SCALING_G;
@@ -248,6 +211,8 @@ imu_config_t IMU_GET_DEFAULT_CONFIG(){
     imu_config_t temp = {0};
     temp.orientation = 0;
     temp.odr = IMU_ODR_3333Hz;
+    temp.mahony_k = 0.1f;
+    temp.mahony_i = 0.0f;
     return temp;
 }
 

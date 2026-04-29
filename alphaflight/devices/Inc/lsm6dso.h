@@ -2,6 +2,7 @@
 #include "spi.h"
 #include "scheduler.h"
 #include "stm32h7xx_hal.h"
+#include "math_types.h"
 
 #ifndef LSM6DSO_H
 #define LSM6DSO_H
@@ -25,26 +26,9 @@ typedef enum{
 typedef struct{
     uint8_t orientation;
     uint8_t odr;
+    float mahony_k;
+    float mahony_i;
 }imu_config_t;
-
-typedef struct{
-    float w;
-    float x;
-    float y;
-    float z;
-}quat_t;
-
-typedef struct{
-    float wx;
-    float wy;
-    float wz;
-}rate_t;
-
-typedef struct{
-    float x;
-    float y;
-    float z;
-}accel_t;
 
 typedef struct{
     int16_t wx;
@@ -59,9 +43,15 @@ typedef struct{
 }accel_raw_t;
 
 typedef struct{
-    quat_t quat;
-    rate_t rate;
-    accel_t accel;
+    float pitch;
+    float roll;
+} attitude_t;
+
+typedef struct{
+    QUAT_T quat;
+    attitude_t attitude;
+    VECT_3D_T rate;
+    VECT_3D_T accel;
 }IMU_PROCESSED_T;
 
 typedef struct{

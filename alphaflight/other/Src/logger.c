@@ -181,10 +181,10 @@ static void store_imu(bool force_absolute){    // ID: 0x05 or 0x06
     imu_absolute.accy = imu_vals.raw.accel_raw.y;
     imu_absolute.accz = imu_vals.raw.accel_raw.z;
 
-    imu_absolute.quat_w = (int16_t)UTILS_MAX_I(UTILS_MIN_I(imu_vals.processed.quat.w * 10000, INT16_MAX), INT16_MIN);
-    imu_absolute.quat_x = (int16_t)UTILS_MAX_I(UTILS_MIN_I(imu_vals.processed.quat.x * 10000, INT16_MAX), INT16_MIN);
-    imu_absolute.quat_y = (int16_t)UTILS_MAX_I(UTILS_MIN_I(imu_vals.processed.quat.y * 10000, INT16_MAX), INT16_MIN);
-    imu_absolute.quat_z = (int16_t)UTILS_MAX_I(UTILS_MIN_I(imu_vals.processed.quat.z * 10000, INT16_MAX), INT16_MIN);
+    imu_absolute.quat_w = (int16_t)UTILS_MIN_MAX_I((int32_t)(imu_vals.processed.quat.w * 10000), INT16_MIN, INT16_MAX);
+    imu_absolute.quat_x = (int16_t)UTILS_MIN_MAX_I((int32_t)(imu_vals.processed.quat.x * 10000), INT16_MIN, INT16_MAX);
+    imu_absolute.quat_y = (int16_t)UTILS_MIN_MAX_I((int32_t)(imu_vals.processed.quat.y * 10000), INT16_MIN, INT16_MAX);
+    imu_absolute.quat_z = (int16_t)UTILS_MIN_MAX_I((int32_t)(imu_vals.processed.quat.z * 10000), INT16_MIN, INT16_MAX);
 
 }
 
