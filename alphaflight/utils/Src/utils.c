@@ -50,7 +50,7 @@ float UTILS_MIN_MAX_F(float var, float min, float max){
 	return var;
 }
 
-QUAT_T UTILS_QUATERNION_PRODUCT(QUAT_T q1,QUAT_T q2){		// calculates q1*q2, saves value in q3
+QUAT_T UTILS_QUATERNION_PRODUCT(QUAT_T q1,QUAT_T q2){		// calculates q1*q2
 	QUAT_T q_new;
 	q_new.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
 	q_new.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
@@ -76,6 +76,8 @@ QUAT_T UTILS_QUATERNION_SCALE(QUAT_T q, float scalar){
 	q.x *= scalar;
 	q.y *= scalar;
 	q.z *= scalar;
+
+	return q;
 }
 QUAT_T UTILS_QUATERNION_ADD(QUAT_T q1, QUAT_T q2){
 	q1.w += q2.w;
@@ -84,6 +86,13 @@ QUAT_T UTILS_QUATERNION_ADD(QUAT_T q1, QUAT_T q2){
 	q1.z += q2.z;
 
 	return q1;
+}
+QUAT_T UTILS_QUATERNION_CONJUGATE(QUAT_T q){
+	q.x = -q.x;
+	q.y = -q.y;
+	q.z = -q.z;
+
+	return q;
 }
 
 VECT_3D_T UTILS_VECT_CROSS_PRODUCT(VECT_3D_T a, VECT_3D_T b){

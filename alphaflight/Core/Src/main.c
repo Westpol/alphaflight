@@ -235,8 +235,8 @@ int main(void)
   LOG_SET_TASK_PID(SCHEDULER_REGISTER_TASK(LOG_RUN, HZ_TO_US(LOG_GET_FREQUENCY()), false, 0, 0, 10, "SD Logger"));
   SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
   SCHEDULER_REGISTER_TASK(CRSF_TELEMETRY, HZ_TO_US(10), false, 0, 0, 10, "CRSF Telemetry");
-  SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
-  //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(60), false, 90000, 110000, 500, "USB Stats");
+  //SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
+  SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(60), false, 90000, 110000, 500, "USB Stats");
 
   GPS_INIT(&huart2, &hdma_usart2_rx);
   CRSF_INIT(&huart3, &hdma_usart3_rx);
@@ -251,7 +251,8 @@ int main(void)
   while (1)
   {
     SCHEDULER_LOOP();
-    if(latch == 0 && (MILLIS32() - now) > 20000){
+    
+    /*if(latch == 0 && (MILLIS32() - now) > 20000){
       LOG_START();
       now = MILLIS32();
       latch = 1;
@@ -262,7 +263,9 @@ int main(void)
       LOG_END();
       latch = 2;
       STATUS_LED_SET_ALL(20);
-    }
+    }*/
+
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

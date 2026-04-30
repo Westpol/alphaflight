@@ -152,7 +152,7 @@ uint8_t crc8(const uint8_t * ptr, uint8_t len){
 }
 
 
-uint32_t CRSF_TELEMETRY(task_info_t* task){
+uint32_t CRSF_TELEMETRY(const task_info_t* task){
     CRSF_SEND_TELEMETRY(0x21);
     return 0;
 }

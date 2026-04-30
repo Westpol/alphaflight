@@ -2,6 +2,7 @@
 #include "main.h"
 #include "math_types.h"
 #include "timer.h"
+#include <math.h>
 
 #define imu_execution_delta_offset 20       // offset in us
 #define imu_execution_averaging_bias 9
@@ -91,11 +92,11 @@ static IMU_RETURN_TYPE imu_update_quat(void){
     float dt = (float)(now - last_integration) / 1000000.0f;
     last_integration = now;
 
-    QUAT_T q_g_ref = {0, 0, 0, 1};  // create gravity reference quat
+    QUAT_T q_g_ref = {0.0f, 0.0f, 0.0f, 1.0f};  // create gravity reference quat
 
     QUAT_T q_a = imu.processed.quat;    // save imu quat locally
 
-    QUAT_T q_a_c = {-q_a.w, -q_a.x, -q_a.y, -q_a.z};    // create conjugated imu quat
+    QUAT_T q_a_c = {q_a.w, -q_a.x, -q_a.y, -q_a.z};    // create conjugated imu quat
 
     QUAT_T q_g_est = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_a, q_g_ref), q_a_c));   // rotate gravity estimation quat by imu attitude quat
 
@@ -107,15 +108,15 @@ static IMU_RETURN_TYPE imu_update_quat(void){
 
     g_est = UTILS_VECT_NORMALIZE(g_est);
 
-    VECT_3D_T e = UTILS_VECT_CROSS_PRODUCT(accel_vals, g_est);  // calculate error via cross product
+    VECT_3D_T e = UTILS_VECT_CROSS_PRODUCT(g_est, accel_vals);  // calculate error via cross product
 
     e_i = UTILS_VECT_ADD(e_i, UTILS_VECT_SCALE(e, dt)); // update integral e part
 
     VECT_3D_T w_gyro = imu.processed.rate;  // get gyro data
 
-    w_gyro = UTILS_VECT_SCALE(UTILS_VECT_ADD(UTILS_VECT_ADD(w_gyro, UTILS_VECT_SCALE(e, config.mahony_k)), UTILS_VECT_SCALE(e, config.mahony_i)), dt);    // add error correection to gyro data
+    w_gyro = UTILS_VECT_SCALE(UTILS_VECT_ADD(UTILS_VECT_ADD(w_gyro, UTILS_VECT_SCALE(e, config.mahony_k)), UTILS_VECT_SCALE(e_i, config.mahony_i)), dt);    // add error correection to gyro data
 
-    QUAT_T q_gyro_rot = {0, w_gyro.x, w_gyro.y, w_gyro.z};
+    QUAT_T q_gyro_rot = {0.0f, w_gyro.x, w_gyro.y, w_gyro.z};
 
     QUAT_T q_rot = UTILS_QUATERNION_SCALE(UTILS_QUATERNION_PRODUCT(q_a, q_gyro_rot), 0.5f);
 
@@ -125,7 +126,7 @@ static IMU_RETURN_TYPE imu_update_quat(void){
 
     imu.processed.quat = q_a;
 
-    imu.processed.attitude.pitch = asin(UTILS_MIN_MAX_F(2*(q_a.w*q_a.y - q_a.z*q_a.x), -1, 1));
+    imu.processed.attitude.pitch = asin(UTILS_MIN_MAX_F(2.0f*(q_a.w*q_a.y - q_a.z*q_a.x), -1.0f, 1.0f));
     imu.processed.attitude.roll = atan2(2*(q_a.w*q_a.x + q_a.y*q_a.z), 1 - 2*(q_a.x*q_a.x + q_a.y*q_a.y));
 
     return IMU_OKAY;
@@ -211,7 +212,7 @@ imu_config_t IMU_GET_DEFAULT_CONFIG(){
     imu_config_t temp = {0};
     temp.orientation = 0;
     temp.odr = IMU_ODR_3333Hz;
-    temp.mahony_k = 0.1f;
+    temp.mahony_k = 30.0f;
     temp.mahony_i = 0.0f;
     return temp;
 }

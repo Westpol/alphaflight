@@ -6,6 +6,8 @@
 #include "lsm6dso.h"
 #include "usbd_def.h"
 
+#include "math_types.h"
+
 volatile static bool connection_detected = false;
 
 void USB_PRINTLN(const char *format, ...){
@@ -33,7 +35,16 @@ uint32_t USB_STATUS(const task_info_t *task){
     //USB_PRINTLN("%luus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
     //USB_PRINTLN("Data Length: %d", LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_0));
     IMU_PROCESSED_T imu = IMU_GET_DATA();
-    USB_PRINTLN("%f,%f,%f,%f", imu.quat.w, imu.quat.x, imu.quat.y, imu.quat.z);
+
+
+    float angle = UTILS_RADIANS(10) / 2.0;
+    QUAT_T q_setpoint = {cosf(angle), 1*sinf(angle), 0.0f, 0.0f};
+    QUAT_T q_error = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_CONJUGATE(imu.quat), q_setpoint));
+    q_error = UTILS_QUATERNION_SCALE(q_error, 2.0f);
+
+    VECT_3D_T v_error = {q_error.x, q_error.y, q_error.z};
+
+    USB_PRINTLN("%f,%f,%f,%f | %f,%f", imu.quat.w, imu.quat.x, imu.quat.y, imu.quat.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
     return 0;
 }
 
