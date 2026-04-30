@@ -38,11 +38,17 @@ uint32_t USB_STATUS(const task_info_t *task){
 
 
     float angle = UTILS_RADIANS(10) / 2.0;
-    QUAT_T q_setpoint = {cosf(angle), 1*sinf(angle), 0.0f, 0.0f};
-    QUAT_T q_error = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_CONJUGATE(imu.quat), q_setpoint));
-    q_error = UTILS_QUATERNION_SCALE(q_error, 2.0f);
+    QUAT_T q_set = {cosf(angle), 1*sinf(angle), 0.0f, 0.0f};
+    QUAT_T gravity = {0.0f, 0.0f, 0.0f, 1.0f};
 
-    VECT_3D_T v_error = {q_error.x, q_error.y, q_error.z};
+    QUAT_T q_setpoint = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_set, gravity), UTILS_QUATERNION_CONJUGATE(q_set)));
+    VECT_3D_T v_setpoint = {q_setpoint.x, q_setpoint.y, q_setpoint.z};
+    
+    QUAT_T q_curr = imu.quat;
+    QUAT_T q_current = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_curr, gravity), UTILS_QUATERNION_CONJUGATE(q_curr)));
+    VECT_3D_T v_current = {q_current.x, q_current.y, q_current.z};
+
+    VECT_3D_T v_error = UTILS_VECT_CROSS_PRODUCT(v_current, v_setpoint);
 
     USB_PRINTLN("%f,%f,%f,%f | %f,%f", imu.quat.w, imu.quat.x, imu.quat.y, imu.quat.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
     return 0;
