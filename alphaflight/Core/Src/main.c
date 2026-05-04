@@ -242,8 +242,8 @@ int main(void)
   CRSF_INIT(&huart3, &hdma_usart3_rx);
   STATUS_LED_SET_ALL(20);
 
-  uint32_t now = MILLIS32();
-  uint8_t latch = 0;
+  //uint32_t now = MILLIS32();
+  //uint8_t latch = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */

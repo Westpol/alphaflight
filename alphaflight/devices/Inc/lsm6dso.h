@@ -55,6 +55,11 @@ typedef struct{
 }IMU_PROCESSED_T;
 
 typedef struct{
+    VECT_3D_T e;
+    VECT_3D_T e_i;
+}imu_debug_t;
+
+typedef struct{
     rate_raw_t rate_raw;
     accel_raw_t accel_raw;
 }imu_raw_t;
@@ -62,6 +67,7 @@ typedef struct{
 typedef struct{
     IMU_PROCESSED_T processed;
     imu_raw_t raw;
+    imu_debug_t debug;
 }IMU_T;
 
 IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA_HandleTypeDef* spi_rx_dma);

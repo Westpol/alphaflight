@@ -34,7 +34,7 @@ uint32_t USB_STATUS(const task_info_t *task){
     //const task_stat_t* stat = SCHEDULER_GET_TASK_STAT_BY_INDEX(0);
     //USB_PRINTLN("%luus TEST | task: %s, task time: %d", MICROS32(), task->task_name,stat->average_exec_time);
     //USB_PRINTLN("Data Length: %d", LL_DMA_GetDataLength(DMA2, LL_DMA_STREAM_0));
-    IMU_PROCESSED_T imu = IMU_GET_DATA();
+    IMU_T imu = IMU_GET_RAW_DATA();
 
 
     float angle = UTILS_RADIANS(10) / 2.0;
@@ -44,13 +44,18 @@ uint32_t USB_STATUS(const task_info_t *task){
     QUAT_T q_setpoint = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_set, gravity), UTILS_QUATERNION_CONJUGATE(q_set)));
     VECT_3D_T v_setpoint = {q_setpoint.x, q_setpoint.y, q_setpoint.z};
     
-    QUAT_T q_curr = imu.quat;
+    QUAT_T q_curr = imu.processed.quat;
     QUAT_T q_current = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_curr, gravity), UTILS_QUATERNION_CONJUGATE(q_curr)));
     VECT_3D_T v_current = {q_current.x, q_current.y, q_current.z};
 
     VECT_3D_T v_error = UTILS_VECT_CROSS_PRODUCT(v_current, v_setpoint);
 
-    USB_PRINTLN("%f,%f,%f,%f | %f,%f", imu.quat.w, imu.quat.x, imu.quat.y, imu.quat.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
+    VECT_3D_T e = imu.debug.e;
+    VECT_3D_T e_i = imu.debug.e_i;
+
+    USB_PRINTLN("e:(%10f,%10f,%10f) e_i:(%10f, %10f, %10f) | %f,%f", e.x, e.y, e.z, e_i.x, e_i.y, e_i.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
+
+    //USB_PRINTLN("%f,%f,%f,%f | %f,%f", imu.processed.quat.w, imu.processed.quat.x, imu.processed.quat.y, imu.processed.quat.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
     return 0;
 }
 

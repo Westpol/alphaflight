@@ -19,7 +19,7 @@ static uint32_t last_integration = 0;
 static int32_t imu_convert_task_index = -1;
 volatile static bool imu_set_up = false;
 
-VECT_3D_T e_i = {0};
+VECT_3D_T gyro_bias = {0};
 
 #if LSM6DSO_INTERRUPT
 __attribute__((section(".dma_rx"))) static uint8_t imu_dma_rx[STM32_WORD_SIZE] = {0};
@@ -104,17 +104,28 @@ static IMU_RETURN_TYPE imu_update_quat(void){
 
     VECT_3D_T accel_vals = {imu.processed.accel.x, imu.processed.accel.y, imu.processed.accel.z};   // create accel vector
 
+    float accel_mag = sqrtf(accel_vals.x*accel_vals.x + accel_vals.y*accel_vals.y + accel_vals.z*accel_vals.z);
+    float accel_error = fabsf(1.0f - accel_mag);
+
+    float k = 4.0f;
+
+    float accel_trust = 1.0f - k * accel_error * accel_error;
+    accel_trust = UTILS_MIN_MAX_F(accel_trust, 0.0f, 1.0f);
+
     accel_vals = UTILS_VECT_NORMALIZE(accel_vals);  // normalize vectors
 
     g_est = UTILS_VECT_NORMALIZE(g_est);
 
-    VECT_3D_T e = UTILS_VECT_CROSS_PRODUCT(g_est, accel_vals);  // calculate error via cross product
+    VECT_3D_T e = UTILS_VECT_SCALE(UTILS_VECT_CROSS_PRODUCT(g_est, accel_vals), accel_trust);  // calculate error via cross product
 
-    e_i = UTILS_VECT_ADD(e_i, UTILS_VECT_SCALE(e, dt)); // update integral e part
+    gyro_bias = UTILS_VECT_ADD(gyro_bias, UTILS_VECT_SCALE(e, dt * config.mahony_i)); // update integral e part
+
+    imu.debug.e = e;
+    imu.debug.e_i = gyro_bias;
 
     VECT_3D_T w_gyro = imu.processed.rate;  // get gyro data
 
-    w_gyro = UTILS_VECT_SCALE(UTILS_VECT_ADD(UTILS_VECT_ADD(w_gyro, UTILS_VECT_SCALE(e, config.mahony_k)), UTILS_VECT_SCALE(e_i, config.mahony_i)), dt);    // add error correection to gyro data
+    w_gyro = UTILS_VECT_SCALE(UTILS_VECT_ADD(UTILS_VECT_ADD(w_gyro, UTILS_VECT_SCALE(e, config.mahony_k)), UTILS_VECT_SCALE(gyro_bias, -1)), dt);    // add error correection to gyro data
 
     QUAT_T q_gyro_rot = {0.0f, w_gyro.x, w_gyro.y, w_gyro.z};
 
@@ -145,9 +156,9 @@ static IMU_RETURN_TYPE imu_convert_data(const uint8_t* rx_data){
     imu.raw.accel_raw.y = (int16_t)((rx_data[9] << 8) | rx_data[8]);
     imu.raw.accel_raw.z = (int16_t)((rx_data[11] << 8) | rx_data[10]);
 
-    imu.processed.rate.x = imu.raw.rate_raw.wx * GYRO_SCALING_RAD;
-    imu.processed.rate.y = imu.raw.rate_raw.wy * GYRO_SCALING_RAD;
-    imu.processed.rate.z = imu.raw.rate_raw.wz * GYRO_SCALING_RAD;
+    imu.processed.rate.x = -imu.raw.rate_raw.wx * GYRO_SCALING_RAD;
+    imu.processed.rate.y = -imu.raw.rate_raw.wy * GYRO_SCALING_RAD;
+    imu.processed.rate.z = -imu.raw.rate_raw.wz * GYRO_SCALING_RAD;
 
     imu.processed.accel.x = imu.raw.accel_raw.x * ACCEL_SCALING_G;
     imu.processed.accel.y = imu.raw.accel_raw.y * ACCEL_SCALING_G;
@@ -212,7 +223,7 @@ imu_config_t IMU_GET_DEFAULT_CONFIG(){
     imu_config_t temp = {0};
     temp.orientation = 0;
     temp.odr = IMU_ODR_3333Hz;
-    temp.mahony_k = 30.0f;
+    temp.mahony_k = 0.6f;
     temp.mahony_i = 0.0f;
     return temp;
 }
