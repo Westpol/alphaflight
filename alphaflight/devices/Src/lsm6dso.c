@@ -107,9 +107,7 @@ static IMU_RETURN_TYPE imu_update_quat(void){
     float accel_mag = sqrtf(accel_vals.x*accel_vals.x + accel_vals.y*accel_vals.y + accel_vals.z*accel_vals.z);
     float accel_error = fabsf(1.0f - accel_mag);
 
-    float k = 4.0f;
-
-    float accel_trust = 1.0f - k * accel_error * accel_error;
+    float accel_trust = 1.0f - config.mahony_accel_trust * accel_error * accel_error;
     accel_trust = UTILS_MIN_MAX_F(accel_trust, 0.0f, 1.0f);
 
     accel_vals = UTILS_VECT_NORMALIZE(accel_vals);  // normalize vectors
@@ -225,6 +223,8 @@ imu_config_t IMU_GET_DEFAULT_CONFIG(){
     temp.odr = IMU_ODR_3333Hz;
     temp.mahony_k = 0.6f;
     temp.mahony_i = 0.0f;
+    temp.mahony_accel_trust = 4.0f;
+    temp.mahony_i_clamp = 1.0f;
     return temp;
 }
 

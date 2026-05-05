@@ -28,6 +28,8 @@ typedef struct{
     uint8_t odr;
     float mahony_k;
     float mahony_i;
+    float mahony_accel_trust;
+    float mahony_i_clamp;
 }imu_config_t;
 
 typedef struct{
