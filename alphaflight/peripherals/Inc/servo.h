@@ -25,7 +25,9 @@ typedef struct{
     uint8_t servo_function_map[8];
 }servo_config_t;
 
-SERVO_RETURN_TYPE SERVO_INIT();
+SERVO_RETURN_TYPE SERVO_INIT(TIM_TypeDef* servo_0_3, TIM_TypeDef* servo_4_7);
+
+SERVO_RETURN_TYPE SERVO_SET_PWM(uint8_t servo, uint16_t pwm_val);
 
 SERVO_RETURN_TYPE SERVO_SET_CONFIG(servo_config_t new_config);
 servo_config_t SERVO_GET_DEFAULT_CONFIG();

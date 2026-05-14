@@ -1,42 +1,60 @@
 #include "servo.h"
 #include "stm32h723xx.h"
 #include "stm32h7xx_ll_tim.h"
+#include <stdint.h>
+#include <string.h>
 
 static servo_config_t config = {0};
 static bool config_set = false;
 static bool initialized = false;
 
-SERVO_RETURN_TYPE SERVO_INIT(){
+TIM_TypeDef* servo_timers[2] = {NULL, NULL};
+
+SERVO_RETURN_TYPE SERVO_INIT(TIM_TypeDef* servo_0_3, TIM_TypeDef* servo_4_7){
     if(!config_set) return SERVO_FAIL;
     if(initialized) return SERVO_FAIL;
 
-    TIM_TypeDef* servo_1_4 = TIM2;  // servo timers in vars for easier change if hardware ever changes
-    TIM_TypeDef* servo_5_8 = TIM3;
+    servo_timers[0] = servo_0_3;
+    servo_timers[1] = servo_4_7;
 
-    servo_1_4->CCR1 = config.servo_idle_pos[0]; // load idle vals channels 1-4
-    servo_1_4->CCR2 = config.servo_idle_pos[1];
-    servo_1_4->CCR3 = config.servo_idle_pos[2];
-    servo_1_4->CCR4 = config.servo_idle_pos[3];
+    servo_timers[0]->CCR1 = config.servo_idle_pos[0]; // load idle vals channels 1-4
+    servo_timers[0]->CCR2 = config.servo_idle_pos[1];
+    servo_timers[0]->CCR3 = config.servo_idle_pos[2];
+    servo_timers[0]->CCR4 = config.servo_idle_pos[3];
 
-    servo_5_8->CCR1 = config.servo_idle_pos[4]; // load idle vals channels 5-8
-    servo_5_8->CCR2 = config.servo_idle_pos[5];
-    servo_5_8->CCR3 = config.servo_idle_pos[6];
-    servo_5_8->CCR4 = config.servo_idle_pos[7];
+    servo_timers[1]->CCR1 = config.servo_idle_pos[4]; // load idle vals channels 5-8
+    servo_timers[1]->CCR2 = config.servo_idle_pos[5];
+    servo_timers[1]->CCR3 = config.servo_idle_pos[6];
+    servo_timers[1]->CCR4 = config.servo_idle_pos[7];
 
-    servo_1_4->CCER |= LL_TIM_CHANNEL_CH1;  // enable channels 1-4
-    servo_1_4->CCER |= LL_TIM_CHANNEL_CH2;
-    servo_1_4->CCER |= LL_TIM_CHANNEL_CH3;
-    servo_1_4->CCER |= LL_TIM_CHANNEL_CH4;
+    servo_timers[0]->CCER |= LL_TIM_CHANNEL_CH1;  // enable channels 1-4
+    servo_timers[0]->CCER |= LL_TIM_CHANNEL_CH2;
+    servo_timers[0]->CCER |= LL_TIM_CHANNEL_CH3;
+    servo_timers[0]->CCER |= LL_TIM_CHANNEL_CH4;
 
-    servo_5_8->CCER |= LL_TIM_CHANNEL_CH1;  // enable channels 5-8
-    servo_5_8->CCER |= LL_TIM_CHANNEL_CH2;
-    servo_5_8->CCER |= LL_TIM_CHANNEL_CH3;
-    servo_5_8->CCER |= LL_TIM_CHANNEL_CH4;
+    servo_timers[1]->CCER |= LL_TIM_CHANNEL_CH1;  // enable channels 5-8
+    servo_timers[1]->CCER |= LL_TIM_CHANNEL_CH2;
+    servo_timers[1]->CCER |= LL_TIM_CHANNEL_CH3;
+    servo_timers[1]->CCER |= LL_TIM_CHANNEL_CH4;
 
-    servo_1_4->CR1 |= TIM_CR1_CEN;  // enable timers
-    servo_5_8->CR1 |= TIM_CR1_CEN;
+    servo_timers[0]->CR1 |= TIM_CR1_CEN;  // enable timers
+    servo_timers[1]->CR1 |= TIM_CR1_CEN;
 
     initialized = true;
+    return SERVO_OKAY;
+}
+
+SERVO_RETURN_TYPE SERVO_SET_PWM(uint8_t servo, uint16_t pwm_val){
+    pwm_val = UTILS_MIN_MAX_I(pwm_val, 1000, 2000);
+    if(servo <= 3){
+        ((volatile uint32_t*)(&servo_timers[0]->CCR1))[servo] = pwm_val;
+    }
+    else if (servo <= 7) {
+        ((volatile uint32_t*)(&servo_timers[1]->CCR1))[servo - 4] = pwm_val;
+    }
+    else{
+        return SERVO_FAIL;
+    }
     return SERVO_OKAY;
 }
 
