@@ -62,6 +62,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "other/Src/filesystem.c"
     "other/Src/logger.c"
     "other/Src/flight_control.c"
+    "peripherals/Src/smart_audio.c"
     # Add user sources here
 )
 
