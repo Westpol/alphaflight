@@ -20,7 +20,7 @@ static volatile struct{
 
 #define DMA_BUFFER_SIZE (STM32_WORD_SIZE * 4)
 __attribute__((section(".dma_rx"))) static uint8_t crsf_dma_buffer[DMA_BUFFER_SIZE] = {0};
-__attribute__((section(".dma_rx"))) static uint8_t telemetry_data[64] = {0};
+__attribute__((section(".dma_tx"))) static uint8_t telemetry_data[64] = {0};
 static uint8_t crsf_packet[64] = {0};
 
 CRSF_LINK_T crsf_fc_link_statistics = {0};
