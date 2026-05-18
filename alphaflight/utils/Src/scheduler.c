@@ -3,12 +3,18 @@
 #include "usb.h"
 
 #define num_tasks 100
+#define num_throwaway_tasks 25
 #define min_call_delta 100      // in us
 
 static struct{
     task_t task[num_tasks];
     uint32_t num_registered_tasks;
 } scheduler = {0};
+
+static struct{
+    task_t task[num_throwaway_tasks];
+    uint32_t num_registered_tasks;
+} throwaway_scheduler = {0};
 
 #define avgr_delta_filter 10
 void SCHEDULER_LOOP(void){
@@ -86,6 +92,14 @@ int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dyna
     return task_num;
 }
 
+int32_t SCHEDULER_REGISTER_THROWAWAY_TASK(task_func_t func, uint32_t max_execution_time_us, char* task_name){
+    if(throwaway_scheduler.num_registered_tasks >= num_throwaway_tasks) return -1;
+
+    uint32_t task_num = throwaway_scheduler.num_registered_tasks++;
+    throwaway_scheduler.task[task_num].
+    return 
+}
+
 uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
     if(MICROS32() == 0) return 0; // avoid division by zero
     USB_PRINTLN_BLOCKING("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");   // a few newlines
@@ -118,4 +132,36 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
                     "",
                     cpu_usage_total * 100.0f);   // print header
     return 0;
+}
+
+void SCHEDULER_PRINT_TASK_PAGE_SINGLE(void){
+    if(MICROS32() == 0) return; // avoid division by zero
+    USB_PRINTLN_BLOCKING("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");   // a few newlines
+    USB_PRINTLN_BLOCKING("%-16s | %-15s | %-14s | %-10s |",
+                     "Task Name",
+                     "Next Execution",
+                     "Exec Delta",
+                     "CPU Usage");   // print header
+
+    USB_PRINTLN_BLOCKING("------------------------------------------------------------------");  // header seperator
+    float cpu_usage_total = 0;
+
+    for(uint32_t i = 0; i < scheduler.num_registered_tasks; i++){
+        //if(!scheduler.task[i].info.activated) continue;
+        task_t task = scheduler.task[i];
+        float cpu_usage = (float)task.stat.total_exec_time / MICROS32();
+        cpu_usage_total += cpu_usage;
+        USB_PRINTLN_BLOCKING("%-16s | %12lu us | %11d us | %8.2f %% |",
+                     task.info.task_name,
+                     task.info.next_execution_timestamp,
+                     task.stat.average_exec_time,
+                     cpu_usage * 100.0f);
+    }
+
+    USB_PRINTLN_BLOCKING("------------------------------------------------------------------");  // total seperator
+    USB_PRINTLN_BLOCKING("%-16s | %-15s | %-14s | %8.2f %% |",
+                    "Total",
+                    "",
+                    "",
+                    cpu_usage_total * 100.0f);   // print header
 }

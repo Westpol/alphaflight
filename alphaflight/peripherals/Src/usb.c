@@ -7,8 +7,14 @@
 #include "usbd_def.h"
 
 #include "math_types.h"
+#include <string.h>
 
 volatile static bool connection_detected = false;
+
+volatile static uint32_t usb_rx_len = 0;
+volatile static bool usb_new_rx = false;
+static uint8_t usb_rx_buffer[APP_RX_DATA_SIZE] = {0};
+
 
 void USB_PRINTLN(const char *format, ...){
     if(!connection_detected) return;
@@ -95,4 +101,31 @@ void UTIL_USB_PRINT_HEX(uint8_t *data, uint32_t len){
 
 void UTIL_USB_PRINT_RAW(const char* message, uint32_t len){
 
+}
+
+uint32_t USB_RECIEVE_PARSE_DATA(const task_info_t* task){
+
+    if(strncmp((const char*)usb_rx_buffer, "tasks\n", sizeof(usb_rx_buffer)) == 0){
+        SCHEDULER_PRINT_TASK_PAGE_SINGLE();
+    }
+
+    usb_new_rx = false;
+
+    return 0;
+}
+
+void USB_RECIEVE_INTERRUPT(uint8_t* buf, uint32_t len){
+
+    if(usb_new_rx) return;
+
+    if(len > APP_RX_DATA_SIZE){
+        len = APP_RX_DATA_SIZE;
+    }
+
+    memcpy(usb_rx_buffer, buf, len);
+
+    usb_rx_len = len;
+    usb_new_rx = true;
+
+    USB_RECIEVE_PARSE_DATA(NULL);
 }

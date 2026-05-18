@@ -12,6 +12,8 @@
 
 void USB_CHANGE_CONSOLE_STATUS(bool connection);
 
+void USB_RECIEVE_INTERRUPT(uint8_t* buf, uint32_t len);
+
 void USB_PRINTLN(const char *format, ...);
 uint32_t USB_STATUS(const task_info_t *task);
 void USB_PRINTLN_BLOCKING(const char *format, ...);
