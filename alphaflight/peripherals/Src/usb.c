@@ -108,6 +108,13 @@ uint32_t USB_RECIEVE_PARSE_DATA(const task_info_t* task){
     if(strncmp((const char*)usb_rx_buffer, "tasks\n", sizeof(usb_rx_buffer)) == 0){
         SCHEDULER_PRINT_TASK_PAGE_SINGLE();
     }
+    else if(strncmp((const char*)usb_rx_buffer, "debug\n", sizeof(usb_rx_buffer)) == 0){
+        USB_STATUS(NULL);
+    }
+    else{
+        USB_PRINTLN("Command not found!");
+    }
+    
 
     usb_new_rx = false;
 
@@ -127,5 +134,5 @@ void USB_RECIEVE_INTERRUPT(uint8_t* buf, uint32_t len){
     usb_rx_len = len;
     usb_new_rx = true;
 
-    USB_RECIEVE_PARSE_DATA(NULL);
+    SCHEDULER_REGISTER_THROWAWAY_TASK(USB_RECIEVE_PARSE_DATA, 100, "USB RX Parsing");
 }

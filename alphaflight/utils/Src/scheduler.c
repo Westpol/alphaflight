@@ -18,6 +18,14 @@ static struct{
 
 #define avgr_delta_filter 10
 void SCHEDULER_LOOP(void){
+
+    // handling throwaway tasks (interrupt based tasks) once per planned task
+    if(throwaway_scheduler.num_registered_tasks > 0){
+        task_t* throwaway_task = &throwaway_scheduler.task[throwaway_scheduler.num_registered_tasks - 1];
+        throwaway_task->func(&throwaway_task->info);
+        throwaway_scheduler.num_registered_tasks--;
+    }
+
     uint32_t now = MICROS32();
 
     for(uint8_t i = 0; i < scheduler.num_registered_tasks; i++){
@@ -92,12 +100,14 @@ int32_t SCHEDULER_REGISTER_TASK(task_func_t func, uint32_t delta_norm, bool dyna
     return task_num;
 }
 
-int32_t SCHEDULER_REGISTER_THROWAWAY_TASK(task_func_t func, uint32_t max_execution_time_us, char* task_name){
+int32_t SCHEDULER_REGISTER_THROWAWAY_TASK(task_func_t func, uint32_t max_execution_time_us, char* task_name){   // lifo buffer of irregular tasks (update to fifo later)
     if(throwaway_scheduler.num_registered_tasks >= num_throwaway_tasks) return -1;
 
     uint32_t task_num = throwaway_scheduler.num_registered_tasks++;
-    throwaway_scheduler.task[task_num].
-    return 
+    scheduler.task[task_num].info.task_index = task_num;
+    throwaway_scheduler.task[task_num].info.task_name = task_name;
+    throwaway_scheduler.task[task_num].func = func;
+    return task_num;
 }
 
 uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
