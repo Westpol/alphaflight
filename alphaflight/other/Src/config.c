@@ -59,10 +59,6 @@ CONFIG_RETURN_TYPE CONFIG_LOAD_DEFAULTS(void){
 
 static CONFIG_RETURN_TYPE config_set_global(void){
     if(!config_loaded) return CONFIG_FAIL;
-    /*IMU_SET_CONFIG(config_entrances.imu);
-    SERVO_SET_CONFIG(config_entrances.servo);
-    DSHOT_SET_CONFIG(config_entrances.dshot);
-    LOG_SET_CONFIG(config_entrances.logger);*/
     #define APPLY_SET(module, field) module##_SET_CONFIG(config_entrances.field);
     CONFIG_MODULE_LIST(APPLY_SET)
     #undef APPLY_SET
@@ -72,20 +68,18 @@ static CONFIG_RETURN_TYPE config_set_global(void){
 
 static CONFIG_RETURN_TYPE config_get_global(void){
     if(!config_loaded) return CONFIG_FAIL;
-    config_entrances.imu = IMU_GET_CONFIG();
-    config_entrances.servo = SERVO_GET_CONFIG();
-    config_entrances.dshot = DSHOT_GET_CONFIG();
-    config_entrances.logger = LOG_GET_CONFIG();
+    #define APPLY_SET(module, field) config_entrances.field = module##_GET_CONFIG();
+    CONFIG_MODULE_LIST(APPLY_SET)
+    #undef APPLY_SET
     config_entrances.version = CONFIG_VERSION;
     return CONFIG_OKAY;
 }
 
 
 static CONFIG_RETURN_TYPE config_get_defaults_global(void){
-    config_entrances.imu = IMU_GET_DEFAULT_CONFIG();
-    config_entrances.servo = SERVO_GET_DEFAULT_CONFIG();
-    config_entrances.dshot = DSHOT_GET_DEFAULT_CONFIG();
-    config_entrances.logger = LOG_GET_DEFAULT_CONFIG();
+    #define APPLY_SET(module, field) config_entrances.field = module##_GET_DEFAULT_CONFIG();
+    CONFIG_MODULE_LIST(APPLY_SET)
+    #undef APPLY_SET
     config_entrances.version = CONFIG_VERSION;
     return CONFIG_OKAY;
 }

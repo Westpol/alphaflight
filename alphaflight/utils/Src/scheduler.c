@@ -146,7 +146,7 @@ uint32_t SCHEDULER_PRINT_TASK_PAGE(const task_info_t* task){
 
 void SCHEDULER_PRINT_TASK_PAGE_SINGLE(void){
     if(MICROS32() == 0) return; // avoid division by zero
-    USB_PRINTLN_BLOCKING("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");   // a few newlines
+    //USB_PRINTLN_BLOCKING("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");   // a few newlines
     USB_PRINTLN_BLOCKING("%-16s | %-15s | %-14s | %-10s |",
                      "Task Name",
                      "Next Execution",

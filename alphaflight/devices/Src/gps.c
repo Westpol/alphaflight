@@ -1,7 +1,10 @@
 #include "gps.h"
-#include "timer.h"
+
 #include <string.h>
 #include <time.h>
+
+#include "timer.h"
+#include "usb.h"
 
 static UART_HandleTypeDef* gps_uart;
 static DMA_HandleTypeDef* gps_dma;
@@ -205,4 +208,11 @@ GPS_RETURN_TYPE GPS_SET_PARSER_TASK_PID(int32_t index){
 
 GPS_PROCESSED_T GPS_GET_DATA(){
     return gps_processed;
+}
+
+GPS_RETURN_TYPE GPS_PRINT_DATA(void){
+    GPS_PROCESSED_T g = gps_processed;
+    gps_nav_pvt_t n = gps_nav_pvt.data;
+    USB_PRINTLN("Time: %02d.%02d.%d %02d:%02d:%02d\nSats: %d\nLat/Lon: %f,%f\nSpeed: %f\nHeading: %f\n", n.day, n.month, n.year, n.hour, n.min, n.sec, g.status.num_sv, g.pos.lat * 1e-7, g.pos.lon * 1e-7, g.movement.gspeed * 1e-3, g.movement.course_over_ground * 1e-5);
+    return GPS_OKAY;
 }

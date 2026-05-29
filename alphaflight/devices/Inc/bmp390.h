@@ -39,6 +39,8 @@ uint32_t BARO_READ_DATA(const task_info_t* task);
 
 BARO_PROCESSED_T BARO_GET_DATA();
 
+BARO_RETURN_TYPE BARO_PRINT_DATA(void);
+
 typedef struct {
 	uint16_t NVM_PAR_T1;
 	uint16_t NVM_PAR_T2;

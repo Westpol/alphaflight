@@ -106,7 +106,7 @@ void UTIL_USB_PRINT_RAW(const char* message, uint32_t len){
 }
 
 uint32_t USB_RECIEVE_PARSE_DATA(const task_info_t* task){
-    SERIAL_PARSER_PARSE(usb_rx_buffer);
+    SERIAL_PARSER_PARSE(usb_rx_buffer, usb_rx_len);
     usb_new_rx = false;
 
     return 0;

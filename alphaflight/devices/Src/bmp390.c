@@ -1,7 +1,9 @@
 #include "bmp390.h"
+
 #include <math.h>
-#include <stdint.h>
+
 #include "timer.h"
+#include "usb.h"
 
 static BARO_T baro = {0};
 
@@ -192,4 +194,9 @@ static BARO_RETURN_TYPE write_register(uint8_t address, uint8_t data){
     uint8_t rx_buff[2] = {0};
     if(SPI_TRANSFER_BLOCKING(spi_device, &tx_buff[0], &rx_buff[0], 2, 1) != SPI_OKAY) return BARO_FAIL;
     return BARO_OKAY;
+}
+
+BARO_RETURN_TYPE BARO_PRINT_DATA(void){
+	USB_PRINTLN("Temperature: %f°C\nPressure: %fhPa\nHeight: %fm\n", baro.processed.temp, baro.processed.pressure, baro.processed.height);
+	return BARO_OKAY;
 }
