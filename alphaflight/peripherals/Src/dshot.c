@@ -117,6 +117,12 @@ DSHOT_RETURN_TYPE DSHOT_SET_CONFIG(dshot_config_t conf){
     return DSHOT_OKAY;
 }
 
+
+dshot_config_t DSHOT_GET_CONFIG(void){
+    return config;
+}
+
+
 dshot_config_t DSHOT_GET_DEFAULT_CONFIG(void){
     dshot_config_t temp = {0};
     temp.motor_idle = 50;

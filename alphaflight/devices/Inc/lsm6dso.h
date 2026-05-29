@@ -85,6 +85,7 @@ IMU_PROCESSED_T IMU_GET_DATA();
 IMU_T IMU_GET_RAW_DATA();
 
 void IMU_SET_CONFIG(imu_config_t new_config);
+imu_config_t IMU_GET_CONFIG(void);
 imu_config_t IMU_GET_DEFAULT_CONFIG();
 
 #define LSM6DSO_WRITE 0x7F

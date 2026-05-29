@@ -6,6 +6,8 @@
 #include "lsm6dso.h"
 #include "usbd_def.h"
 
+#include "serial_parser.h"
+
 #include "math_types.h"
 #include <string.h>
 
@@ -104,18 +106,7 @@ void UTIL_USB_PRINT_RAW(const char* message, uint32_t len){
 }
 
 uint32_t USB_RECIEVE_PARSE_DATA(const task_info_t* task){
-
-    if(strncmp((const char*)usb_rx_buffer, "tasks\n", sizeof(usb_rx_buffer)) == 0){
-        SCHEDULER_PRINT_TASK_PAGE_SINGLE();
-    }
-    else if(strncmp((const char*)usb_rx_buffer, "debug\n", sizeof(usb_rx_buffer)) == 0){
-        USB_STATUS(NULL);
-    }
-    else{
-        USB_PRINTLN("Command not found!");
-    }
-    
-
+    SERIAL_PARSER_PARSE(usb_rx_buffer);
     usb_new_rx = false;
 
     return 0;

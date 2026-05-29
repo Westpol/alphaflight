@@ -64,7 +64,13 @@ SERVO_RETURN_TYPE SERVO_SET_CONFIG(servo_config_t new_config){
     return SERVO_OKAY;
 }
 
-servo_config_t SERVO_GET_DEFAULT_CONFIG(){
+
+servo_config_t SERVO_GET_CONFIG(void){
+    return config;
+}
+
+
+servo_config_t SERVO_GET_DEFAULT_CONFIG(void){
     servo_config_t temp = {0};
     for(uint8_t i = 0; i < 8; i++){
         temp.servo_direction[i] = 1;

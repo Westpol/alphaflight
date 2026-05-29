@@ -135,15 +135,23 @@ LOG_RETURN_TYPE LOG_END(){
     return LOG_OKAY;
 }
 
-void LOG_SET_CONFIG(log_config_t new_config){
-    config = new_config;
-}
 
 void LOG_SET_TASK_PID(int32_t index){
     task_index = index;
 }
 
-log_config_t LOG_GET_DEFAULT_CONFIG(){
+
+void LOG_SET_CONFIG(log_config_t new_config){
+    config = new_config;
+}
+
+
+log_config_t LOG_GET_CONFIG(void){
+    return config;
+}
+
+
+log_config_t LOG_GET_DEFAULT_CONFIG(void){
     log_config_t temp = {0};
     temp.log_frequency = 1000;
     temp.delta_mode = true;

@@ -5,8 +5,9 @@
 static bool config_loaded = false;
 static config_entrances_t config_entrances = {0};
 
-static CONFIG_RETURN_TYPE config_set_values_global(void);
+static CONFIG_RETURN_TYPE config_set_global(void);
 static CONFIG_RETURN_TYPE config_get_defaults_global(void);
+static CONFIG_RETURN_TYPE config_get_global(void);
 
 CONFIG_RETURN_TYPE CONFIG_LOAD_FROM_SD(){
 
@@ -23,13 +24,13 @@ CONFIG_RETURN_TYPE CONFIG_LOAD_FROM_SD(){
     if(config_entrances.version != CONFIG_VERSION) return CONFIG_FAIL;
 
     config_loaded = true;
-    config_set_values_global();
+    config_set_global();
     return CONFIG_OKAY;
 }
 
 CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD(){
 
-    config_get_defaults_global();
+    config_get_global();
 
     if(sizeof(config_entrances_t) > SD_USABLE_BLOCK_SIZE_BYTES * CONFIG_SPACE_BLOCKS) return CONFIG_FAIL;   // check if config is bigger than assigned space
 
@@ -44,14 +45,41 @@ CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD(){
     return CONFIG_OKAY;
 }
 
-static CONFIG_RETURN_TYPE config_set_values_global(void){
-    if(!config_loaded) return CONFIG_FAIL;
-    IMU_SET_CONFIG(config_entrances.imu);
-    SERVO_SET_CONFIG(config_entrances.servo);
-    DSHOT_SET_CONFIG(config_entrances.dshot);
-    LOG_SET_CONFIG(config_entrances.logger);
+CONFIG_RETURN_TYPE CONFIG_LOAD_DEFAULTS(void){
+    config_get_defaults_global();
     return CONFIG_OKAY;
 }
+
+
+#define CONFIG_MODULE_LIST(X) \
+    X(IMU, imu)              \
+    X(SERVO, servo)          \
+    X(DSHOT, dshot)          \
+    X(LOG, logger)
+
+static CONFIG_RETURN_TYPE config_set_global(void){
+    if(!config_loaded) return CONFIG_FAIL;
+    /*IMU_SET_CONFIG(config_entrances.imu);
+    SERVO_SET_CONFIG(config_entrances.servo);
+    DSHOT_SET_CONFIG(config_entrances.dshot);
+    LOG_SET_CONFIG(config_entrances.logger);*/
+    #define APPLY_SET(module, field) module##_SET_CONFIG(config_entrances.field);
+    CONFIG_MODULE_LIST(APPLY_SET)
+    #undef APPLY_SET
+    return CONFIG_OKAY;
+}
+
+
+static CONFIG_RETURN_TYPE config_get_global(void){
+    if(!config_loaded) return CONFIG_FAIL;
+    config_entrances.imu = IMU_GET_CONFIG();
+    config_entrances.servo = SERVO_GET_CONFIG();
+    config_entrances.dshot = DSHOT_GET_CONFIG();
+    config_entrances.logger = LOG_GET_CONFIG();
+    config_entrances.version = CONFIG_VERSION;
+    return CONFIG_OKAY;
+}
+
 
 static CONFIG_RETURN_TYPE config_get_defaults_global(void){
     config_entrances.imu = IMU_GET_DEFAULT_CONFIG();

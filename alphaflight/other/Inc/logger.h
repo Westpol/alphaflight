@@ -23,7 +23,8 @@ uint32_t LOG_RUN(const task_info_t* task);
 LOG_RETURN_TYPE LOG_END();
 
 void LOG_SET_CONFIG(log_config_t new_config);
-log_config_t LOG_GET_DEFAULT_CONFIG();
+log_config_t LOG_GET_DEFAULT_CONFIG(void);
+log_config_t LOG_GET_CONFIG(void);
 
 void LOG_SET_TASK_PID(int32_t index);
 

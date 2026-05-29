@@ -58,6 +58,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "peripherals/Src/sd.c"
     "peripherals/Src/usb.c"
     "peripherals/Src/dshot.c"
+    "other/Src/serial_parser.c"
     "other/Src/config.c"
     "other/Src/filesystem.c"
     "other/Src/logger.c"

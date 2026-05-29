@@ -27,5 +27,6 @@ DSHOT_RETURN_TYPE DSHOT_DMA_CPLT_CALLBACK(void);
 
 DSHOT_RETURN_TYPE DSHOT_SET_CONFIG(dshot_config_t conf);
 dshot_config_t DSHOT_GET_DEFAULT_CONFIG(void);
+dshot_config_t DSHOT_GET_CONFIG(void);
 
 #endif
