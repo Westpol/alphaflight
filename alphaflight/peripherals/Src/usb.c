@@ -61,7 +61,9 @@ uint32_t USB_STATUS(const task_info_t *task){
     VECT_3D_T e = imu.debug.e;
     VECT_3D_T e_i = imu.debug.e_i;
 
-    USB_PRINTLN("e:(%10f,%10f,%10f) e_i:(%10f, %10f, %10f) | %f,%f", e.x, e.y, e.z, e_i.x, e_i.y, e_i.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
+    //USB_PRINTLN("e:(%10f,%10f,%10f) e_i:(%10f, %10f, %10f) | %f,%f", e.x, e.y, e.z, e_i.x, e_i.y, e_i.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
+    USB_PRINTLN("Pitch: %f°\nRoll: %f°", UTILS_DEGREES(imu.processed.attitude.pitch), UTILS_DEGREES(imu.processed.attitude.roll));
+    //USB_PRINTLN("(%f, %f, %f)", imu.debug.g_est.x, imu.debug.g_est.y, imu.debug.g_est.z);
 
     //USB_PRINTLN("%f,%f,%f,%f | %f,%f", imu.processed.quat.w, imu.processed.quat.x, imu.processed.quat.y, imu.processed.quat.z, UTILS_DEGREES(v_error.x), UTILS_DEGREES(v_error.y));
     return 0;

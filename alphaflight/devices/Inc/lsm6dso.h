@@ -59,6 +59,7 @@ typedef struct{
 typedef struct{
     VECT_3D_T e;
     VECT_3D_T e_i;
+    VECT_3D_T g_est;
 }imu_debug_t;
 
 typedef struct{

@@ -113,6 +113,7 @@ static IMU_RETURN_TYPE imu_update_quat(void){
     accel_vals = UTILS_VECT_NORMALIZE(accel_vals);  // normalize vectors
 
     g_est = UTILS_VECT_NORMALIZE(g_est);
+    imu.debug.g_est = g_est;
 
     VECT_3D_T e = UTILS_VECT_SCALE(UTILS_VECT_CROSS_PRODUCT(g_est, accel_vals), accel_trust);  // calculate error via cross product
 
@@ -135,8 +136,9 @@ static IMU_RETURN_TYPE imu_update_quat(void){
 
     imu.processed.quat = q_a;
 
-    imu.processed.attitude.pitch = asin(UTILS_MIN_MAX_F(2.0f*(q_a.w*q_a.y - q_a.z*q_a.x), -1.0f, 1.0f));
-    imu.processed.attitude.roll = atan2(2*(q_a.w*q_a.x + q_a.y*q_a.z), 1 - 2*(q_a.x*q_a.x + q_a.y*q_a.y));
+    imu.processed.attitude.roll = -atan2f(g_est.x, g_est.z);
+
+    imu.processed.attitude.pitch = -atan2f(-g_est.y, sqrtf(g_est.x * g_est.x + g_est.z * g_est.z));
 
     return IMU_OKAY;
 }
