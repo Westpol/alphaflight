@@ -11,8 +11,8 @@
 
 static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n"};
 static const char* getset[] = {"get", "set"};
-static const char* devices[] = {"imu", "baro", "gps", "crsf", "servo", "osd", "logger"}
-static const char* points[][] = {{"rate"}, {"rate", "offset"}, {"rate", "protocol"}, {"channel throttle", "channel pitch", "channel roll", "telemetry"}, {"aileron left", "aileron right", "pitch", "min", "max", "center", "direction"}, {"enable"}, {"rate", "log data"}};
+static const char* devices[] = {"imu", "baro", "gps", "crsf", "servo", "osd", "logger"};
+// {{"rate"}, {"rate", "offset"}, {"rate", "protocol"}, {"channel throttle", "channel pitch", "channel roll", "telemetry"}, {"aileron left", "aileron right", "pitch", "min", "max", "center", "direction"}, {"enable"}, {"rate", "log data"}};
 
 static SERIAL_PARSER_RETURN_TYPE print_help();
 
