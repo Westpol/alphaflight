@@ -1,5 +1,6 @@
 #include "osd.h"
 #include "gps.h"
+#include <stdint.h>
 #include <string.h>
 
 __attribute__((section(".dma_rx"))) static uint8_t osd_dma_buffer[OSD_DMA_BUFFER_SIZE] = {0};
@@ -68,12 +69,31 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
     } __attribute__ ((packed));
 
     GPS_PROCESSED_T gp = GPS_GET_DATA();
+    uint8_t frame_length = 0;
 
     struct msp_raw_gps_t msp_raw_gps = {MSP_GPS_FIX_3D, gp.status.num_sv, gp.pos.lat, gp.pos.lon, gp.movement.heightMSL, gp.movement.gspeed, gp.movement.course_over_ground, 1};
 
-    memcpy(osd_response_dma_buffer, &msp_raw_gps, sizeof(msp_raw_gps));
+    osd_response_dma_buffer[frame_length++] = '$';
+    osd_response_dma_buffer[frame_length++] = 'M';
+    osd_response_dma_buffer[frame_length++] = '>';
+    osd_response_dma_buffer[frame_length++] = sizeof(msp_raw_gps);
+    osd_response_dma_buffer[frame_length++] = MSP_RAW_GPS;
 
-    HAL_UART_Transmit_DMA(osd_uart, osd_response_dma_buffer, sizeof(msp_raw_gps));
+    memcpy(&osd_response_dma_buffer[frame_length], &msp_raw_gps, sizeof(msp_raw_gps));
+
+    frame_length += sizeof(msp_raw_gps);
+
+    uint8_t crc8 = 0;
+    crc8 ^= osd_response_dma_buffer[3];
+    crc8 ^= osd_response_dma_buffer[4];
+
+    for(int i = 0; i < sizeof(msp_raw_gps); i++){
+        crc8 ^= osd_response_dma_buffer[5 + i];
+    }
+
+    osd_response_dma_buffer[frame_length++] = crc8;
+
+    HAL_UART_Transmit_DMA(osd_uart, osd_response_dma_buffer, frame_length);
 
     return 0;
 }
