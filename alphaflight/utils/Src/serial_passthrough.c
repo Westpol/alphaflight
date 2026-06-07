@@ -41,7 +41,7 @@ PASSTHROUGH_RETURN_TYPE PASSTHROUGH_START(UART_HandleTypeDef* huart, DMA_HandleT
     }
 }
 
-PASSTHROUGH_RETURN_TYPE PASSTHROUGH_UART2_CALLBACK(){
+PASSTHROUGH_RETURN_TYPE PASSTHROUGH_UART3_CALLBACK(){
     if(!passthrough_active) return PASSTHROUGH_FAIL;    // skip ISR if passtrhogh is not activated
 
     if (__HAL_UART_GET_FLAG(local_huart, UART_FLAG_IDLE)){

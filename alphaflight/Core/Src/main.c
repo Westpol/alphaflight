@@ -197,7 +197,7 @@ int main(void)
   
   STATUS_LED_INIT();
 
-  //PASSTHROUGH_START(&huart2, &hdma_usart2_rx);
+  //PASSTHROUGH_START(&huart3, &hdma_usart3_rx);
 
 //  if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
 
@@ -1381,9 +1381,9 @@ static void MX_UART8_Init(void)
 
   /* USER CODE END UART8_Init 1 */
   huart8.Instance = UART8;
-  huart8.Init.BaudRate = 4800;
+  huart8.Init.BaudRate = 115200;
   huart8.Init.WordLength = UART_WORDLENGTH_8B;
-  huart8.Init.StopBits = UART_STOPBITS_2;
+  huart8.Init.StopBits = UART_STOPBITS_1;
   huart8.Init.Parity = UART_PARITY_NONE;
   huart8.Init.Mode = UART_MODE_TX_RX;
   huart8.Init.HwFlowCtl = UART_HWCONTROL_NONE;
