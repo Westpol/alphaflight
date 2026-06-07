@@ -1,5 +1,6 @@
 #include "common.h"
 #include "stm32h7xx_hal.h"
+#include "scheduler.h"
 
 
 #ifndef OSD_H
@@ -13,6 +14,10 @@ typedef enum{
 } OSD_RETURN_TYPE;
 
 OSD_RETURN_TYPE OSD_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* dma);
+
+uint32_t OSD_MSP_RESPONSE(const task_info_t* task);
+
+OSD_RETURN_TYPE OSD_IDLE_CALLBACK(void);
 
 
 

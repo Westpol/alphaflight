@@ -31,6 +31,7 @@
 #include "dshot.h"
 #include "serial_passthrough.h"
 #include "crossfire.h"
+#include "osd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -545,7 +546,8 @@ void UART8_IRQHandler(void)
   /* USER CODE END UART8_IRQn 0 */
   HAL_UART_IRQHandler(&huart8);
   /* USER CODE BEGIN UART8_IRQn 1 */
-
+  if(__HAL_UART_GET_FLAG(&huart8, UART_FLAG_IDLE)) __HAL_UART_CLEAR_IDLEFLAG(&huart8);
+  OSD_IDLE_CALLBACK();
   /* USER CODE END UART8_IRQn 1 */
 }
 
