@@ -297,4 +297,483 @@ OSD_RETURN_TYPE OSD_IDLE_CALLBACK(void);
 #define DUALCOPTER     20 
 #define SINGLECOPTER   21 
 
+
+/******************************************************************
+ *
+ * MSP Type Structures - 
+ * 
+ ******************************************************************/
+
+// MSP_IDENT reply
+struct msp_ident_t {
+  uint8_t multiWiiVersion;
+  uint8_t multiType;
+  uint8_t mspVersion;
+  uint32_t capability;
+} __attribute__ ((packed));
+
+// MSP_API_VERSION reply
+struct msp_api_version_t {
+  uint8_t protocolVersion;
+  uint8_t APIMajor;
+  uint8_t APIMinor;
+} __attribute__ ((packed));
+
+
+// MSP_FC_VARIANT reply
+struct msp_fc_variant_t {
+  char flightControlIdentifier[5];
+} __attribute__ ((packed));
+
+
+// MSP_FC_VERSION reply
+struct msp_fc_version_t {
+  uint8_t versionMajor;
+  uint8_t versionMinor;
+  uint8_t versionPatchLevel;
+} __attribute__ ((packed));
+
+
+// MSP_BOARD_INFO reply
+struct msp_board_info_t {
+  char     boardIdentifier[5];
+  uint16_t hardwareRevision;
+} __attribute__ ((packed));
+
+
+// MSP_BUILD_INFO reply
+struct msp_build_info_t {
+  char buildDate[11];
+  char buildTime[8];
+  char shortGitRevision[7];
+} __attribute__ ((packed));
+
+
+// MSP_RAW_IMU reply
+struct msp_raw_imu_t {
+  int16_t acc[3];  // x, y, z
+  int16_t gyro[3]; // x, y, z
+  int16_t mag[3];  // x, y, z  
+} __attribute__ ((packed));
+
+
+// MSP_STATUS_EX reply
+struct msp_status_ex_t {
+  uint16_t cycleTime;
+  uint16_t i2cErrorCounter;
+  uint16_t sensor;                    // MSP_STATUS_SENSOR_...
+  uint32_t flightModeFlags;           // see getActiveModes()
+  uint8_t  configProfileIndex;
+  uint16_t averageSystemLoadPercent;  // 0...100
+  uint16_t armingFlags;
+  uint8_t  accCalibrationAxisFlags;
+} __attribute__ ((packed));
+
+
+// MSP_STATUS
+struct msp_status_t {
+  uint16_t cycleTime;
+  uint16_t i2cErrorCounter;
+  uint16_t sensor;                    // MSP_STATUS_SENSOR_...
+  uint32_t flightModeFlags;           // see getActiveModes()
+  uint8_t  configProfileIndex;        // Connection Mode
+} __attribute__ ((packed));
+
+
+// MSP_SENSOR_STATUS reply
+struct msp_sensor_status_t {
+  uint8_t isHardwareHealthy;  // 0...1
+  uint8_t hwGyroStatus;
+  uint8_t hwAccelerometerStatus;
+  uint8_t hwCompassStatus;
+  uint8_t hwBarometerStatus;
+  uint8_t hwGPSStatus;
+  uint8_t hwRangefinderStatus;
+  uint8_t hwPitotmeterStatus;
+  uint8_t hwOpticalFlowStatus;  
+} __attribute__ ((packed));
+
+
+// MSP_SERVO reply
+struct msp_servo_t {
+  uint16_t servo[MSP_MAX_SUPPORTED_SERVOS];
+} __attribute__ ((packed));
+
+
+// MSP_SERVO_CONFIGURATIONS reply
+struct msp_servo_configurations_t {
+  __attribute__ ((packed)) struct {
+    uint16_t min;
+    uint16_t max;
+    uint16_t middle;
+    uint8_t rate;
+    uint8_t angleAtMin;
+    uint8_t angleAtMax;
+    uint8_t forwardFromChannel;
+    uint32_t reversedSources;
+  } conf[MSP_MAX_SUPPORTED_SERVOS];
+} __attribute__ ((packed));
+
+/*
+// MSP_SERVO_MIX_RULES reply
+struct msp_servo_mix_rules_t {
+  __attribute__ ((packed)) struct {
+    uint8_t targetChannel;
+    uint8_t inputSource;
+    uint8_t rate;
+    uint8_t speed;
+    uint8_t min;
+    uint8_t max;
+  } mixRule[MSP_MAX_SERVO_RULES];
+} __attribute__ ((packed));*/
+
+
+// MSP_MOTOR reply
+struct msp_motor_t {
+  uint16_t motor[MSP_QUAD_MOTORS];
+} __attribute__ ((packed));
+
+
+// MSP_RC reply
+struct msp_rc_t {
+  uint16_t channelValue[MSP_MAX_SUPPORTED_CHANNELS];
+} __attribute__ ((packed));
+
+
+// MSP_ATTITUDE reply
+struct msp_attitude_t {
+  int16_t roll;
+  int16_t pitch;
+  int16_t yaw;
+} __attribute__ ((packed));
+
+
+// MSP_ALTITUDE reply
+struct msp_altitude_t {
+  int32_t estimatedActualPosition;  // cm
+  int16_t estimatedActualVelocity;  // cm/s
+  int32_t baroLatestAltitude;      
+} __attribute__ ((packed));
+
+
+// MSP_SONAR_ALTITUDE reply
+struct msp_sonar_altitude_t {
+  int32_t altitude;
+} __attribute__ ((packed));
+
+
+// MSP_ANALOG reply
+struct msp_analog_t {
+  uint16_t  vbat;     // Converted to int x 100
+  uint16_t mAhDrawn; // milliamp hours drawn from battery
+  uint16_t rssi;     // 0..1023
+  int16_t  amperage; // send amperage in 0.01 A steps, range is -320A to 320A  
+} __attribute__ ((packed));
+
+
+// MSP_ARMING_CONFIG reply
+struct msp_arming_config_t {
+  uint8_t auto_disarm_delay;
+  uint8_t disarm_kill_switch;
+} __attribute__ ((packed));
+
+
+// MSP_LOOP_TIME reply
+struct msp_loop_time_t {
+  uint16_t looptime;
+} __attribute__ ((packed));
+
+
+// MSP_RC_TUNING reply
+struct msp_rc_tuning_t {
+  uint8_t  rcRate8;  // no longer used
+  uint8_t  rcExpo8;
+  uint8_t  rates[3]; // R,P,Y
+  uint8_t  dynThrPID;
+  uint8_t  thrMid8;
+  uint8_t  thrExpo8;
+  uint16_t tpa_breakpoint;
+  uint8_t  rcYawExpo8;  
+} __attribute__ ((packed));
+
+
+// MSP_PID reply
+struct msp_pid_t {
+  uint8_t roll[3];     // 0=P, 1=I, 2=D
+  uint8_t pitch[3];    // 0=P, 1=I, 2=D
+  uint8_t yaw[3];      // 0=P, 1=I, 2=D
+  uint8_t pos_z[3];    // 0=P, 1=I, 2=D
+  uint8_t pos_xy[3];   // 0=P, 1=I, 2=D
+  uint8_t vel_xy[3];   // 0=P, 1=I, 2=D
+  uint8_t surface[3];  // 0=P, 1=I, 2=D
+  uint8_t level[3];    // 0=P, 1=I, 2=D
+  uint8_t heading[3];  // 0=P, 1=I, 2=D
+  uint8_t vel_z[3];    // 0=P, 1=I, 2=D
+} __attribute__ ((packed));
+
+
+// MSP_MISC reply
+struct msp_misc_t {
+  uint16_t midrc;
+  uint16_t minthrottle;
+  uint16_t maxthrottle;
+  uint16_t mincommand;
+  uint16_t failsafe_throttle;
+  uint8_t  gps_provider;
+  uint8_t  gps_baudrate;
+  uint8_t  gps_ubx_sbas;
+  uint8_t  multiwiiCurrentMeterOutput;
+  uint8_t  rssi_channel;
+  uint8_t  dummy;
+  uint16_t mag_declination;
+  uint8_t  vbatscale;
+  uint8_t  vbatmincellvoltage;
+  uint8_t  vbatmaxcellvoltage;
+  uint8_t  vbatwarningcellvoltage;
+} __attribute__ ((packed));
+
+
+// MSP_RAW_GPS reply
+struct msp_raw_gps_t {
+  uint8_t  fixType;       // MSP_GPS_NO_FIX, MSP_GPS_FIX_2D, MSP_GPS_FIX_3D
+  uint8_t  numSat;
+  int32_t  lat;           // 1 / 10000000 deg
+  int32_t  lon;           // 1 / 10000000 deg
+  int16_t  alt;           // meters
+  int16_t  groundSpeed;   // cm/s
+  int16_t  groundCourse;  // unit: degree x 10
+  uint16_t hdop;
+} __attribute__ ((packed));
+
+
+// MSP_COMP_GPS reply
+struct msp_comp_gps_t {
+  int16_t  distanceToHome;  // distance to home in meters
+  int16_t  directionToHome; // direction to home in degrees
+  uint8_t  heartbeat;       // toggles 0 and 1 for each change
+} __attribute__ ((packed));
+
+
+// MSP_NAV_STATUS reply
+struct msp_nav_status_t {
+  uint8_t mode;           // one of MSP_NAV_STATUS_MODE_XXX
+  uint8_t state;          // one of MSP_NAV_STATUS_STATE_XXX
+  uint8_t activeWpAction; // combination of MSP_NAV_STATUS_WAYPOINT_ACTION_XXX
+  uint8_t activeWpNumber;
+  uint8_t error;          // one of MSP_NAV_STATUS_ERROR_XXX
+  int16_t magHoldHeading;
+} __attribute__ ((packed));
+
+
+// MSP_GPSSVINFO reply
+struct msp_gpssvinfo_t {
+  uint8_t dummy1;
+  uint8_t dummy2;
+  uint8_t dummy3;
+  uint8_t dummy4;
+  uint8_t HDOP;
+} __attribute__ ((packed));
+
+
+// MSP_GPSSTATISTICS reply
+struct msp_gpsstatistics_t {
+  uint16_t lastMessageDt;
+  uint32_t errors;
+  uint32_t timeouts;
+  uint32_t packetCount;
+  uint16_t hdop;
+  uint16_t eph;
+  uint16_t epv;
+} __attribute__ ((packed));
+
+
+// MSP_UID reply
+struct msp_uid_t {
+  uint32_t uid0;
+  uint32_t uid1;
+  uint32_t uid2;
+} __attribute__ ((packed));
+
+
+// MSP_FEATURE reply
+struct msp_feature_t {
+  uint32_t featureMask; // combination of MSP_FEATURE_XXX
+} __attribute__ ((packed));
+
+
+// MSP_BOARD_ALIGNMENT reply
+struct msp_board_alignment_t {
+  int16_t rollDeciDegrees;
+  int16_t pitchDeciDegrees;
+  int16_t yawDeciDegrees;
+} __attribute__ ((packed));
+ 
+
+// MSP_CURRENT_METER_CONFIG reply
+struct msp_current_meter_config_t {
+  int16_t currentMeterScale;
+  int16_t currentMeterOffset;
+  uint8_t currentMeterType; // MSP_CURRENT_SENSOR_XXX
+  uint16_t batteryCapacity;  
+} __attribute__ ((packed));
+
+
+// MSP_RX_CONFIG reply
+struct msp_rx_config_t {
+  uint8_t   serialrx_provider;  // one of MSP_SERIALRX_XXX values
+  uint16_t  maxcheck;
+  uint16_t  midrc;
+  uint16_t  mincheck;
+  uint8_t   spektrum_sat_bind;
+  uint16_t  rx_min_usec;
+  uint16_t  rx_max_usec;
+  uint8_t   dummy1;
+  uint8_t   dummy2; 
+  uint16_t  dummy3;
+  uint8_t   rx_spi_protocol;  // one of MSP_SPI_PROT_XXX values
+  uint32_t  rx_spi_id;
+  uint8_t   rx_spi_rf_channel_count; 
+} __attribute__ ((packed));
+
+/*
+// MSP_RX_MAP reply
+struct msp_rx_map_t {
+  uint8_t rxmap[MSP_MAX_MAPPABLE_RX_INPUTS];  // [0]=roll channel, [1]=pitch channel, [2]=yaw channel, [3]=throttle channel, [3+n]=aux n channel, etc...
+} __attribute__ ((packed));*/
+
+
+// MSP_SENSOR_ALIGNMENT reply
+struct msp_sensor_alignment_t {
+  uint8_t gyro_align;   // one of MSP_SENSOR_ALIGN_XXX
+  uint8_t acc_align;    // one of MSP_SENSOR_ALIGN_XXX
+  uint8_t mag_align;    // one of MSP_SENSOR_ALIGN_XXX
+} __attribute__ ((packed));
+
+
+// MSP_CALIBRATION_DATA reply
+struct msp_calibration_data_t {
+  int16_t accZeroX;
+  int16_t accZeroY;
+  int16_t accZeroZ;
+  int16_t accGainX;
+  int16_t accGainY;
+  int16_t accGainZ;
+  int16_t magZeroX;
+  int16_t magZeroY;
+  int16_t magZeroZ;
+} __attribute__ ((packed));
+
+
+// MSP_SET_HEAD command
+struct msp_set_head_t {
+  int16_t magHoldHeading; // degrees
+} __attribute__ ((packed));
+
+
+// MSP_SET_RAW_RC command
+struct msp_set_raw_rc_t {
+  uint16_t channel[MSP_MAX_SUPPORTED_CHANNELS];
+} __attribute__ ((packed));
+
+
+// MSP_SET_PID command
+//typedef msp_pid_t msp_set_pid_t;
+
+
+// MSP_SET_RAW_GPS command
+struct msp_set_raw_gps_t {
+  uint8_t  fixType;       // MSP_GPS_NO_FIX, MSP_GPS_FIX_2D, MSP_GPS_FIX_3D
+  uint8_t  numSat;
+  int32_t  lat;           // 1 / 10000000 deg
+  int32_t  lon;           // 1 / 10000000 deg
+  int16_t  alt;           // meters
+  int16_t  groundSpeed;   // cm/s
+} __attribute__ ((packed));
+
+
+// MSP_SET_WP command
+// Special waypoints are 0 and 255. 0 is the RTH position, 255 is the POSHOLD position (lat, lon, alt).
+struct msp_set_wp_t {
+  uint8_t waypointNumber;  
+  uint8_t action;   // one of MSP_NAV_STATUS_WAYPOINT_ACTION_XXX
+  int32_t lat;      // decimal degrees latitude * 10000000
+  int32_t lon;      // decimal degrees longitude * 10000000
+  int32_t alt;      // altitude (cm)
+  int16_t p1;       // speed (cm/s) when action is MSP_NAV_STATUS_WAYPOINT_ACTION_WAYPOINT, or "land" (value 1) when action is MSP_NAV_STATUS_WAYPOINT_ACTION_RTH
+  int16_t p2;       // not used
+  int16_t p3;       // not used
+  uint8_t flag;     // 0xa5 = last, otherwise set to 0
+} __attribute__ ((packed));
+
+//  Reefwing additions
+
+// MSP_SET_MOTOR cmd
+struct msp_set_motor_t {
+  uint16_t motor[MSP_QUAD_MOTORS];
+} __attribute__ ((packed));
+
+// MSP_IMU_ODR reply
+struct msp_imu_odr_t {
+  uint16_t gyro;
+  uint16_t acc;
+  uint16_t mag;
+} __attribute__ ((packed));
+
+// MSP_IMU_BIAS reply
+struct msp_imu_bias_t {
+  char gyro_x[10];
+  char gyro_y[10]; 
+  char gyro_z[10];
+  char acc_x[10];
+  char acc_y[10];
+  char acc_z[10];  
+  char mag_x[10]; 
+  char mag_y[10]; 
+  char mag_z[10];  
+} __attribute__ ((packed));
+
+//  MSP Received Packet contents
+struct msp_packet_t {
+  // recvSize can be NULL
+  uint8_t recvMessageID;
+  uint8_t recvSizeValue;
+  uint8_t payload[MSP_PAYLOAD_SIZE];
+  uint8_t maxSize;
+  uint8_t recvSize;
+};
+
+// MSP_DEBUG Packet contents
+struct msp_debug_t {
+  uint16_t debug1;
+  uint16_t debug2;
+  uint16_t debug3;
+  uint16_t debug4;
+} __attribute__ ((packed));
+
+// MSP_DEBUGMSG Packet contents
+struct msp_debug_msg_t {
+  char msg[32];
+} __attribute__ ((packed));
+
+// MSP_ERROR reply
+struct msp_error_t {
+  uint8_t cmdID;
+  char msg[32];
+} __attribute__ ((packed));
+
+//  Betaflight additions
+
+// return positive for ACK, negative on error, zero for no reply
+typedef enum {
+    MSP_RESULT_ACK = 1,
+    MSP_RESULT_ERROR = -1,
+    MSP_RESULT_NO_REPLY = 0,
+    MSP_RESULT_CMD_UNKNOWN = -2,   // don't know how to process command, try next handler
+} mspResult_e;
+
+typedef enum {
+    MSP_DIRECTION_REPLY = 0,
+    MSP_DIRECTION_REQUEST = 1
+} mspDirection_e;
+
 #endif
