@@ -122,6 +122,8 @@ OSD_RETURN_TYPE OSD_IDLE_CALLBACK(void);
 #define MSP_ACC_TRIM             240   //out message         get acc angle trim values
 #define MSP_BIND                 241   //in message          no param
 
+#define MSP_SET_RTC              246    //in message          Sets the RTC clock
+
 #define MSP_EEPROM_WRITE         250   //in message          no param
 
 #define MSP_DEBUGMSG             253   //out message         debug string buffer

@@ -200,7 +200,7 @@ int main(void)
   
   STATUS_LED_INIT();
 
-  //PASSTHROUGH_START(&huart3, &hdma_usart3_rx);
+  PASSTHROUGH_START(&huart8);
 
 //  if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
 

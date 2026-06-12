@@ -1,7 +1,6 @@
 #include "osd.h"
 #include "gps.h"
 #include "bmp390.h"
-#include <stdint.h>
 #include <string.h>
 
 __attribute__((section(".dma_rx"))) static uint8_t osd_dma_buffer[OSD_DMA_BUFFER_SIZE] = {0};
@@ -96,6 +95,39 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
         baro_latest_altitude = baro_current_altitude;
         baro_last_timing = now;
     }
+    break;
+
+    case MSP_STATUS:    // implement
+
+    break;
+
+    case MSP_RC:    // implement?
+
+    break;
+
+    case MSP_ATTITUDE:  // implement
+
+    break;
+
+    case MSP_COMP_GPS:  // implement
+
+    break;
+
+    case MSP_BOXIDS:
+
+    break;
+
+    case MSP_ANALOG:    // implement
+
+    break;
+
+    case MSP_SET_RTC:
+
+    break;
+
+    default:
+    OSD_INIT(NULL, NULL);
+    break;
     }
 
 

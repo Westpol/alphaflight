@@ -7,6 +7,7 @@
 #include "usbd_def.h"
 
 #include "serial_parser.h"
+#include "serial_passthrough.h"
 
 #include "math_types.h"
 #include <string.h>
@@ -116,16 +117,20 @@ uint32_t USB_RECIEVE_PARSE_DATA(const task_info_t* task){
 
 void USB_RECIEVE_INTERRUPT(uint8_t* buf, uint32_t len){
 
-    if(usb_new_rx) return;
+    if(PASSTHROUGH_ACTIVE()){
+        PASSTHROUGH_USB_RECIEVED(buf, len);
+    } else{
+        if(usb_new_rx) return;
 
-    if(len > APP_RX_DATA_SIZE){
-        len = APP_RX_DATA_SIZE;
+        if(len > APP_RX_DATA_SIZE){
+            len = APP_RX_DATA_SIZE;
+        }
+
+        memcpy(usb_rx_buffer, buf, len);
+
+        usb_rx_len = len;
+        usb_new_rx = true;
+
+        SCHEDULER_REGISTER_THROWAWAY_TASK(USB_RECIEVE_PARSE_DATA, 100, "USB RX Parsing");
     }
-
-    memcpy(usb_rx_buffer, buf, len);
-
-    usb_rx_len = len;
-    usb_new_rx = true;
-
-    SCHEDULER_REGISTER_THROWAWAY_TASK(USB_RECIEVE_PARSE_DATA, 100, "USB RX Parsing");
 }

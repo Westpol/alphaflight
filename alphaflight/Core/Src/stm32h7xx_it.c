@@ -32,6 +32,7 @@
 #include "serial_passthrough.h"
 #include "crossfire.h"
 #include "osd.h"
+#include "common.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -427,13 +428,21 @@ void USART2_IRQHandler(void)
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */
+  
+  bool idle_flag = __HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE);
+
+  if(PASSTHROUGH_ACTIVE() && idle_flag){
+    PASSTHROUGH_UART_CALLBACK(&huart3);
+  }
+  else if(idle_flag){
+    GPS_UART_IDLE_CALLBACK();
+  }
+
   /* USER CODE END USART3_IRQn 0 */
   HAL_UART_IRQHandler(&huart3);
   /* USER CODE BEGIN USART3_IRQn 1 */
-  if(__HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE)) __HAL_UART_CLEAR_IDLEFLAG(&huart3);
 
-  PASSTHROUGH_UART3_CALLBACK();
-  GPS_UART_IDLE_CALLBACK();
+  if(idle_flag) __HAL_UART_CLEAR_IDLEFLAG(&huart3);
   /* USER CODE END USART3_IRQn 1 */
 }
 
@@ -543,11 +552,22 @@ void UART8_IRQHandler(void)
 {
   /* USER CODE BEGIN UART8_IRQn 0 */
 
+  bool idle_flag = __HAL_UART_GET_FLAG(&huart8, UART_FLAG_IDLE);
+
+  if(PASSTHROUGH_ACTIVE() && idle_flag){
+    PASSTHROUGH_UART_CALLBACK(&huart8);
+  }
+  else if(idle_flag){
+    OSD_IDLE_CALLBACK();
+  }
+
+
   /* USER CODE END UART8_IRQn 0 */
   HAL_UART_IRQHandler(&huart8);
   /* USER CODE BEGIN UART8_IRQn 1 */
+
+
   if(__HAL_UART_GET_FLAG(&huart8, UART_FLAG_IDLE)) __HAL_UART_CLEAR_IDLEFLAG(&huart8);
-  OSD_IDLE_CALLBACK();
   /* USER CODE END UART8_IRQn 1 */
 }
 
