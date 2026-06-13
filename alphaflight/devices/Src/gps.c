@@ -7,7 +7,6 @@
 #include "usb.h"
 
 static UART_HandleTypeDef* gps_uart;
-static DMA_HandleTypeDef* gps_dma;
 
 static volatile int32_t gps_parser_task_index = -1;
 
@@ -134,10 +133,8 @@ static GPS_RETURN_TYPE gps_convert_data(void){
     return GPS_OKAY;
 }
 
-GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* gps_uart_dma){   // Assumes UART already initialized with correct settings
+GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* uart){   // Assumes UART already initialized with correct settings
     if(uart == NULL) return GPS_INIT_FAULT;
-    if(gps_uart_dma == NULL) return GPS_INIT_FAULT;
-    gps_dma = gps_uart_dma;
     gps_uart = uart;
 
     HAL_UART_Receive_DMA(gps_uart, gps_dma_buffer, DMA_BUFFER_SIZE);
@@ -195,7 +192,7 @@ uint32_t GPS_PARSE_DMA(const task_info_t* task){
 GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK(){
     if(gps_parser_task_index == -1) return GPS_FAIL;
     new_uart_data_arrived = true;
-    gps_parser.write_point = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(gps_dma);
+    gps_parser.write_point = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(gps_uart->hdmarx);
     SCHEDULER_ENABLE_TASK_BY_INDEX(gps_parser_task_index);
     return GPS_CALLBACK_OKAY;
 }

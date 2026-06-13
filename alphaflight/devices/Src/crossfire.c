@@ -9,7 +9,6 @@
 #include "gps.h"
 
 static UART_HandleTypeDef* crsf_uart;
-static DMA_HandleTypeDef* crsf_dma;
 
 static volatile int32_t crsf_parser_pid = -1;
 
@@ -31,10 +30,8 @@ static uint8_t crc8(const uint8_t * ptr, uint8_t len);
 static void CRSF_SEND_TELEMETRY(uint8_t telemetry_type);
 
 
-CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* crsf_uart_dma){   // Assumes UART already initialized with correct settings
+CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart){   // Assumes UART already initialized with correct settings
     if(uart == NULL) return CRSF_FAIL;
-    if(crsf_uart_dma == NULL) return CRSF_FAIL;
-    crsf_dma = crsf_uart_dma;
     crsf_uart = uart;
 
     __HAL_UART_ENABLE_IT(crsf_uart, UART_IT_IDLE);
@@ -115,7 +112,7 @@ uint32_t CRSF_PARSE_DMA(const task_info_t* task){
 
 CRSF_RETURN_TYPE CRSF_UART_IDLE_CALLBACK(){
     if(crsf_parser_pid == -1) return CRSF_FAIL;
-    crsf_parser.current_interrupt = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(crsf_dma);
+    crsf_parser.current_interrupt = DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(crsf_uart->hdmarx);
     SCHEDULER_ENABLE_TASK_BY_INDEX(crsf_parser_pid);
     return CRSF_OKAY;
 }

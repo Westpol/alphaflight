@@ -13,7 +13,7 @@ typedef enum{
     OSD_FAIL
 } OSD_RETURN_TYPE;
 
-OSD_RETURN_TYPE OSD_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* dma);
+OSD_RETURN_TYPE OSD_INIT(UART_HandleTypeDef* uart);
 
 uint32_t OSD_MSP_RESPONSE(const task_info_t* task);
 

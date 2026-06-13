@@ -50,7 +50,7 @@ typedef struct{
     gps_accuracy_t acc;
 } GPS_PROCESSED_T;
 
-GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* gps_uart, DMA_HandleTypeDef* gps_uart_dma);
+GPS_RETURN_TYPE GPS_INIT(UART_HandleTypeDef* gps_uart);
 uint32_t GPS_PARSE_DMA(const task_info_t* task);
 GPS_RETURN_TYPE GPS_UART_IDLE_CALLBACK();
 

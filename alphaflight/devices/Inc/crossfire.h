@@ -34,7 +34,7 @@ typedef struct{
     uint32_t timestamp;
 } CRSF_LINK_T;
 
-CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* crsf_uart_dma);
+CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart);
 uint32_t CRSF_PARSE_DMA(const task_info_t* task);
 uint32_t CRSF_TELEMETRY(const task_info_t* task);
 CRSF_RETURN_TYPE CRSF_UART_IDLE_CALLBACK();

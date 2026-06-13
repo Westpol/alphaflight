@@ -7,7 +7,6 @@ __attribute__((section(".dma_rx"))) static uint8_t osd_dma_buffer[OSD_DMA_BUFFER
 __attribute__((section(".dma_tx"))) static uint8_t osd_response_dma_buffer[64] = {0};
 
 static UART_HandleTypeDef* osd_uart;
-static DMA_HandleTypeDef* osd_dma;
 
 static volatile int16_t message_pending = -1;
 static volatile uint8_t parser_pos = 0;
@@ -18,12 +17,10 @@ static uint32_t baro_last_timing = 0;
 
 OSD_RETURN_TYPE msp_response_packer(const uint8_t* payload, uint8_t type, uint8_t payload_len);
 
-OSD_RETURN_TYPE OSD_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* dma){
+OSD_RETURN_TYPE OSD_INIT(UART_HandleTypeDef* uart){
     if(uart == NULL) return OSD_FAIL;
-    if(dma == NULL) return OSD_FAIL;
 
     osd_uart = uart;
-    osd_dma = dma;
 
     HAL_UART_Receive_DMA(osd_uart, osd_dma_buffer, OSD_DMA_BUFFER_SIZE);
     __HAL_UART_ENABLE_IT(osd_uart, UART_IT_IDLE);
@@ -33,7 +30,7 @@ OSD_RETURN_TYPE OSD_INIT(UART_HandleTypeDef* uart, DMA_HandleTypeDef* dma){
 
 OSD_RETURN_TYPE OSD_IDLE_CALLBACK(void){
 
-    uint8_t current_dma_pointer = OSD_DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(osd_dma);
+    uint8_t current_dma_pointer = OSD_DMA_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(osd_uart->hdmarx);
     uint8_t message_len = parser_pos - current_dma_pointer;     // add message len check
 
     if(osd_dma_buffer[(uint8_t)(parser_pos)] != '$') goto parser_fail;  // message header check
@@ -126,7 +123,7 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
     break;
 
     default:
-    OSD_INIT(NULL, NULL);
+    OSD_INIT(NULL);
     break;
     }
 

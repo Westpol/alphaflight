@@ -200,7 +200,7 @@ int main(void)
   
   STATUS_LED_INIT();
 
-  PASSTHROUGH_START(&huart8);
+  //PASSTHROUGH_START(&huart8);
 
 //  if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
 
@@ -241,9 +241,9 @@ int main(void)
   //SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
   //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(60), false, 90000, 110000, 500, "USB Stats");
 
-  GPS_INIT(&huart3, &hdma_usart3_rx);
-  CRSF_INIT(&huart2, &hdma_usart2_rx);
-  OSD_INIT(&huart8, &hdma_uart8_rx);
+  GPS_INIT(&huart3);
+  CRSF_INIT(&huart2);
+  OSD_INIT(&huart8);
   STATUS_LED_SET_ALL(20);
 
   //uint32_t now = MILLIS32();
