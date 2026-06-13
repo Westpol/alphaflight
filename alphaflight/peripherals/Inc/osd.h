@@ -19,6 +19,8 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task);
 
 OSD_RETURN_TYPE OSD_IDLE_CALLBACK(void);
 
+UART_HandleTypeDef* OSD_GET_UART(void);
+
 
 
 /******************************************************************

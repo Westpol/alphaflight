@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "stm32h7xx_hal_uart.h"
 #include "timer.h"
 #include "usb.h"
 
@@ -212,4 +213,8 @@ GPS_RETURN_TYPE GPS_PRINT_DATA(void){
     gps_nav_pvt_t n = gps_nav_pvt.data;
     USB_PRINTLN("Time: %02d.%02d.%d %02d:%02d:%02d\nSats: %d\nLat/Lon: %f,%f\nSpeed: %f\nHeading: %f\n", n.day, n.month, n.year, n.hour, n.min, n.sec, g.status.num_sv, g.pos.lat * 1e-7, g.pos.lon * 1e-7, g.movement.gspeed * 1e-3, g.movement.course_over_ground * 1e-5);
     return GPS_OKAY;
+}
+
+UART_HandleTypeDef* GPS_GET_UART(void){
+    return gps_uart;
 }

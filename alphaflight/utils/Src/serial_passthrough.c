@@ -21,7 +21,12 @@ PASSTHROUGH_RETURN_TYPE PASSTHROUGH_START(UART_HandleTypeDef* huart){
     passthrough_active = true;
     local_huart = huart;
 
+    HAL_UART_DMAStop(huart);
+
+    HAL_DMA_Abort(huart->hdmarx);
+
     HAL_UART_Receive_DMA(huart, dma_buffer, BUFFER_SIZE);  // start UART DMA rx
+    
     __HAL_UART_ENABLE_IT(huart, UART_IT_IDLE);  // enable IDLE interrupt, fires when Package is recieved
 
     while(1){

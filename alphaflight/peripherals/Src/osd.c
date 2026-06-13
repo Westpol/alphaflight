@@ -157,3 +157,7 @@ OSD_RETURN_TYPE msp_response_packer(const uint8_t* payload, uint8_t type, uint8_
 
     return OSD_OKAY;
 }
+
+UART_HandleTypeDef* OSD_GET_UART(void){
+    return osd_uart;
+}

@@ -41,6 +41,7 @@
 #include "flight_control.h"
 #include "filesystem.h"
 #include "osd.h"
+#include "mmc5983ma.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -228,6 +229,9 @@ int main(void)
 
 
   if(BARO_INIT(SPI_DEVICE_BARO) != BARO_OKAY) Error_Handler();
+  
+  if(MAGNETO_INIT(SPI_DEVICE_MAGNETO) != MAGNETO_OKAY) Error_Handler();
+
   DSHOT_INIT();
 
 

@@ -60,4 +60,6 @@ GPS_RETURN_TYPE GPS_SET_PARSER_TASK_PID(int32_t index);
 
 GPS_RETURN_TYPE GPS_PRINT_DATA(void);
 
+UART_HandleTypeDef* GPS_GET_UART(void);
+
 #endif
