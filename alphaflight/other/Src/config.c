@@ -45,6 +45,23 @@ CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD(){
     return CONFIG_OKAY;
 }
 
+CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD_DEFAULTS(){
+
+    config_get_defaults_global();
+
+    if(sizeof(config_entrances_t) > SD_USABLE_BLOCK_SIZE_BYTES * CONFIG_SPACE_BLOCKS) return CONFIG_FAIL;   // check if config is bigger than assigned space
+
+    uint8_t buff[SD_USABLE_BLOCK_SIZE_BYTES] = {0};
+
+    for(uint32_t i = 0; i * SD_USABLE_BLOCK_SIZE_BYTES < sizeof(config_entrances_t); i++){
+        uint32_t rest = sizeof(config_entrances_t) - i * SD_USABLE_BLOCK_SIZE_BYTES;
+        memcpy(&buff[0], (uint8_t*)&config_entrances + i * SD_USABLE_BLOCK_SIZE_BYTES, UTILS_MIN_UI(rest, SD_USABLE_BLOCK_SIZE_BYTES));
+        if(SD_WRITE_BLOCK_BLOCKING(buff, CONFIG_SPACE_START_BLOCK + i, sizeof(buff), 100) != SD_OKAY) return CONFIG_FAIL;
+    }
+
+    return CONFIG_OKAY;
+}
+
 CONFIG_RETURN_TYPE CONFIG_LOAD_DEFAULTS(void){
     config_get_defaults_global();
     return CONFIG_OKAY;
@@ -55,7 +72,8 @@ CONFIG_RETURN_TYPE CONFIG_LOAD_DEFAULTS(void){
     X(IMU, imu)              \
     X(SERVO, servo)          \
     X(DSHOT, dshot)          \
-    X(LOG, logger)
+    X(LOG, logger)           \
+    X(POWER_MEASUREMENT, power_measurement)
 
 static CONFIG_RETURN_TYPE config_set_global(void){
     if(!config_loaded) return CONFIG_FAIL;

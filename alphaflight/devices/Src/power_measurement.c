@@ -1,0 +1,67 @@
+#include "power_measurement.h"
+
+#define ADC_MAX 16384
+
+#define VBAT_SCALE_mV 33000u
+#define CURR_SCALE_mA 104000u
+
+#define VBAT_SHIFT 14
+#define CURR_SHIFT 14
+
+__attribute__((section(".dma_rx"))) static uint32_t adc_buffer[2] = {0};
+static ADC_HandleTypeDef* adc_handle_global = NULL;
+
+POWER_DATA_T data = {0};
+static power_config_t config = {0};
+static bool config_set = false;
+
+POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_INIT(ADC_HandleTypeDef* adc_handle){
+    // ADC should already be initialized, just start it in DMA mode
+    if(adc_handle == NULL) return POWER_MEASUREMENT_FAIL;
+    adc_handle_global = adc_handle;
+    return POWER_MEASUREMENT_OKAY;
+}
+
+uint32_t POWER_MEASUREMENT_START_DMA_READ(const task_info_t* task){
+    if(adc_handle_global == NULL) return 0;
+    if(HAL_ADC_Start_DMA(adc_handle_global, adc_buffer, 2) != HAL_OK) return 0;
+    return 0;
+}
+
+uint32_t POWER_MEASUREMENT_CONVERT(const task_info_t* task){
+    data.voltage = (adc_buffer[0] * config.voltage_scale_mV) >> VBAT_SHIFT;   // in mV, assuming 3.3V reference and 14 bit ADC
+    data.current = (adc_buffer[1] * config.current_scale_mA) >> CURR_SHIFT;   // in mA, assuming 104A max current and 14 bit ADC
+    data.voltage += config.voltage_offset_mV;
+    data.current += config.current_offset_mA;
+    return 0;
+}
+
+POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_DMA_CALLBACK(void){
+    SCHEDULER_REGISTER_THROWAWAY_TASK(POWER_MEASUREMENT_CONVERT, 100, "Power Measurement Conversion");
+    return POWER_MEASUREMENT_OKAY;
+}
+
+POWER_DATA_T POWER_GET_DATA(void){
+    return data;
+}
+
+POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_SET_CONFIG(power_config_t new_config){
+    config = new_config;
+    config_set = true;  // make sure that config is loaded before servos are initialized
+    return POWER_MEASUREMENT_OKAY;
+}
+
+
+power_config_t POWER_MEASUREMENT_GET_CONFIG(void){
+    return config;
+}
+
+
+power_config_t POWER_MEASUREMENT_GET_DEFAULT_CONFIG(void){
+    power_config_t temp = {0};
+    temp.voltage_scale_mV = 33000u;
+    temp.current_scale_mA = 104000u;
+    temp.voltage_offset_mV = 0;
+    temp.current_offset_mA = 0;
+    return temp;
+}

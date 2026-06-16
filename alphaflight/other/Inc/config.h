@@ -3,6 +3,7 @@
 #include "servo.h"
 #include "dshot.h"
 #include "logger.h"
+#include "power_measurement.h"
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -22,11 +23,12 @@ typedef struct{
     imu_config_t imu;
     servo_config_t servo;
     dshot_config_t dshot;
-    
     log_config_t logger;
+    power_config_t power_measurement;
 }config_entrances_t;
 
 CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD();
+CONFIG_RETURN_TYPE CONFIG_STORE_TO_SD_DEFAULTS();
 CONFIG_RETURN_TYPE CONFIG_LOAD_FROM_SD();
 
 CONFIG_RETURN_TYPE CONFIG_LOAD_DEFAULTS(void);

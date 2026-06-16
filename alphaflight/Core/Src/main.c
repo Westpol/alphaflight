@@ -42,6 +42,7 @@
 #include "filesystem.h"
 #include "osd.h"
 #include "mmc5983ma.h"
+#include "power_measurement.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -204,7 +205,7 @@ int main(void)
 
   //PASSTHROUGH_START(&huart8);
 
-//  if(CONFIG_STORE_TO_SD() != CONFIG_OKAY) Error_Handler();
+  if(CONFIG_STORE_TO_SD_DEFAULTS() != CONFIG_OKAY) Error_Handler();
 
   if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();   // load complete FC config
 
@@ -243,12 +244,14 @@ int main(void)
   LOG_SET_TASK_PID(SCHEDULER_REGISTER_TASK(LOG_RUN, HZ_TO_US(LOG_GET_FREQUENCY()), false, 0, 0, 10, "SD Logger"));
   SCHEDULER_REGISTER_TASK(BARO_READ_DATA, HZ_TO_US(25), false, HZ_TO_US(30), HZ_TO_US(20), 30, "Baro read");
   SCHEDULER_REGISTER_TASK(CRSF_TELEMETRY, HZ_TO_US(10), false, 0, 0, 10, "CRSF Telemetry");
+  SCHEDULER_REGISTER_TASK(POWER_MEASUREMENT_START_DMA_READ, HZ_TO_US(100), false, 100, 100, 100, "ADC DMA start");
   //SCHEDULER_REGISTER_TASK(SCHEDULER_PRINT_TASK_PAGE, HZ_TO_US(10), false, 90000, 110000, 500, "USB Stats");
   //SCHEDULER_REGISTER_TASK(USB_STATUS, HZ_TO_US(60), false, 90000, 110000, 500, "USB Stats");
 
   GPS_INIT(&huart3);
   CRSF_INIT(&huart2);
   OSD_INIT(&huart8);
+  POWER_MEASUREMENT_INIT(&hadc1);
   STATUS_LED_SET_ALL(20);
 
   //uint32_t now = MILLIS32();
@@ -473,6 +476,7 @@ static void MX_ADC1_Init(void)
 
   /** Configure Regular Channel
   */
+  sConfig.Channel = ADC_CHANNEL_9;
   sConfig.Rank = ADC_REGULAR_RANK_2;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {

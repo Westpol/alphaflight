@@ -50,6 +50,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "devices/Src/status_led.c"
     "devices/Src/crossfire.c"
     "devices/Src/mmc5983ma.c"
+    "devices/Src/power_measurement.c"
     "utils/Src/timer.c"
     "utils/Src/scheduler.c"
     "utils/Src/utils.c"

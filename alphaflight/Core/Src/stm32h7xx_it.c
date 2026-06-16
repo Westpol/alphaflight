@@ -33,6 +33,7 @@
 #include "crossfire.h"
 #include "osd.h"
 #include "common.h"
+#include "power_measurement.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -375,7 +376,7 @@ void DMA1_Stream4_IRQHandler(void)
   /* USER CODE END DMA1_Stream4_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_adc1);
   /* USER CODE BEGIN DMA1_Stream4_IRQn 1 */
-
+  POWER_MEASUREMENT_DMA_CALLBACK();
   /* USER CODE END DMA1_Stream4_IRQn 1 */
 }
 
