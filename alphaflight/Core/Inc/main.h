@@ -88,8 +88,6 @@ void Error_Handler(void);
 #define IMU_CS_GPIO_Port GPIOC
 #define V_SENSE_Pin LL_GPIO_PIN_5
 #define V_SENSE_GPIO_Port GPIOC
-#define CUR_SENSE_Pin LL_GPIO_PIN_0
-#define CUR_SENSE_GPIO_Port GPIOB
 #define IMU_EXTI_1_Pin LL_GPIO_PIN_2
 #define IMU_EXTI_1_GPIO_Port GPIOB
 #define IMU_EXTI_1_EXTI_IRQn EXTI2_IRQn
