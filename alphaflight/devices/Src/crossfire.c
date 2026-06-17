@@ -2,11 +2,13 @@
 #include "stm32h723xx.h"
 #include "stm32h7xx_hal_uart.h"
 #include "timer.h"
+#include <stdint.h>
 #include <string.h>
 
 #include "lsm6dso.h"
 #include "bmp390.h"
 #include "gps.h"
+#include "power_measurement.h"
 
 static UART_HandleTypeDef* crsf_uart;
 
@@ -22,12 +24,14 @@ __attribute__((section(".dma_rx"))) static uint8_t crsf_dma_buffer[DMA_BUFFER_SI
 __attribute__((section(".dma_tx"))) static uint8_t telemetry_data[64] = {0};
 static uint8_t crsf_packet[64] = {0};
 
-CRSF_LINK_T crsf_fc_link_statistics = {0};
+static CRSF_LINK_T crsf_fc_link_statistics = {0};
 
-CRSF_CHANNELS_T crsf_fc_channels = {0};
+static CRSF_CHANNELS_T crsf_fc_channels = {0};
 
 static uint8_t crc8(const uint8_t * ptr, uint8_t len);
 static void CRSF_SEND_TELEMETRY(uint8_t telemetry_type);
+
+static uint8_t counter = 0;
 
 
 CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart){   // Assumes UART already initialized with correct settings
@@ -150,7 +154,12 @@ uint8_t crc8(const uint8_t * ptr, uint8_t len){
 
 
 uint32_t CRSF_TELEMETRY(const task_info_t* task){
-    CRSF_SEND_TELEMETRY(0x21);
+    if((counter & 0x01) == 0){
+        CRSF_SEND_TELEMETRY(0x21);
+    } else{
+        CRSF_SEND_TELEMETRY(0x08);
+    }
+    counter++;
     return 0;
 }
 
@@ -332,11 +341,28 @@ static void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
         break;
         }
 
-        /*case 0x08: {		//Batt Info
-            int16_t vbat = (int16_t)(ONBOARD_SENSORS.vbat.vbat * 10.0f);
-            uint8_t payload_data[9] = {telemetry_type, 0x00, 0x64, 0x00, 0x64, 0x00, 0x00, 0xff, 0x14};
-            payload_data[1] = (vbat >> 8) & 0xFF;
+        case 0x08: {		//Batt Info
+            POWER_DATA_T power = POWER_GET_DATA();
+            power_config_t power_conf = POWER_MEASUREMENT_GET_CONFIG();
+            int16_t vbat = (int16_t)(power.voltage * 100);
+            int16_t curr = (int16_t)(power.current * 100);
+            uint32_t cap_used_mAh = power.capacity_used_mAh;
+
+            uint8_t payload_data[9] = {0};
+
+            payload_data[0] = telemetry_type;
+
+            payload_data[1] = (vbat >> 8) & 0xFF;   // voltage
             payload_data[2] = vbat & 0xFF;
+
+            payload_data[3] = (curr >> 8) & 0xFF;    // current
+            payload_data[4] = curr & 0xFF;
+
+            payload_data[5] = (cap_used_mAh >> 16) & 0xFF;    // capayity used
+            payload_data[6] = (cap_used_mAh >> 8) & 0xFF;
+            payload_data[7] = cap_used_mAh & 0xFF;
+
+            payload_data[8] = (100 * cap_used_mAh) / power_conf.battery_capacity_mAh;    // battery used in %
             uint8_t crc = crc8(payload_data, 9);
             telemetry_data[0] = 0xC8;
             telemetry_data[1] = 10;
@@ -353,7 +379,7 @@ static void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
 
             HAL_UART_Transmit_DMA(crsf_uart, telemetry_data, 12);
         break;
-        }*/
+        }
         
         default:
         break;

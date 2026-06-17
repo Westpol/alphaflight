@@ -10,11 +10,13 @@ typedef struct{
     uint32_t current_scale_mA;   // scale factor for converting ADC reading to mA
     int32_t voltage_offset_mV;  // offset to add to voltage reading in mV
     int32_t current_offset_mA;  // offset to add to current reading in mA
+    uint32_t battery_capacity_mAh;
 } power_config_t;
 
 typedef struct{
     uint32_t voltage;   // in mV
     uint32_t current;   // in mA
+    float capacity_used_mAh;
 } POWER_DATA_T;
 
 typedef enum{
@@ -26,6 +28,10 @@ POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_INIT(ADC_HandleTypeDef* adc_hand
 
 uint32_t POWER_MEASUREMENT_START_DMA_READ(const task_info_t* task);
 uint32_t POWER_MEASUREMENT_CONVERT(const task_info_t* task);
+
+POWER_DATA_T POWER_GET_DATA(void);
+
+POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_PRINT_DATA(void);
 
 POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_DMA_CALLBACK(void);
 

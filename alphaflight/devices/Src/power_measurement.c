@@ -1,4 +1,5 @@
 #include "power_measurement.h"
+#include "usb.h"
 
 #define ADC_MAX 16384
 
@@ -7,6 +8,8 @@
 
 #define VBAT_SHIFT 14
 #define CURR_SHIFT 14
+
+uint32_t last_conversion_time = 0;
 
 __attribute__((section(".dma_rx"))) static uint32_t adc_buffer[2] = {0};
 static ADC_HandleTypeDef* adc_handle_global = NULL;
@@ -28,13 +31,25 @@ uint32_t POWER_MEASUREMENT_START_DMA_READ(const task_info_t* task){
     return 0;
 }
 
+
+#define us_to_hours ((1.0f / 1000000.0f) / 3600.0f)
 uint32_t POWER_MEASUREMENT_CONVERT(const task_info_t* task){
+    uint32_t now = MICROS32();
+    uint32_t delta = now - last_conversion_time;
+    last_conversion_time = now;
     data.voltage = (adc_buffer[0] * config.voltage_scale_mV) >> VBAT_SHIFT;   // in mV, assuming 3.3V reference and 14 bit ADC
     data.current = (adc_buffer[1] * config.current_scale_mA) >> CURR_SHIFT;   // in mA, assuming 104A max current and 14 bit ADC
     data.voltage += config.voltage_offset_mV;
     data.current += config.current_offset_mA;
+    data.capacity_used_mAh += (float)data.current * us_to_hours * delta;
     return 0;
 }
+
+POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_PRINT_DATA(void){
+    USB_PRINTLN("VBat: %f V\nCurrent: %f A\nBattery used (mAh): %d mAh\n Battery Capacity: %d mAh\n Battery capacity used: %d percent");
+    return POWER_MEASUREMENT_OKAY;
+}
+
 
 POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_DMA_CALLBACK(void){
     SCHEDULER_REGISTER_THROWAWAY_TASK(POWER_MEASUREMENT_CONVERT, 100, "Power Measurement Conversion");

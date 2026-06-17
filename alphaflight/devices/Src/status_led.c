@@ -30,10 +30,9 @@ void STATUS_LED_SET_B(uint32_t brightness){
     TIM4->CCR2 = brightness;
 }
 
-uint32_t rgb[3] = {1, 0, 0};
-int8_t changing_index = 0;
-bool sign = true;
-uint32_t counter = 0;
+static uint32_t rgb[3] = {1, 0, 0};
+static int8_t changing_index = 0;
+static bool sign = true;
 
 uint32_t STATUS_PULSE(const task_info_t* info){
     if(rgb[changing_index] >= 100) sign = false;
