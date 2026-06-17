@@ -10,8 +10,9 @@
 #include "osd.h"
 #include "bmp390.h"
 #include "serial_passthrough.h"
+#include "power_measurement.h"
 
-static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n", "passthrough osd\n", "passthrough gps\n"};
+static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n", "passthrough osd\n", "passthrough gps\n", "show power\n"};
 static const char* getset[] = {"get", "set"};
 static const char* devices[] = {"imu", "baro", "gps", "crsf", "servo", "osd", "logger"};
 // {{"rate"}, {"rate", "offset"}, {"rate", "protocol"}, {"channel throttle", "channel pitch", "channel roll", "telemetry"}, {"aileron left", "aileron right", "pitch", "min", "max", "center", "direction"}, {"enable"}, {"rate", "log data"}};
@@ -74,6 +75,10 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
             PASSTHROUGH_START(GPS_GET_UART());
         break;
 
+        case 9:
+            POWER_MEASUREMENT_PRINT_DATA();
+        break;
+
         case -1:
             USB_PRINTLN("Command not found!");
         break;
@@ -93,7 +98,7 @@ static SERIAL_PARSER_RETURN_TYPE print_help(){
         "help\t\t\tprints help page\n"
         "tasks\t\t\tprints all tasks and their respective CPU load\n"
         "debug\t\t\tprints debug value(s) set by user\n"
-        "show [device]\t\tprints device data, devices available: [gps, baro]\n"
+        "show [device]\t\tprints device data, devices available: [gps, baro, power]\n"
         "load default\t\tloads default config values in non permanent storage\n"
         "save\t\t\tsaves config data to the SD card\n"
         "passthrough \t\tsets up a uart to usb passthrough [gps, osd] (need to restart FC to deactivate)");

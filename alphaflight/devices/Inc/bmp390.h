@@ -19,12 +19,15 @@ typedef struct{
 
 typedef struct{
     float pressure_base;
+	float height_last;
+	uint32_t pressure_last_timestamp;
 }baro_data_processing_t;
 
 typedef struct{
-    float temp;
-    float pressure;
-    float height;
+    float temp;				// in °C
+    float pressure;			// in Pa
+    float height;			// in m
+	float vertical_speed;	// in cm/s
 }BARO_PROCESSED_T;
 
 typedef struct{
@@ -38,6 +41,7 @@ BARO_RETURN_TYPE BARO_INIT(SPI_DEVICE device);
 uint32_t BARO_READ_DATA(const task_info_t* task);
 
 BARO_PROCESSED_T BARO_GET_DATA();
+BARO_T BARO_GET_DATA_RAW();
 
 BARO_RETURN_TYPE BARO_PRINT_DATA(void);
 

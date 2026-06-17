@@ -45,11 +45,11 @@ CRSF_RETURN_TYPE CRSF_INIT(UART_HandleTypeDef* uart){   // Assumes UART already 
     return CRSF_OKAY;
 }
 
-CRSF_CHANNELS_T CRSF_GET_CHANNELS(void){
+CRSF_CHANNELS_T CRSF_GET_CHANNELS_DATA(void){
     return crsf_fc_channels;
 }
 
-CRSF_LINK_T CRSF_GET_LINK(void){
+CRSF_LINK_T CRSF_GET_LINK_DATA(void){
     return crsf_fc_link_statistics;
 }
 
@@ -154,10 +154,14 @@ uint8_t crc8(const uint8_t * ptr, uint8_t len){
 
 
 uint32_t CRSF_TELEMETRY(const task_info_t* task){
-    if((counter & 0x01) == 0){
+    if((counter & 0x03) == 0){
         CRSF_SEND_TELEMETRY(0x21);
-    } else{
+    } else if((counter & 0x03) == 1){
         CRSF_SEND_TELEMETRY(0x08);
+    } else if((counter & 0x03) == 2){
+        CRSF_SEND_TELEMETRY(0x02);
+    } else if((counter & 0x03) == 3){
+        //CRSF_SEND_TELEMETRY(0x1E);
     }
     counter++;
     return 0;
@@ -344,8 +348,8 @@ static void CRSF_SEND_TELEMETRY(uint8_t telemetry_type){
         case 0x08: {		//Batt Info
             POWER_DATA_T power = POWER_GET_DATA();
             power_config_t power_conf = POWER_MEASUREMENT_GET_CONFIG();
-            int16_t vbat = (int16_t)(power.voltage * 100);
-            int16_t curr = (int16_t)(power.current * 100);
+            int16_t vbat = (int16_t)(power.voltage / 100);
+            int16_t curr = (int16_t)(power.current / 100);
             uint32_t cap_used_mAh = power.capacity_used_mAh;
 
             uint8_t payload_data[9] = {0};

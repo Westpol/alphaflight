@@ -52,12 +52,24 @@ BARO_PROCESSED_T BARO_GET_DATA(){
     return baro.processed;
 }
 
+BARO_T BARO_GET_DATA_RAW(){
+	return baro;
+}
+
+#define VERTICAL_SPEED_ALPHA 0.5f
 static BARO_RETURN_TYPE baro_convert_data(uint8_t* rx_val){
     baro.raw.pressure = ((uint32_t)rx_val[2] << 16) | ((uint32_t)rx_val[1] << 8) | rx_val[0];
     baro.raw.temp = ((uint32_t)rx_val[5] << 16) | ((uint32_t)rx_val[4] << 8) | rx_val[3];
     baro.processed.temp = baro_compensate_temperature(baro.raw.temp, &baro_calibration);
     baro.processed.pressure = baro_compensate_pressure(baro.raw.pressure, &baro_calibration);
     baro.processed.height = baro_get_altitude(baro.processed.pressure, baro.processing.pressure_base);
+	uint32_t now = MICROS32();
+	uint32_t delta = now - baro.processing.pressure_last_timestamp;
+	if(delta > 0){
+		baro.processed.vertical_speed = baro.processed.vertical_speed * (1.0f - VERTICAL_SPEED_ALPHA) + ((baro.processed.height - baro.processing.height_last) * 100000000.0f / (float)delta) * VERTICAL_SPEED_ALPHA;
+	}
+	baro.processing.height_last = baro.processed.height;
+	baro.processing.pressure_last_timestamp = now;
     return BARO_OKAY;
 }
 

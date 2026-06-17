@@ -10,7 +10,7 @@ static bool armed = false;
 static bool arming_failed = false;
 
 uint32_t FC_DIRECT_LAW(const task_info_t* task){
-    CRSF_CHANNELS_T crsf = CRSF_GET_CHANNELS();
+    CRSF_CHANNELS_T crsf = CRSF_GET_CHANNELS_DATA();
     if(crsf.channel[4] > 1500){
         if(!armed){
             if(!armed && !arming_failed && crsf.channel[0] - 173 == 0){

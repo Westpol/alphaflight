@@ -41,12 +41,14 @@ uint32_t POWER_MEASUREMENT_CONVERT(const task_info_t* task){
     data.current = (adc_buffer[1] * config.current_scale_mA) >> CURR_SHIFT;   // in mA, assuming 104A max current and 14 bit ADC
     data.voltage += config.voltage_offset_mV;
     data.current += config.current_offset_mA;
+    data.voltage = data.voltage > 40000 ? 0 : data.voltage;   // filter out invalid readings above 40V
+    data.current = data.current > 100000 ? 0 : data.current;   // filter out invalid readings above 100A
     data.capacity_used_mAh += (float)data.current * us_to_hours * delta;
     return 0;
 }
 
 POWER_MEASUREMENT_RETURN_TYPE POWER_MEASUREMENT_PRINT_DATA(void){
-    USB_PRINTLN("VBat: %f V\nCurrent: %f A\nBattery used (mAh): %d mAh\n Battery Capacity: %d mAh\n Battery capacity used: %d percent");
+    USB_PRINTLN("VBat: %f V\nCurrent: %f A\nBattery used (mAh): %d mAh\n Battery Capacity: %d mAh\n Battery capacity used: %d percent", data.voltage / 1000.0f, data.current / 1000.0f, (uint32_t)data.capacity_used_mAh, config.battery_capacity_mAh, (uint32_t)((data.capacity_used_mAh / config.battery_capacity_mAh) * 100));
     return POWER_MEASUREMENT_OKAY;
 }
 
@@ -76,7 +78,8 @@ power_config_t POWER_MEASUREMENT_GET_DEFAULT_CONFIG(void){
     power_config_t temp = {0};
     temp.voltage_scale_mV = 33000u;
     temp.current_scale_mA = 104000u;
-    temp.voltage_offset_mV = 0;
-    temp.current_offset_mA = 0;
+    temp.voltage_offset_mV = 1150u;
+    temp.current_offset_mA = -2400u;
+    temp.battery_capacity_mAh = 3000u;
     return temp;
 }

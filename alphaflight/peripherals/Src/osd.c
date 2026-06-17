@@ -1,6 +1,8 @@
 #include "osd.h"
 #include "gps.h"
 #include "bmp390.h"
+#include "power_measurement.h"
+#include "crossfire.h"
 #include <string.h>
 
 __attribute__((section(".dma_rx"))) static uint8_t osd_dma_buffer[OSD_DMA_BUFFER_SIZE] = {0};
@@ -10,9 +12,6 @@ static UART_HandleTypeDef* osd_uart;
 
 static volatile int16_t message_pending = -1;
 static volatile uint8_t parser_pos = 0;
-
-static int32_t baro_latest_altitude = 0;
-static uint32_t baro_last_timing = 0;
 
 
 OSD_RETURN_TYPE msp_response_packer(const uint8_t* payload, uint8_t type, uint8_t payload_len);
@@ -61,7 +60,7 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
 
     case MSP_RAW_GPS:{
         GPS_PROCESSED_T gp = GPS_GET_DATA();
-        struct msp_raw_gps_t msp_raw_gps = {MSP_GPS_FIX_3D, gp.status.num_sv, gp.pos.lat, gp.pos.lon, gp.movement.heightMSL, gp.movement.gspeed, gp.movement.course_over_ground, 1};
+        struct msp_raw_gps_t msp_raw_gps = {MSP_GPS_FIX_3D, gp.status.num_sv, gp.pos.lat, gp.pos.lon, gp.movement.heightMSL / 1000, gp.movement.gspeed / 10, gp.movement.course_over_ground, 1};
         msp_response_packer((uint8_t*)&msp_raw_gps, MSP_RAW_GPS, sizeof(msp_raw_gps));
     }
     break;
@@ -73,24 +72,14 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
     break;
 
     case MSP_ALTITUDE:{
-        uint32_t now = MICROS32();
-        BARO_PROCESSED_T bp = BARO_GET_DATA();
-        int32_t baro_current_altitude = (int32_t)(bp.height * 100);
+        BARO_T baro = BARO_GET_DATA_RAW();
         struct msp_altitude_t msp_altitude;
-        if(now - baro_last_timing == 0){
-            msp_altitude.estimatedActualPosition = baro_current_altitude;
-            msp_altitude.estimatedActualVelocity = 0;
-            msp_altitude.baroLatestAltitude = baro_latest_altitude;
-        }
-        else{
-            msp_altitude.estimatedActualPosition = baro_current_altitude;
-            msp_altitude.estimatedActualVelocity = (int16_t)((baro_current_altitude - baro_latest_altitude) * (1000000.0 / (now - baro_last_timing)));
-            msp_altitude.baroLatestAltitude = baro_latest_altitude;
-        }
+
+        msp_altitude.estimatedActualPosition = (int32_t)(baro.processed.height * 100);
+        msp_altitude.estimatedActualVelocity = (int16_t)baro.processed.vertical_speed;
+        msp_altitude.baroLatestAltitude = (int32_t)(baro.processed.height * 100);
 
         msp_response_packer((uint8_t*)&msp_altitude, MSP_ALTITUDE, sizeof(msp_altitude));
-        baro_latest_altitude = baro_current_altitude;
-        baro_last_timing = now;
     }
     break;
 
@@ -115,7 +104,14 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
     break;
 
     case MSP_ANALOG:    // implement
-
+        struct msp_analog_t msp_analog = {0};
+        POWER_DATA_T power_data = POWER_GET_DATA();
+        CRSF_LINK_T link_data = CRSF_GET_LINK_DATA();
+        msp_analog.vbat = power_data.voltage / 10;   // convert
+        msp_analog.mAhDrawn = (uint16_t)power_data.capacity_used_mAh;
+        msp_analog.rssi = link_data.down_link_quality;   // not supported by RX yet
+        msp_analog.amperage = power_data.current / 10;   // convert
+        msp_response_packer((uint8_t*)&msp_analog, MSP_ANALOG, sizeof(msp_analog));
     break;
 
     case MSP_SET_RTC:
