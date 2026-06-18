@@ -102,4 +102,6 @@ static SERIAL_PARSER_RETURN_TYPE print_help(){
         "load default\t\tloads default config values in non permanent storage\n"
         "save\t\t\tsaves config data to the SD card\n"
         "passthrough \t\tsets up a uart to usb passthrough [gps, osd] (need to restart FC to deactivate)");
+
+    return SERIAL_PARSER_OKAY;
 }

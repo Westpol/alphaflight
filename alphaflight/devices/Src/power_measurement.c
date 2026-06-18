@@ -3,9 +3,6 @@
 
 #define ADC_MAX 16384
 
-#define VBAT_SCALE_mV 33000u
-#define CURR_SCALE_mA 104000u
-
 #define VBAT_SHIFT 14
 #define CURR_SHIFT 14
 

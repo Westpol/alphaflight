@@ -62,14 +62,14 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
         GPS_PROCESSED_T gp = GPS_GET_DATA();
         struct msp_raw_gps_t msp_raw_gps = {MSP_GPS_FIX_3D, gp.status.num_sv, gp.pos.lat, gp.pos.lon, gp.movement.heightMSL / 1000, gp.movement.gspeed / 10, gp.movement.course_over_ground, 1};
         msp_response_packer((uint8_t*)&msp_raw_gps, MSP_RAW_GPS, sizeof(msp_raw_gps));
-    }
     break;
+    }
     
     case MSP_NAME:{
         char* craft_name = "Highwire Plen";
         msp_response_packer((const uint8_t*)craft_name, MSP_NAME, strlen(craft_name));
-    }
     break;
+    }
 
     case MSP_ALTITUDE:{
         BARO_T baro = BARO_GET_DATA_RAW();
@@ -80,8 +80,8 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
         msp_altitude.baroLatestAltitude = (int32_t)(baro.processed.height * 100);
 
         msp_response_packer((uint8_t*)&msp_altitude, MSP_ALTITUDE, sizeof(msp_altitude));
-    }
     break;
+    }
 
     case MSP_STATUS:    // implement
 
@@ -103,7 +103,7 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
 
     break;
 
-    case MSP_ANALOG:    // implement
+    case MSP_ANALOG:{    // implement
         struct msp_analog_t msp_analog = {0};
         POWER_DATA_T power_data = POWER_GET_DATA();
         CRSF_LINK_T link_data = CRSF_GET_LINK_DATA();
@@ -113,6 +113,7 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
         msp_analog.amperage = power_data.current / 10;   // convert
         msp_response_packer((uint8_t*)&msp_analog, MSP_ANALOG, sizeof(msp_analog));
     break;
+    }
 
     case MSP_SET_RTC:
 
