@@ -468,7 +468,7 @@ struct msp_sonar_altitude_t {
 
 // MSP_ANALOG reply
 struct msp_analog_t {
-  uint16_t  vbat;     // Converted to int x 100
+  uint8_t  vbat;     // Converted to int x 100
   uint16_t mAhDrawn; // milliamp hours drawn from battery
   uint16_t rssi;     // 0..1023
   int16_t  amperage; // send amperage in 0.01 A steps, range is -320A to 320A  

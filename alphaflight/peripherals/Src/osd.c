@@ -107,7 +107,7 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
         struct msp_analog_t msp_analog = {0};
         POWER_DATA_T power_data = POWER_GET_DATA();
         CRSF_LINK_T link_data = CRSF_GET_LINK_DATA();
-        msp_analog.vbat = power_data.voltage / 10;   // convert
+        msp_analog.vbat = power_data.voltage / 100;   // convert
         msp_analog.mAhDrawn = (uint16_t)power_data.capacity_used_mAh;
         msp_analog.rssi = link_data.down_link_quality;   // not supported by RX yet
         msp_analog.amperage = power_data.current / 10;   // convert
