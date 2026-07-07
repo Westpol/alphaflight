@@ -9,3 +9,4 @@ src/cmake/starm-clang.cmake
 src/cmake/gcc-arm-none-eabi.cmake
 */.vscode/*
 */.settings/*
+*.swp

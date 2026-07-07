@@ -5,6 +5,8 @@
 #ifndef CROSSFIRE_H
 #define CROSSFIRE_H
 
+#define CRSF_NUM_CHANNELS 16
+
 typedef enum{
     CRSF_FAIL,
     CRSF_OKAY
@@ -15,6 +17,7 @@ typedef struct{
 } crsf_config_t;
 
 typedef struct{
+    uint16_t channel_raw[16];
     uint16_t channel[16];
     uint32_t timestamp;
 } CRSF_CHANNELS_T;

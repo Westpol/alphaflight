@@ -11,9 +11,9 @@ static bool arming_failed = false;
 
 uint32_t FC_DIRECT_LAW(const task_info_t* task){
     CRSF_CHANNELS_T crsf = CRSF_GET_CHANNELS_DATA();
-    if(crsf.channel[4] > 1500){
+    if(crsf.channel_raw[4] > 1500){
         if(!armed){
-            if(!armed && !arming_failed && crsf.channel[0] - 173 == 0){
+            if(!armed && !arming_failed && crsf.channel_raw[0] - 173 == 0){
                 armed = true;
             }
             else {
@@ -22,22 +22,22 @@ uint32_t FC_DIRECT_LAW(const task_info_t* task){
         }
     }
 
-    if(crsf.channel[4] < 1500){
+    if(crsf.channel_raw[4] < 1500){
         arming_failed = false;
         armed = false;
     }
     if(armed && !arming_failed){  // Motor armed
-        DSHOT_SET_THROTTLE((crsf.channel[0] - 172) + 1, true);
+        DSHOT_SET_THROTTLE((crsf.channel_raw[0] - 172) + 1, true);
     }
     else {  // Motor disarmed
         DSHOT_SET_THROTTLE(0, false);
     }
-    if(crsf.channel[11] > 1000 && logging == false){
+    if(crsf.channel_raw[11] > 1000 && logging == false){
         LOG_START();
         logging = true;
         STATUS_LED_SET_R(1000);
     }
-    if(crsf.channel[11] < 1000 && logging == true){
+    if(crsf.channel_raw[11] < 1000 && logging == true){
         LOG_END();
         logging = false;
         STATUS_LED_SET_R(0);

@@ -53,6 +53,7 @@ CRSF_LINK_T CRSF_GET_LINK_DATA(void){
     return crsf_fc_link_statistics;
 }
 
+#define RAW_CHANNEL_TO_SERVO (1000.0f / 1639.0f)
 uint32_t CRSF_PARSE_DMA(const task_info_t* task){
     uint16_t package_start = crsf_parser.last_interrupt;
     uint16_t package_end = crsf_parser.current_interrupt;
@@ -73,23 +74,28 @@ uint32_t CRSF_PARSE_DMA(const task_info_t* task){
     uint8_t type = crsf_packet[0];
 
     if(type == 0x16){   // channels
-        crsf_fc_channels.channel[0]  = (crsf_packet[1]       | crsf_packet[2] << 8) & 0x07FF;
-        crsf_fc_channels.channel[1]  = (crsf_packet[2] >> 3  | crsf_packet[3] << 5) & 0x07FF;
-        crsf_fc_channels.channel[2]  = (crsf_packet[3] >> 6  | crsf_packet[4] << 2 | crsf_packet[5] << 10) & 0x07FF;
-        crsf_fc_channels.channel[3]  = (crsf_packet[5] >> 1  | crsf_packet[6] << 7) & 0x07FF;
-        crsf_fc_channels.channel[4]  = (crsf_packet[6] >> 4  | crsf_packet[7] << 4) & 0x07FF;
-        crsf_fc_channels.channel[5]  = (crsf_packet[7] >> 7  | crsf_packet[8] << 1 | crsf_packet[9] << 9) & 0x07FF;
-        crsf_fc_channels.channel[6]  = (crsf_packet[9] >> 2  | crsf_packet[10] << 6) & 0x07FF;
-        crsf_fc_channels.channel[7]  = (crsf_packet[10] >> 5 | crsf_packet[11] << 3) & 0x07FF;
+        crsf_fc_channels.channel_raw[0]  = (crsf_packet[1]       | crsf_packet[2] << 8) & 0x07FF;
+        crsf_fc_channels.channel_raw[1]  = (crsf_packet[2] >> 3  | crsf_packet[3] << 5) & 0x07FF;
+        crsf_fc_channels.channel_raw[2]  = (crsf_packet[3] >> 6  | crsf_packet[4] << 2 | crsf_packet[5] << 10) & 0x07FF;
+        crsf_fc_channels.channel_raw[3]  = (crsf_packet[5] >> 1  | crsf_packet[6] << 7) & 0x07FF;
+        crsf_fc_channels.channel_raw[4]  = (crsf_packet[6] >> 4  | crsf_packet[7] << 4) & 0x07FF;
+        crsf_fc_channels.channel_raw[5]  = (crsf_packet[7] >> 7  | crsf_packet[8] << 1 | crsf_packet[9] << 9) & 0x07FF;
+        crsf_fc_channels.channel_raw[6]  = (crsf_packet[9] >> 2  | crsf_packet[10] << 6) & 0x07FF;
+        crsf_fc_channels.channel_raw[7]  = (crsf_packet[10] >> 5 | crsf_packet[11] << 3) & 0x07FF;
 
-        crsf_fc_channels.channel[8]  = (crsf_packet[12]      | crsf_packet[13] << 8) & 0x07FF;
-        crsf_fc_channels.channel[9]  = (crsf_packet[13] >> 3 | crsf_packet[14] << 5) & 0x07FF;
-        crsf_fc_channels.channel[10] = (crsf_packet[14] >> 6 | crsf_packet[15] << 2 | crsf_packet[16] << 10) & 0x07FF;
-        crsf_fc_channels.channel[11] = (crsf_packet[16] >> 1 | crsf_packet[17] << 7) & 0x07FF;
-        crsf_fc_channels.channel[12] = (crsf_packet[17] >> 4 | crsf_packet[18] << 4) & 0x07FF;
-        crsf_fc_channels.channel[13] = (crsf_packet[18] >> 7 | crsf_packet[19] << 1 | crsf_packet[20] << 9) & 0x07FF;
-        crsf_fc_channels.channel[14] = (crsf_packet[20] >> 2 | crsf_packet[21] << 6) & 0x07FF;
-        crsf_fc_channels.channel[15] = (crsf_packet[21] >> 5 | crsf_packet[22] << 3) & 0x07FF;
+        crsf_fc_channels.channel_raw[8]  = (crsf_packet[12]      | crsf_packet[13] << 8) & 0x07FF;
+        crsf_fc_channels.channel_raw[9]  = (crsf_packet[13] >> 3 | crsf_packet[14] << 5) & 0x07FF;
+        crsf_fc_channels.channel_raw[10] = (crsf_packet[14] >> 6 | crsf_packet[15] << 2 | crsf_packet[16] << 10) & 0x07FF;
+        crsf_fc_channels.channel_raw[11] = (crsf_packet[16] >> 1 | crsf_packet[17] << 7) & 0x07FF;
+        crsf_fc_channels.channel_raw[12] = (crsf_packet[17] >> 4 | crsf_packet[18] << 4) & 0x07FF;
+        crsf_fc_channels.channel_raw[13] = (crsf_packet[18] >> 7 | crsf_packet[19] << 1 | crsf_packet[20] << 9) & 0x07FF;
+        crsf_fc_channels.channel_raw[14] = (crsf_packet[20] >> 2 | crsf_packet[21] << 6) & 0x07FF;
+        crsf_fc_channels.channel_raw[15] = (crsf_packet[21] >> 5 | crsf_packet[22] << 3) & 0x07FF;
+
+        for(int i = 0; i < CRSF_NUM_CHANNELS; i++){
+            crsf_fc_channels.channel[i] = UTILS_MIN_MAX_UI((crsf_fc_channels.channel_raw[i] - 172) * RAW_CHANNEL_TO_SERVO + 1000, 1000, 2000);
+        }
+
         crsf_fc_channels.timestamp = MICROS32();
     }
 

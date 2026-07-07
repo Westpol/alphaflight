@@ -1,0 +1,12 @@
+Ch1: Throttle
+Ch2: Elevator
+Ch3: Rudder
+Ch4: Unused
+Ch5: Disarmed / servos + logging / armed (motor) + servos + logging
+Ch6: Full manual / Fly by wire / autopilot
+Ch7: SD
+Ch8: SA
+Ch9: two way right bottom
+Ch10: three way right bottom
+Ch11: three way left bottom
+Ch12: OSW switch

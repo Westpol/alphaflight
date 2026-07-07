@@ -87,9 +87,16 @@ uint32_t OSD_MSP_RESPONSE(const task_info_t* task){
 
     break;
 
-    case MSP_RC:    // implement?
-
+    case MSP_RC:{    // implement!
+        struct msp_rc_t msp_channels = {0};
+        CRSF_CHANNELS_T channels = {0};
+        channels = CRSF_GET_CHANNELS_DATA();
+        for(int i = 0; i < MSP_MAX_SUPPORTED_CHANNELS; i++){
+            msp_channels.channelValue[i] = channels.channel[i];
+        }
+        msp_response_packer((uint8_t*)&msp_channels, MSP_RC, (sizeof(msp_channels)));
     break;
+    }
 
     case MSP_ATTITUDE:  // implement
 
