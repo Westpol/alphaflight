@@ -9,4 +9,4 @@ Ch8: SA
 Ch9: two way right bottom
 Ch10: three way right bottom
 Ch11: three way left bottom
-Ch12: OSW switch
+Ch12: OSD switch

@@ -17,8 +17,8 @@ typedef struct{
 } crsf_config_t;
 
 typedef struct{
-    uint16_t channel_raw[16];
-    uint16_t channel[16];
+    uint16_t channel_raw[16];   // raw values from RX, scaled to 172-1811
+    uint16_t channel[16];   // scaled to 1000-2000
     uint32_t timestamp;
 } CRSF_CHANNELS_T;
 

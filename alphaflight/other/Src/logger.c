@@ -1,4 +1,7 @@
 #include "logger.h"
+
+#include <string.h>
+
 #include "sd.h"
 #include "filesystem.h"
 #include "lsm6dso.h"
