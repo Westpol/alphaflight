@@ -1,8 +1,6 @@
 #include "servo.h"
 #include "stm32h723xx.h"
 #include "stm32h7xx_ll_tim.h"
-#include <stdint.h>
-#include <string.h>
 
 static servo_config_t config = {0};
 static bool config_set = false;
@@ -56,6 +54,16 @@ SERVO_RETURN_TYPE SERVO_SET_PWM(uint8_t servo, uint16_t pwm_val){
         return SERVO_FAIL;
     }
     return SERVO_OKAY;
+}
+
+uint32_t SERVO_GET_PWM(uint8_t servo){
+    if(servo <= 3){
+        return (&servo_timers[0]->CCR1)[servo];
+    }
+    else if (servo <= 7) {
+        return (&servo_timers[1]->CCR1)[servo - 4];
+    }
+    return 0;
 }
 
 SERVO_RETURN_TYPE SERVO_SET_CONFIG(servo_config_t new_config){

@@ -28,6 +28,7 @@ typedef struct{
 SERVO_RETURN_TYPE SERVO_INIT(TIM_TypeDef* servo_0_3, TIM_TypeDef* servo_4_7);
 
 SERVO_RETURN_TYPE SERVO_SET_PWM(uint8_t servo, uint16_t pwm_val);
+uint32_t SERVO_GET_PWM(uint8_t servo);
 
 SERVO_RETURN_TYPE SERVO_SET_CONFIG(servo_config_t new_config);
 servo_config_t SERVO_GET_DEFAULT_CONFIG(void);
