@@ -43,7 +43,7 @@ SERVO_RETURN_TYPE SERVO_INIT(TIM_TypeDef* servo_0_3, TIM_TypeDef* servo_4_7){
 }
 
 SERVO_RETURN_TYPE SERVO_SET_PWM(uint8_t servo, uint16_t pwm_val){
-    pwm_val = UTILS_MIN_MAX_I(pwm_val, 1000, 2000);
+    pwm_val = UTILS_MIN_MAX_I(pwm_val + config.servo_neutral_pos_corr[servo], 1000, 2000);
     if(servo <= 3){
         ((volatile uint32_t*)(&servo_timers[0]->CCR1))[servo] = pwm_val;
     }
@@ -82,12 +82,15 @@ servo_config_t SERVO_GET_DEFAULT_CONFIG(void){
     servo_config_t temp = {0};
     for(uint8_t i = 0; i < 8; i++){
         temp.servo_direction[i] = 1;
-        temp.servo_neutral_pos[i] = 1500;
+        temp.servo_neutral_pos_corr[i] = 0;
         temp.servo_function_map[i] = 1;
         temp.servo_idle_pos[i] = 1500;
         temp.servo_max[i] = 2000;
         temp.servo_min[i] = 1000;
         temp.servo_max_delta_per_update[i] = 1000;
     }
+    temp.servo_neutral_pos_corr[2] = 60;
+    temp.servo_neutral_pos_corr[1] = 50;
+    temp.servo_neutral_pos_corr[0] = -30;
     return temp;
 }

@@ -93,7 +93,7 @@ uint32_t CRSF_PARSE_DMA(const task_info_t* task){
         crsf_fc_channels.channel_raw[15] = (crsf_packet[21] >> 5 | crsf_packet[22] << 3) & 0x07FF;
 
         for(int i = 0; i < CRSF_NUM_CHANNELS; i++){
-            crsf_fc_channels.channel[i] = UTILS_MIN_MAX_UI((crsf_fc_channels.channel_raw[i] - 172) * RAW_CHANNEL_TO_SERVO + 1000, 1000, 2000);
+            crsf_fc_channels.channel[i] = UTILS_MIN_MAX_UI((crsf_fc_channels.channel_raw[i] - 173) * RAW_CHANNEL_TO_SERVO + 1000, 1000, 2000);
         }
 
         crsf_fc_channels.timestamp = MICROS32();

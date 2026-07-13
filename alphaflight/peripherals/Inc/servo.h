@@ -16,8 +16,8 @@ typedef enum{
 }SERVO_ROLES;
 
 typedef struct{
-    uint32_t servo_idle_pos[8];     // start and rxloss position
-    uint32_t servo_neutral_pos[8];  // neutral position for rudders
+    int32_t servo_idle_pos[8];     // start and rxloss position
+    uint32_t servo_neutral_pos_corr[8];  // neutral position for rudders
     uint32_t servo_max[8];      // max servo angle (angle at 100%)
     uint32_t servo_min[8];      // min servo angle (angle at -100%)
     int8_t servo_direction[8];
