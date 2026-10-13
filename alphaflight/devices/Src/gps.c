@@ -150,35 +150,36 @@ uint32_t GPS_PARSE_DMA(const task_info_t* task){
 
     uint16_t read_so_far = gps_parser.read_point;
     uint16_t write_so_far = gps_parser.write_point;
-
     if(read_so_far < write_so_far){ // no buffer wrap
-        for(uint16_t i = read_so_far; i < write_so_far - 5; i++){   // search new data for header
-            if(0xb5 == gps_dma_buffer[i] && 0x62 == gps_dma_buffer[i + 1]){ // check for header
-                uint8_t class = gps_dma_buffer[i + 2];
-                uint8_t id = gps_dma_buffer[i + 3];
-                if(class == 0x01 && id == 0x07){    // nav pvt
-                    uint16_t len = ((uint16_t)gps_dma_buffer[i + 5] << 8) | gps_dma_buffer[i + 4];
-                    if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
+        if (write_so_far >= 6) {
+            for(uint16_t i = read_so_far; i < write_so_far - 5; i++){   // search new data for header
+                if(0xb5 == gps_dma_buffer[i] && 0x62 == gps_dma_buffer[i + 1]){ // check for header
+                    uint8_t class = gps_dma_buffer[i + 2];
+                    uint8_t id = gps_dma_buffer[i + 3];
+                    if(class == 0x01 && id == 0x07){    // nav pvt
+                        uint16_t len = ((uint16_t)gps_dma_buffer[i + 5] << 8) | gps_dma_buffer[i + 4];
+                        if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
 
-                    if(len != sizeof(gps_nav_pvt_t)) continue;  // lengths don't match, start parsing from new position
-                    // crc doesn't match, start parsing from new position
-                    if(!validate_ubx_crc(&gps_dma_buffer[i + 2], len + 4, gps_dma_buffer[i + len + 6], gps_dma_buffer[i + len + 7])) continue;
+                        if(len != sizeof(gps_nav_pvt_t)) continue;  // lengths don't match, start parsing from new position
+                        // crc doesn't match, start parsing from new position
+                        if(!validate_ubx_crc(&gps_dma_buffer[i + 2], len + 4, gps_dma_buffer[i + len + 6], gps_dma_buffer[i + len + 7])) continue;
 
-                    memcpy(&gps_nav_pvt, &gps_dma_buffer[i], sizeof(gps_nav_pvt_t));
+                        memcpy(&gps_nav_pvt, &gps_dma_buffer[i], sizeof(gps_nav_pvt_t));
 
-                    gps_parser.read_point = i + len + 8;
-                    gps_convert_data();
-                    goto found_packet;
-                }
-                else if(class == 0x01 && id == 0x12){   // velned
-                    uint16_t len = ((uint16_t)gps_dma_buffer[i + 5] << 8) | gps_dma_buffer[i + 4];
-                    if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
-                    gps_parser.read_point = i + len + 8;
-                    goto found_packet;
+                        gps_parser.read_point = i + len + 8;
+                        gps_convert_data();
+                        goto found_packet;
+                    }
+                    else if(class == 0x01 && id == 0x12){   // velned
+                        uint16_t len = ((uint16_t)gps_dma_buffer[i + 5] << 8) | gps_dma_buffer[i + 4];
+                        if(i + len + 8 > write_so_far) return 1;    // not all of the packet there yet, try again later
+                        gps_parser.read_point = i + len + 8;
+                        goto found_packet;
+                    }
                 }
             }
         }
-        gps_parser.read_point = UTILS_MAX_UI(write_so_far - 7, 0);
+        gps_parser.read_point = UTILS_MAX_I((int32_t)(write_so_far) - 7, 0);
     }
     else{
         gps_parser.read_point = write_so_far;   // skip wrapped around package

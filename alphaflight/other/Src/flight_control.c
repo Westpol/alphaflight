@@ -42,7 +42,7 @@ uint32_t FC_DIRECT_LAW(const task_info_t* task){
 
     // servo command
     if(crsf.channel[4] > 1100){
-        MIXER_SET_POSITION(crsf.channel[1], crsf.channel[2]);
+        MIXER_SET_POSITION(crsf.channel[1], crsf.channel[2], crsf.channel[3]);
     }
 
     // logging logic

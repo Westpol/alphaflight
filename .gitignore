@@ -10,3 +10,4 @@ src/cmake/gcc-arm-none-eabi.cmake
 */.vscode/*
 */.settings/*
 *.swp
+.vscode/settings.json

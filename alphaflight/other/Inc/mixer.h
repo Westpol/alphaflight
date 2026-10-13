@@ -8,6 +8,6 @@ typedef enum{
     MIXER_OKAY
 } MIXER_RETURN_TYPE;
 
-MIXER_RETURN_TYPE MIXER_SET_POSITION(uint16_t elevator, uint16_t aileron);
+MIXER_RETURN_TYPE MIXER_SET_POSITION(uint16_t elevator, uint16_t aileron, uint16_t rudder);
 
 #endif
