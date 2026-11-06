@@ -205,6 +205,10 @@ int main(void)
 
   //PASSTHROUGH_START(&huart8);
 
+  extern uint32_t alphaflight_cpp_test(void);
+
+  uint32_t result = alphaflight_cpp_test();
+
   if(CONFIG_STORE_TO_SD_DEFAULTS() != CONFIG_OKAY) Error_Handler();
 
   if(CONFIG_LOAD_FROM_SD() != CONFIG_OKAY) Error_Handler();   // load complete FC config
