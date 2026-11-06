@@ -19,3 +19,11 @@ extern "C" uint32_t alphaflight_cpp_test(void)
 {
     return cpp_test_add<uint32_t>(41);
 }
+
+class Scheduler{
+    public:
+    Scheduler(){
+
+    }
+
+};
