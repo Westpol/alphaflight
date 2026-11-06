@@ -65,7 +65,7 @@ const task_stat_t* SCHEDULER_GET_TASK_STAT_BY_INDEX(uint32_t index){
 }
 
 int32_t SCHEDULER_DISABLE_TASK_BY_INDEX(uint32_t index){
-    if(index >= scheduler.num_registered_tasks) return -1;
+    if(index > scheduler.num_registered_tasks) return -1;
     if(!scheduler.task[index].info.activated){
         return 1;
     }
