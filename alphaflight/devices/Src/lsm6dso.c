@@ -86,56 +86,99 @@ IMU_RETURN_TYPE IMU_INIT(SPI_DEVICE device, int32_t gyro_convert_task_index, DMA
     return IMU_OKAY;
 }
 
-static IMU_RETURN_TYPE imu_update_quat(void){
 
+static IMU_RETURN_TYPE imu_update_quat(void){
     uint32_t now = MICROS32();
-    float dt = (float)(now - last_integration) / 1000000.0f;
+
+    if (last_integration == 0){
+        last_integration = now;
+        return IMU_OKAY;
+    }
+
+    float dt = (float)(now - last_integration) * 1e-6f;
     last_integration = now;
 
-    QUAT_T q_g_ref = {0.0f, 0.0f, 0.0f, 1.0f};  // create gravity reference quat
+    //Reject inf Hz and lower than 100 Hz
+    if (dt <= 0.0f || dt > 0.01f) {
+        return IMU_OKAY;
+    }
 
-    QUAT_T q_a = imu.processed.quat;    // save imu quat locally
+    QUAT_T q = imu.processed.quat;
 
-    QUAT_T q_a_c = {q_a.w, -q_a.x, -q_a.y, -q_a.z};    // create conjugated imu quat
+    // World gravity reference (positive Z).
+    QUAT_T gravity_ref = {0.0f, 0.0f, 0.0f, 1.0f};
 
-    QUAT_T q_g_est = UTILS_QUATERNION_NORMALIZE(UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_a, q_g_ref), q_a_c));   // rotate gravity estimation quat by imu attitude quat
+    // Transform gravity from world into body coordinates.
+    QUAT_T q_conj = UTILS_QUATERNION_CONJUGATE(q);
 
-    VECT_3D_T g_est = {q_g_est.x, q_g_est.y, q_g_est.z};    // turn g est quat into vector
+    QUAT_T gravity_pred = UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_conj, gravity_ref), q);
 
-    VECT_3D_T accel_vals = {imu.processed.accel.x, imu.processed.accel.y, imu.processed.accel.z};   // create accel vector
+    VECT_3D_T g_est = {gravity_pred.x, gravity_pred.y, gravity_pred.z};
 
-    float accel_mag = sqrtf(accel_vals.x*accel_vals.x + accel_vals.y*accel_vals.y + accel_vals.z*accel_vals.z);
+    // Accelerometer measurement.
+    VECT_3D_T accel_vals = {imu.processed.accel.x, imu.processed.accel.y, imu.processed.accel.z};
+
+    float accel_mag = sqrtf(accel_vals.x * accel_vals.x + accel_vals.y * accel_vals.y + accel_vals.z * accel_vals.z);
+
+    // Avoid invalid normalization.
+    if (accel_mag < 1e-6f){
+        return IMU_OKAY;
+    }
+
     float accel_error = fabsf(1.0f - accel_mag);
 
     float accel_trust = 1.0f - config.mahony_accel_trust * accel_error * accel_error;
+
     accel_trust = UTILS_MIN_MAX_F(accel_trust, 0.0f, 1.0f);
 
-    accel_vals = UTILS_VECT_NORMALIZE(accel_vals);  // normalize vectors
+    accel_vals = UTILS_VECT_SCALE(accel_vals, 1.0f / accel_mag);
 
     g_est = UTILS_VECT_NORMALIZE(g_est);
+
     imu.debug.g_est = g_est;
 
-    VECT_3D_T e = UTILS_VECT_SCALE(UTILS_VECT_CROSS_PRODUCT(g_est, accel_vals), accel_trust);  // calculate error via cross product
+    // Gravity direction error.
+    VECT_3D_T e = UTILS_VECT_SCALE(UTILS_VECT_CROSS_PRODUCT(accel_vals, g_est), accel_trust);
 
-    gyro_bias = UTILS_VECT_ADD(gyro_bias, UTILS_VECT_SCALE(e, dt * config.mahony_i)); // update integral e part
+    // Integral gyro bias estimation.
+    gyro_bias = UTILS_VECT_ADD(gyro_bias, UTILS_VECT_SCALE(e, -dt * config.mahony_i));
+
+    // Clamp integral bias.
+    float bias_mag = sqrtf(gyro_bias.x * gyro_bias.x + gyro_bias.y * gyro_bias.y + gyro_bias.z * gyro_bias.z);
+
+    if (bias_mag > config.mahony_i_clamp && bias_mag > 1e-8f){
+        gyro_bias = UTILS_VECT_SCALE(gyro_bias, config.mahony_i_clamp / bias_mag);
+    }
 
     imu.debug.e = e;
     imu.debug.e_i = gyro_bias;
 
-    VECT_3D_T w_gyro = imu.processed.rate;  // get gyro data
+    // Correct gyroscope measurements.
+    VECT_3D_T w_gyro = UTILS_VECT_ADD(imu.processed.rate, UTILS_VECT_SCALE(e, config.mahony_k));
 
-    w_gyro = UTILS_VECT_SCALE(UTILS_VECT_ADD(UTILS_VECT_ADD(w_gyro, UTILS_VECT_SCALE(e, config.mahony_k)), UTILS_VECT_SCALE(gyro_bias, -1)), dt);    // add error correection to gyro data
+    w_gyro = UTILS_VECT_SUB(w_gyro, gyro_bias);
 
+    // Integrate quaternion.
     QUAT_T q_gyro_rot = {0.0f, w_gyro.x, w_gyro.y, w_gyro.z};
 
-    QUAT_T q_rot = UTILS_QUATERNION_SCALE(UTILS_QUATERNION_PRODUCT(q_a, q_gyro_rot), 0.5f);
+    QUAT_T q_dot = UTILS_QUATERNION_SCALE(UTILS_QUATERNION_PRODUCT(q, q_gyro_rot), 0.5f);
 
-    q_a = UTILS_QUATERNION_ADD(q_a, q_rot);
+    q = UTILS_QUATERNION_ADD(q, UTILS_QUATERNION_SCALE(q_dot, dt));
 
-    q_a = UTILS_QUATERNION_NORMALIZE(q_a);
+    q = UTILS_QUATERNION_NORMALIZE(q);
 
-    imu.processed.quat = q_a;
+    imu.processed.quat = q;
 
+    // Recalculate gravity using the updated quaternion.
+    q_conj = UTILS_QUATERNION_CONJUGATE(q);
+
+    gravity_pred = UTILS_QUATERNION_PRODUCT(UTILS_QUATERNION_PRODUCT(q_conj, gravity_ref), q);
+
+    g_est.x = gravity_pred.x;
+    g_est.y = gravity_pred.y;
+    g_est.z = gravity_pred.z;
+
+    // Extract tilt angles.
     imu.processed.attitude.roll = -atan2f(g_est.x, g_est.z);
 
     imu.processed.attitude.pitch = -atan2f(-g_est.y, sqrtf(g_est.x * g_est.x + g_est.z * g_est.z));

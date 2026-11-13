@@ -26,6 +26,7 @@ VECT_3D_T UTILS_VECT_CROSS_PRODUCT(VECT_3D_T a, VECT_3D_T b);
 VECT_3D_T UTILS_VECT_NORMALIZE(VECT_3D_T v);
 VECT_3D_T UTILS_VECT_SCALE(VECT_3D_T v, float scalar);
 VECT_3D_T UTILS_VECT_ADD(VECT_3D_T v1, VECT_3D_T v2);
+VECT_3D_T UTILS_VECT_SUB(VECT_3D_T v1, VECT_3D_T v2);
 
 float UTILS_RADIANS(float degrees); // converts degrees in radians
 float UTILS_DEGREES(float radians); // converts radians in degrees

@@ -130,6 +130,14 @@ VECT_3D_T UTILS_VECT_ADD(VECT_3D_T v1, VECT_3D_T v2){
 	return v1;
 }
 
+VECT_3D_T UTILS_VECT_SUB(VECT_3D_T v1, VECT_3D_T v2){
+    v1.x -= v2.x;
+    v1.y -= v2.y;
+    v1.z -= v2.z;
+
+    return v1;
+}
+
 float UTILS_RADIANS(float degrees){
 	return degrees * ((float)M_PI / 180.0f);
 }
