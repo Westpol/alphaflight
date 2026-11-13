@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 
+typedef enum{
     CONTROL_MODE_DIRECT_LAW = 0,
     CONTROL_MODE_FLY_BY_WIRE,
     CONTROL_MODE_AUTOPILOT
