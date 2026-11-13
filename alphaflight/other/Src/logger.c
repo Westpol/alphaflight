@@ -85,6 +85,7 @@ uint32_t LOG_RUN(const task_info_t* task){
 
     store_timestamp(false);
     store_imu(false);
+    store_servo_motor_out();
 
     if(log_counter >= 100){
         store_gps(false);

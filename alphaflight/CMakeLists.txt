@@ -71,6 +71,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     "other/Src/logger.c"
     "other/Src/flight_control.c"
     "other/Src/mixer.c"
+    "other/Src/flight_state.c"
     "other/Src/test.cpp"
     # Add user sources here
 )
