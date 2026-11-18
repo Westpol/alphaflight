@@ -76,6 +76,34 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
 )
 
+set_source_files_properties(
+    devices/Src/gps.c
+    devices/Src/lsm6dso.c
+    devices/Src/bmp390.c
+    devices/Src/status_led.c
+    devices/Src/crossfire.c
+    devices/Src/mmc5983ma.c
+    devices/Src/power_measurement.c
+    utils/Src/timer.c
+    utils/Src/scheduler.c
+    utils/Src/utils.c
+    utils/Src/serial_passthrough.c
+    peripherals/Src/servo.c
+    peripherals/Src/spi.c
+    peripherals/Src/sd.c
+    peripherals/Src/usb.c
+    peripherals/Src/dshot.c
+    peripherals/Src/osd.c
+    other/Src/serial_parser.c
+    other/Src/config.c
+    other/Src/filesystem.c
+    other/Src/logger.c
+    other/Src/flight_control.c
+    other/Src/mixer.c
+    other/Src/flight_state.c
+    PROPERTIES LANGUAGE CXX
+)
+
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     "devices/Inc"
