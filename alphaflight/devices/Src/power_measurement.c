@@ -77,6 +77,6 @@ power_config_t POWER_MEASUREMENT_GET_DEFAULT_CONFIG(void){
     temp.current_scale_mA = 104000u;
     temp.voltage_offset_mV = 1150u;
     temp.current_offset_mA = -2400u;
-    temp.battery_capacity_mAh = 3000u;
+    temp.battery_capacity_mAh = 4000u;
     return temp;
 }

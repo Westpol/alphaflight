@@ -11,8 +11,9 @@
 #include "bmp390.h"
 #include "serial_passthrough.h"
 #include "power_measurement.h"
+#include "filesystem.h"
 
-static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n", "passthrough osd\n", "passthrough gps\n", "show power\n"};
+static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n", "passthrough osd\n", "passthrough gps\n", "show power\n", "blackbox status\n", "blackbox format\n"};
 static const char* getset[] = {"get", "set"};
 static const char* devices[] = {"imu", "baro", "gps", "crsf", "servo", "osd", "logger"};
 // {{"rate"}, {"rate", "offset"}, {"rate", "protocol"}, {"channel throttle", "channel pitch", "channel roll", "telemetry"}, {"aileron left", "aileron right", "pitch", "min", "max", "center", "direction"}, {"enable"}, {"rate", "log data"}};
@@ -79,6 +80,16 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
             POWER_MEASUREMENT_PRINT_DATA();
         break;
 
+        case 10:
+            USB_PRINTLN("Flight number: %d\n", FS_GET_LATEST_FN());
+        break;
+
+        case 11:
+            fs_reset_superblock();
+            FS_LOAD_SUPERBLOCK();
+            USB_PRINTLN("Superblock reset!\n");
+        break;
+
         case -1:
             USB_PRINTLN("Command not found!");
         break;
@@ -101,7 +112,8 @@ static SERIAL_PARSER_RETURN_TYPE print_help(){
         "show [device]\t\tprints device data, devices available: [gps, baro, power]\n"
         "load default\t\tloads default config values in non permanent storage\n"
         "save\t\t\tsaves config data to the SD card\n"
-        "passthrough \t\tsets up a uart to usb passthrough [gps, osd] (need to restart FC to deactivate)");
+        "passthrough \t\tsets up a uart to usb passthrough [gps, osd] (need to restart FC to deactivate)\n"
+        "blackbox status \toutputs current flight number for the next flight");
 
     return SERIAL_PARSER_OKAY;
 }

@@ -102,6 +102,11 @@ uint32_t FS_GET_FN(){
     return current_flight.flight_num_abs;
 }
 
+uint32_t FS_GET_LATEST_FN(){
+    if(!sb_loaded) FS_LOAD_SUPERBLOCK();
+    return sb.curr_flight_num_abs;
+}
+
 FS_RETURN_TYPE FS_FORMAT_CARD(){
     FS_LOAD_SUPERBLOCK();
     sb.seq = 0;
