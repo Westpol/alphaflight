@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "math_types.h"
 #include <math.h>
+#include <numbers>
 
 uint32_t UTILS_MAX_UI(uint32_t var1, uint32_t var2){
     return var1 > var2 ? var1 : var2;
@@ -139,9 +140,9 @@ VECT_3D_T UTILS_VECT_SUB(VECT_3D_T v1, VECT_3D_T v2){
 }
 
 float UTILS_RADIANS(float degrees){
-	return degrees * ((float)M_PI / 180.0f);
+	return degrees * ((float)std::numbers::pi / 180.0f);
 }
 
 float UTILS_DEGREES(float radians){
-	return radians * (180.0f / (float)M_PI);
+	return radians * (180.0f / (float)std::numbers::pi);
 }
