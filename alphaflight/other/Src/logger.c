@@ -65,6 +65,7 @@ static void store_servo_motor_out();
 
 
 LOG_RETURN_TYPE LOG_START(){
+    if(log_active) return LOG_FAIL;
     current_block = FS_NEW_FLIGHT();
     flight_num = FS_GET_FN();
 
@@ -97,6 +98,7 @@ uint32_t LOG_RUN(const task_info_t* task){
 }
 
 LOG_RETURN_TYPE LOG_END(){
+    if(!log_active) return LOG_FAIL;
     log_active = false;
     FS_END_FLIGHT(current_block);
     // write last block

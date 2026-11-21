@@ -13,7 +13,7 @@
 #include "power_measurement.h"
 #include "filesystem.h"
 
-static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n", "passthrough osd\n", "passthrough gps\n", "show power\n", "blackbox status\n", "blackbox format\n"};
+static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n", "passthrough osd\n", "passthrough gps\n", "show power\n", "blackbox status\n", "blackbox format\n", "blackbox start\n", "blackbox end\n"};
 static const char* getset[] = {"get", "set"};
 static const char* devices[] = {"imu", "baro", "gps", "crsf", "servo", "osd", "logger"};
 // {{"rate"}, {"rate", "offset"}, {"rate", "protocol"}, {"channel throttle", "channel pitch", "channel roll", "telemetry"}, {"aileron left", "aileron right", "pitch", "min", "max", "center", "direction"}, {"enable"}, {"rate", "log data"}};
@@ -90,6 +90,22 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
             USB_PRINTLN("Superblock reset!\n");
         break;
 
+        case 12:
+            if(LOG_START() == LOG_OKAY{
+                USB_PRINTLN("Log started.\n");
+            } else{
+                USB_PRINTLN("Error while starting log!\n")
+            }
+        break;
+
+        case 13:
+            if(LOG_END() == LOG_OKAY){
+                USB_PRINTLN("Log ended.\n");
+            } else{
+                USB_PRINTLN("Error while ending log!\n")
+            }
+        break;
+
         case -1:
             USB_PRINTLN("Command not found!");
         break;
@@ -113,7 +129,10 @@ static SERIAL_PARSER_RETURN_TYPE print_help(){
         "load default\t\tloads default config values in non permanent storage\n"
         "save\t\t\tsaves config data to the SD card\n"
         "passthrough \t\tsets up a uart to usb passthrough [gps, osd] (need to restart FC to deactivate)\n"
-        "blackbox status \toutputs current flight number for the next flight");
+        "blackbox status \toutputs current flight number for the next flight\n"
+        "blackbox format \tformats blackbox flights on SD card"
+        "blackbox start \t\tstarts blackbox flight log\n"
+        "blackbox end \t\tends blackbox flight log\n");
 
     return SERIAL_PARSER_OKAY;
 }
