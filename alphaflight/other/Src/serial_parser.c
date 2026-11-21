@@ -91,10 +91,10 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
         break;
 
         case 12:
-            if(LOG_START() == LOG_OKAY{
+            if(LOG_START() == LOG_OKAY){
                 USB_PRINTLN("Log started.\n");
             } else{
-                USB_PRINTLN("Error while starting log!\n")
+                USB_PRINTLN("Error while starting log!\n");
             }
         break;
 
@@ -102,7 +102,7 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
             if(LOG_END() == LOG_OKAY){
                 USB_PRINTLN("Log ended.\n");
             } else{
-                USB_PRINTLN("Error while ending log!\n")
+                USB_PRINTLN("Error while ending log!\n");
             }
         break;
 
