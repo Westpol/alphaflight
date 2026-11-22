@@ -6,6 +6,7 @@
 #include "usbd_cdc_if.h"
 #include "config.h"
 #include "usb.h"
+#include "lsm6dso.h"
 #include "gps.h"
 #include "osd.h"
 #include "bmp390.h"
@@ -16,7 +17,7 @@
 static const char* commands[] = {"tasks\n", "debug\n", "save\n", "load default\n", "show gps\n", "show baro\n", "help\n", "passthrough osd\n", "passthrough gps\n", "show power\n", "blackbox status\n", "blackbox format\n", "blackbox start\n", "blackbox end\n"};
 static const char* getset[] = {"get", "set"};
 static const char* devices[] = {"imu", "baro", "gps", "crsf", "servo", "osd", "logger"};
-// {{"rate"}, {"rate", "offset"}, {"rate", "protocol"}, {"channel throttle", "channel pitch", "channel roll", "telemetry"}, {"aileron left", "aileron right", "pitch", "min", "max", "center", "direction"}, {"enable"}, {"rate", "log data"}};
+static const char* settings[] = {{"rate"}, {"rate", "offset"}, {"rate", "protocol"}, {"channel throttle", "channel pitch", "channel roll", "telemetry"}, {"aileron left", "aileron right", "pitch", "min", "max", "center", "direction"}, {"enable"}, {"rate", "log data"}};
 
 static SERIAL_PARSER_RETURN_TYPE print_help();
 
@@ -105,15 +106,78 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
                 USB_PRINTLN("Error while ending log!\n");
             }
         break;
+    }
 
-        case -1:
-            USB_PRINTLN("Command not found!");
-        break;
+    if(command_type != -1){     // command was of fixed type, return here
+        return SERIAL_PARSER_OKAY;
     }
 
     //------------------------- get/set ----------------------------------
+    int16_t getset_type = -1;
+    for(uint16_t i = 0; i < sizeof(getset) / sizeof(getset[0]); i++){
+        if(strncmp((const char*)buffer, getset[i], UTILS_MIN_I(strlen(getset[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
+            getset_type = i;
+            break;
+        }
+    }
 
+    if(getset_type == -1){  // either fixed command or get/set after this point
+        USB_PRINTLN("Command not found!");
+        return SERIAL_PARSER_FAIL;
+    }
 
+    //------------------------ devices ------------------------------------
+    int16_t device_type = -1;
+    for(uint16_t i = 0; i < sizeof(getset) / sizeof(getset[0]); i++){
+        if(strncmp((const char*)&buffer[4], devices[i], UTILS_MIN_I(strlen(devices[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
+            device_type = i;
+            break;
+        }
+    }
+
+    if(device_type == -1){  // completely acceptable message after this point
+        USB_PRINTLN("Command not found!");
+        return SERIAL_PARSER_FAIL;
+    }
+
+    // message processing
+    switch(device_type){
+        case 0:
+            if(getset_type == 1){
+
+            } else{
+                IMU_PRINT_CONFIG();
+            }
+        break;
+
+        case 1:
+
+        break;
+
+        case 2:
+
+        break;
+
+        case 3:
+
+        break;
+
+        case 4:
+
+        break;
+
+        case 5:
+
+        break;
+
+        case 6:
+
+        break;
+
+        default:
+            // achievement unlocked: How did we get here?
+        break;
+    }
 
     USB_PRINTLN("Command not found!");
     return SERIAL_PARSER_OKAY;

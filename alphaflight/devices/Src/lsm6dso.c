@@ -2,6 +2,7 @@
 #include "main.h"
 #include "math_types.h"
 #include "timer.h"
+#include "usb.h"
 #include <math.h>
 
 #define imu_execution_delta_offset 20       // offset in us
@@ -289,5 +290,35 @@ static IMU_RETURN_TYPE write_register(uint8_t address, uint8_t data){
     uint8_t tx_buff[2] = {LSM6DSO_WRITE & address, data};
     uint8_t rx_buff[2] = {0};
     SPI_TRANSFER_BLOCKING(spi_device, &tx_buff[0], &rx_buff[0], 2, 1);
+    return IMU_OKAY;
+}
+
+IMU_RETURN_TYPE IMU_PRINT_CONFIG(){
+    uint16_t odr = 0;
+    switch(config.odr){
+        case IMU_ODR_833Hz:
+            odr = 833;
+        break;
+
+        case IMU_ODR_1666Hz:
+            odr = 1666;
+        break;
+
+        case IMU_ODR_3333Hz:
+            odr = 3333;
+        break;
+
+        case IMU_ODR_6666Hz:
+            odr = 6666;
+        break;
+    }
+    USB_PRINTLN("# imu config\n\n"
+    "# orientation = %d\n"
+    "# data_rate = %d\n"
+    "# mahony_k = %f\n"
+    "# mahony_i = %f\n"
+    "# mahony_accel_trust = %f\n"
+    "# mahony_i_clamp = %f\n", config.orientation, odr, config.mahony_k, config.mahony_i, config.mahony_accel_trust, config.mahony_i_clamp);
+
     return IMU_OKAY;
 }

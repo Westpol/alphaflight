@@ -89,6 +89,8 @@ void IMU_SET_CONFIG(imu_config_t new_config);
 imu_config_t IMU_GET_CONFIG(void);
 imu_config_t IMU_GET_DEFAULT_CONFIG();
 
+IMU_RETURN_TYPE IMU_PRINT_CONFIG();
+
 #define LSM6DSO_WRITE 0x7F
 #define LSM6DSO_READ 0x80
 
