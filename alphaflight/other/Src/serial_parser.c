@@ -21,12 +21,15 @@ static const char* settings[] = {{"rate"}, {"rate", "offset"}, {"rate", "protoco
 
 static SERIAL_PARSER_RETURN_TYPE print_help();
 
+static uint8_t parser_call_count = 0;
+
 SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
+    parser_call_count++;
 
     //-------------------- check for fixed commands -------------------------
     int16_t command_type = -1;
     for(uint16_t i = 0; i < sizeof(commands) / sizeof(commands[0]); i++){
-        if(strncmp((const char*)buffer, commands[i], UTILS_MIN_I(strlen(commands[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
+        if(len == strlen(commands[i]) && strncmp((const char*)buffer, commands[i], UTILS_MIN_I(strlen(commands[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
             command_type = i;
             break;
         }
@@ -115,7 +118,7 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
     //------------------------- get/set ----------------------------------
     int16_t getset_type = -1;
     for(uint16_t i = 0; i < sizeof(getset) / sizeof(getset[0]); i++){
-        if(strncmp((const char*)buffer, getset[i], UTILS_MIN_I(strlen(getset[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
+        if(len == strlen(getset[i]) && strncmp((const char*)buffer, getset[i], UTILS_MIN_I(strlen(getset[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
             getset_type = i;
             break;
         }
@@ -129,7 +132,7 @@ SERIAL_PARSER_RETURN_TYPE SERIAL_PARSER_PARSE(uint8_t* buffer, uint32_t len){
     //------------------------ devices ------------------------------------
     int16_t device_type = -1;
     for(uint16_t i = 0; i < sizeof(getset) / sizeof(getset[0]); i++){
-        if(strncmp((const char*)&buffer[4], devices[i], UTILS_MIN_I(strlen(devices[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
+        if(len == strlen(devices[i]) && strncmp((const char*)&buffer[4], devices[i], UTILS_MIN_I(strlen(devices[i]), len)) == 0){    // strlen(commands[i]) - 1 to cut off \n in order to successfully parse get/set command
             device_type = i;
             break;
         }

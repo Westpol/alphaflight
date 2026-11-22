@@ -73,8 +73,10 @@ LOG_RETURN_TYPE LOG_START(){
     memcpy(log_buff, &flight_num, sizeof(flight_num));
     buff_index = 4;
 
-    store_timestamp(true);
-    store_gps(true);
+    store_timestamp();
+    store_imu();
+    store_servo_motor_out();
+    store_gps();
 
     log_active = true;
     SCHEDULER_ENABLE_TASK_BY_INDEX(task_index);
@@ -84,12 +86,12 @@ LOG_RETURN_TYPE LOG_START(){
 uint32_t LOG_RUN(const task_info_t* task){
     if(!log_active) return 0;
 
-    store_timestamp(false);
-    store_imu(false);
+    store_timestamp();
+    store_imu();
     store_servo_motor_out();
 
     if(log_counter >= 100){
-        store_gps(false);
+        store_gps();
         log_counter = 0;
     }
 
@@ -141,10 +143,12 @@ uint32_t LOG_GET_FREQUENCY(void){
     return config.log_frequency;
 }
 
-static void check_buffer_space(uint8_t space_checked){
+static void check_buffer_space(uint16_t space_checked){
     if(buff_index + space_checked > SD_USABLE_BLOCK_SIZE_BYTES){
         memset(&log_buff[buff_index], 0, SD_USABLE_BLOCK_SIZE_BYTES - buff_index);
         SD_WRITE_BLOCK_DMA(log_buff, current_block++);
+
+        memset(log_buff, 0, sizeof(log_buff));
         memcpy(log_buff, &flight_num, sizeof(uint32_t));
         buff_index = 4;
     }
@@ -168,6 +172,11 @@ static void store_imu(){    // ID: 0x03
     imu.quat_x = (int16_t)UTILS_MIN_MAX_I((int32_t)(imu_vals.processed.quat.x * 10000), INT16_MIN, INT16_MAX);
     imu.quat_y = (int16_t)UTILS_MIN_MAX_I((int32_t)(imu_vals.processed.quat.y * 10000), INT16_MIN, INT16_MAX);
     imu.quat_z = (int16_t)UTILS_MIN_MAX_I((int32_t)(imu_vals.processed.quat.z * 10000), INT16_MIN, INT16_MAX);
+
+    check_buffer_space(sizeof(imu));
+
+    memcpy(&log_buff[buff_index], &imu, sizeof(imu));
+    buff_index += sizeof(imu);
 
 }
 
@@ -204,4 +213,9 @@ static void store_servo_motor_out(){        // 0x04
     for(uint8_t i = 0; i < 4; i++){
         servo_motor_out_needed.pwm[i] = SERVO_GET_PWM(i);
     }
+
+    check_buffer_space(sizeof(servo_motor_out_needed));
+
+    memcpy(&log_buff[buff_index], &servo_motor_out_needed, sizeof(servo_motor_out_needed));
+    buff_index += sizeof(servo_motor_out_needed);
 }
