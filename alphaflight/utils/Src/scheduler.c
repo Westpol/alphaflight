@@ -104,7 +104,7 @@ int32_t SCHEDULER_REGISTER_THROWAWAY_TASK(task_func_t func, uint32_t max_executi
     if(throwaway_scheduler.num_registered_tasks >= num_throwaway_tasks) return -1;
 
     uint32_t task_num = throwaway_scheduler.num_registered_tasks++;
-    scheduler.task[task_num].info.task_index = task_num;
+    throwaway_scheduler.task[task_num].info.task_index = task_num;
     throwaway_scheduler.task[task_num].info.task_name = task_name;
     throwaway_scheduler.task[task_num].func = func;
     return task_num;

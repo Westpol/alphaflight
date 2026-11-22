@@ -8,7 +8,7 @@ typedef enum{
     FS_FAIL
 }FS_RETURN_TYPE;
 
-typedef struct{
+typedef struct __attribute__((packed)){
     uint32_t magic;     // 0x464C4D44 / "FLMD"
     uint32_t version;
 
@@ -24,7 +24,7 @@ typedef struct{
     uint32_t flags; // first bit if log started, second bit if log ended successfully
 } metadata;
 
-typedef struct{
+typedef struct __attribute__((packed)){
     uint32_t magic;     // 0x53424C4B / "SBLK"
     uint32_t version;
     uint32_t seq;
