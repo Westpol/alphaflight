@@ -102,10 +102,11 @@ uint32_t LOG_RUN(const task_info_t* task){
 LOG_RETURN_TYPE LOG_END(){
     if(!log_active) return LOG_FAIL;
     log_active = false;
-    FS_END_FLIGHT(current_block);
     // write last block
     memset(&log_buff[buff_index], 0, SD_USABLE_BLOCK_SIZE_BYTES - buff_index);
-    SD_WRITE_BLOCK_DMA(log_buff, current_block);
+    SD_WRITE_BLOCK_BLOCKING(log_buff, current_block, sizeof(log_buff), 100);
+
+    FS_END_FLIGHT(current_block);
     SCHEDULER_DISABLE_TASK_BY_INDEX(task_index);
     return LOG_OKAY;
 }
