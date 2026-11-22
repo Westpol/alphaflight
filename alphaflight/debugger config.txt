@@ -6,10 +6,12 @@
             "type": "cortex-debug",
             "request": "launch",
 
+            "preLaunchTask": "Build alphaflight",
+
             "servertype": "openocd",
 
             "cwd": "${workspaceRoot}",
-            "executable": "build/Debug/alphaflight.elf",
+            "executable": "build/Debug/alphaflight",
 
             "device": "STM32H723VG",
 

@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cmake",
+            "label": "Build alphaflight",
+            "command": "build",
+            "targets": [
+                "alphaflight"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}
